@@ -1,8 +1,8 @@
 """ Contains utilities for Git/GitHub operations during creation of an IOC """
 import git
-import logging
+from logging_utils import logger
 
-LOGGER = logging.getLogger("git_utils")
+LOGGER = logger("Git")
 
 
 class GitUtilsException(Exception):
@@ -20,8 +20,6 @@ class GitRepo(object):
     A git repository we wish to manipulate as part of the creation of a boilerplate IOC
     """
 
-    LOG_FORMAT = "Git: %s"
-
     def __init__(self, system_path):
         """
         :param system_path: The local path to the git repo
@@ -36,7 +34,7 @@ class GitRepo(object):
             raise GitUtilsException("Unable to create branch {} in repo {}. Branch already exists".format(
                 branch_name, self.repo.git_dir))
 
-        LOGGER.info(self.LOG_FORMAT, "Creating branch {} in repo {}".format(branch_name, self.repo.git_dir))
+        LOGGER.info("Creating branch {} in repo {}".format(branch_name, self.repo.git_dir))
         self.repo.create_head(branch_name)
 
     def add_modified(self):
