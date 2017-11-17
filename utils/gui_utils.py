@@ -8,28 +8,76 @@ from os import path
 from lxml import etree
 from logging_utils import logger
 
-LOGGER = logger("GUI utils")
+LOGGER = logger("GUI")
 
 
-def create_opi(name, branch):
+def _prepare_branch(repo, branch):
     """
-    Creates a blank OPI as part of the GUI
-    :param name: Name of the IOC to create the GUI for
-    :param branch: Name of the branch to put the changes on
-    :return:
+    :param repo: The git repository for the GUI
+    :param branch: Name of the new branch
     """
-
     LOGGER.info("Preparing GUI branch {}".format(branch))
-    repo = RepoWrapper(CLIENT)
     repo.prepare_new_branch(branch)
 
-    new_opi_file_name = "{}.opi".format(name)
-    dst = path.join(OPI_RESOURCES, new_opi_file_name)
+
+def _get_opi_file_name(name):
+    """
+    Generate the opi file name for a given device name
+    :param name: The name of the device
+    :return: The opi file name
+    """
+    return "{}.opi".format(name.lower().replace(" ", "_"))
+
+
+def _add_new_opi_file(name):
+    """
+    :param name: Device name
+    """
+    dst = path.join(OPI_RESOURCES, _get_opi_file_name(name))
     LOGGER.info("Copying template OPI file to {}".format(dst))
     copyfile(BLANK_OPI, dst)
 
-    # Put the OPI in OPI_info.xml
-    LOGGER.info("Adding basic information to opi info")
+
+def _generate_opi_entry(name):
+    """
+    Generates an ElementTree entry for opi info based on a device name
+    :param name: Name of the device
+    :return: ElementTree template based on the device name
+    """
+    entry = etree.Element("entry")
+
+    key = etree.Element("key")
+    key.text = name
+
+    value = etree.Element("value")
+    value.append(etree.Element("categories"))
+
+    type_ = etree.Element("type")
+    type_.text = "UNKNOWN"
+    value.append(type_)
+
+    path_ = etree.Element("path")
+    path_.text = _get_opi_file_name(name)
+    value.append(path_)
+
+    description = etree.Element("description")
+    description.text = "The OPI for the {}".format(name)
+    value.append(description)
+
+    value.append(etree.Element("macros"))
+
+    entry.append(key)
+    entry.append(value)
+
+    return entry
+
+
+def _update_opi_info(name):
+    """
+    Add some basic template information to the opi_info.xml file
+    :param name: Name of the device
+    """
+    LOGGER.info("Adding template information to opi info")
     opi_info_path = path.join(OPI_RESOURCES, "opi_info.xml")
     with open(opi_info_path) as f:
         # Remove blank on input or pretty printing won't work later
@@ -37,39 +85,39 @@ def create_opi(name, branch):
 
     opis = opi_xml.find("opis")
     if any(entry.find("key").text == name for entry in opis):
-        LOGGER.warn("OPI with default name already exists")
-    else:
-        new_entry = etree.Element("entry")
+        raise RuntimeWarning("OPI with default name already exists")
 
-        key = etree.Element("key")
-        key.text = name
+    opis.append(_generate_opi_entry(name))
+    with open(opi_info_path, "w") as f:
+        f.write(
+            etree.tostring(opi_xml, pretty_print=True, encoding='UTF-8', xml_declaration=True, standalone="yes"))
 
-        value = etree.Element("value")
-        value.append(etree.Element("categories"))
 
-        type_ = etree.Element("type")
-        type_.text = "UNKNOWN"
-        value.append(type_)
-
-        path_ = etree.Element("path")
-        path_.text = new_opi_file_name
-        value.append(path_)
-
-        description = etree.Element("description")
-        description.text = "The OPI for the {}".format(name)
-        value.append(description)
-
-        value.append(etree.Element("macros"))
-
-        new_entry.append(key)
-        new_entry.append(value)
-        opis.append(new_entry)
-
-        with open(opi_info_path, "w") as f:
-            f.write(
-                etree.tostring(opi_xml, pretty_print=True, encoding='UTF-8', xml_declaration=True, standalone="yes"))
-
-    # Add changes to git
+def _push_changes(repo):
+    """
+    :param repo: GUI git repository
+    """
     LOGGER.info("Pushing changes to branch")
     repo.push_all_changes("Add template OPI file")
+
+
+def create_opi(name, branch):
+    """
+    Creates a blank OPI as part of the GUI
+    :param name: Name of the IOC to create the GUI for
+    :param branch: Name of the branch to put the changes on
+    """
+    try:
+        repo = RepoWrapper(CLIENT)
+        _prepare_branch(repo, branch)
+        _update_opi_info(name)
+        _push_changes(repo)
+    except (RuntimeError, IOError) as e:
+        LOGGER.error(str(e))
+        return
+    except Exception as e:
+        LOGGER.error("Encountered unknown error: {}".format(e))
+        return
+    except RuntimeWarning as e:
+        LOGGER.warning(str(e))
 
