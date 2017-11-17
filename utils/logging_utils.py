@@ -10,4 +10,6 @@ def logger(name):
     :return: a logging.logger object
     """
     logging.basicConfig(format="'%(asctime)-15s, " + name + ": %(message)s'")
-    return logging.getLogger(name)
+    new_logger = logging.getLogger(name)
+    new_logger.setLevel(logging.INFO)
+    return new_logger
