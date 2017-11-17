@@ -1,4 +1,4 @@
-""" Utilities for modifying the gui for a new IOC """
+""" Utilities for adding a template emulator for a new IBEX device"""
 from git_utils import RepoWrapper
 from system_paths import CLIENT
 from templates.paths import BLANK_OPI
@@ -8,7 +8,7 @@ from os import path
 from lxml import etree
 from logging_utils import logger
 
-LOGGER = logger("GUI")
+LOGGER = logger("Emulators")
 
 
 def _get_opi_file_name(name):
@@ -63,25 +63,12 @@ def _generate_opi_entry(name):
     return entry
 
 
-def _update_opi_info(name):
+def _push_changes(repo):
     """
-    Add some basic template information to the opi_info.xml file
-    :param name: Name of the device
+    :param repo: GUI git repository
     """
-    LOGGER.info("Adding template information to opi info")
-    opi_info_path = path.join(OPI_RESOURCES, "opi_info.xml")
-    with open(opi_info_path) as f:
-        # Remove blank on input or pretty printing won't work later
-        opi_xml = etree.parse(f, etree.XMLParser(remove_blank_text=True))
-
-    opis = opi_xml.find("opis")
-    if any(entry.find("key").text == name for entry in opis):
-        raise RuntimeWarning("OPI with default name already exists")
-
-    opis.append(_generate_opi_entry(name))
-    with open(opi_info_path, "w") as f:
-        f.write(
-            etree.tostring(opi_xml, pretty_print=True, encoding='UTF-8', xml_declaration=True, standalone="yes"))
+    LOGGER.info("Pushing changes to branch")
+    repo.push_all_changes("Add template OPI file")
 
 
 def create_opi(name, branch):
@@ -92,9 +79,9 @@ def create_opi(name, branch):
     """
     try:
         repo = RepoWrapper(CLIENT)
-        repo.prepare_new_branch(branch)
+        _prepare_branch(repo, branch)
         _update_opi_info(name)
-        repo.push_all_changes("Add template OPI file")
+        _push_changes(repo)
     except (RuntimeError, IOError) as e:
         LOGGER.error(str(e))
         return
@@ -103,3 +90,4 @@ def create_opi(name, branch):
         return
     except RuntimeWarning as e:
         LOGGER.warning(str(e))
+

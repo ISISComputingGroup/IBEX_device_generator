@@ -7,6 +7,7 @@ from utils.logging_utils import logger
 
 LOGGER = logger("GIT")
 
+
 class RepoWrapper(object):
     """
     A wrapper around a git repository
@@ -26,6 +27,7 @@ class RepoWrapper(object):
         """
         :param branch: Name of the new branch
         """
+        LOGGER.info("Preparing new branch, {}, for repo {}".format(branch, self._repo.working_tree_dir))
         try:
             self._repo.git.stash('save')
             self._repo.git.reset("HEAD", hard=True)
@@ -41,11 +43,13 @@ class RepoWrapper(object):
 
     def push_all_changes(self, message, allow_master=False):
         """
-        Adds all modified and untracked files to git, commits with the message provided and pushes to git
+        Adds all modified and un-tracked files to git, commits with the message provided and pushes to git
 
         :param message: The commit message to include with the push
         :param allow_master: Can commit changes to the master branch
         """
+        LOGGER.info("Pushing all changes to current branch, {}, for repo {}".format(
+            self._repo.active_branch, self._repo.working_tree_dir))
         if not allow_master and self._repo.active_branch is "master":
             raise RuntimeError("Attempting to commit to master branch")
 
