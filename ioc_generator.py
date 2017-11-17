@@ -1,11 +1,12 @@
 """ Contains main method for creating a vanilla IOC from scratch """
 from logging_utils import logger
 from run_tests import run_tests
+from utils import gui_utils
 
 LOGGER = logger("IOC generator")
 
 
-def build_ioc(name, ticket=None, submodule=True, opi=True, tests=True, emulator=True):
+def build_ioc(name, ticket, submodule=True, opi=True, tests=True, emulator=True):
     """
     Creates the boilerplate components for an IOC
     :param name: The name of the IOC
@@ -17,6 +18,8 @@ def build_ioc(name, ticket=None, submodule=True, opi=True, tests=True, emulator=
     """
     if not run_tests():
         raise AssertionError("IOC generator failed its unit tests. Please fix before running")
+
+    branch = "Ticket{}_Add_IOC_{}".format(ticket, name)
 
     def create_ioc_directory():
         # Change IOC branch
@@ -34,7 +37,7 @@ def build_ioc(name, ticket=None, submodule=True, opi=True, tests=True, emulator=
         # Add submodule to support make file
         pass
 
-    def create_opi():
+
         # Create a blank OPI file
         # Add the file to opi_info.xml
         pass
@@ -57,4 +60,4 @@ def build_ioc(name, ticket=None, submodule=True, opi=True, tests=True, emulator=
     if emulator:
         create_device_emulator()
     if opi:
-        create_opi()
+        gui_utils.create_opi(name, branch)
