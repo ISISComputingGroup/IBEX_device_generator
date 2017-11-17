@@ -48,4 +48,14 @@ class GitRepo(object):
         Commits all staged changes to git
         :param commit_message: The message to associate with the commit
         """
-        self.repo.commit(commit_message)
+        self.repo.index.commit(commit_message)
+
+
+    def create_submodule(self, name):
+        """
+
+        :param name:
+        :return:
+        """
+        self.repo.create_submodule()
+        self.repo.index.commit("Added submodule {}".format(name))
