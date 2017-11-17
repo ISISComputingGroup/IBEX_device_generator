@@ -1,8 +1,8 @@
 """ Tests for Git utilities """
 import unittest
-import git
-from mock import MagicMock
-from git_utils import GitUtilsException, GitRepo, LOGGER
+from git import Repo
+from mock import MagicMock, patch
+from git_utils import GitUtilsException, GitRepoWrapper, LOGGER
 
 
 class GitUtilsExceptionTests(unittest.TestCase):
@@ -29,32 +29,36 @@ class GitRepoTests(unittest.TestCase):
 
     def test_GIVEN_a_branch_name_which_is_not_an_existing_branch_WHEN_a_new_branch_is_requested_THEN_a_new_branch_is_requested_from_the_git_module(self):
         # Arrange
-        repo = GitRepo("")
-        repo.create_head = MagicMock()
-        repo.active_branch = MagicMock(return_value=["not_new_branch"])
+        with patch("git.Repo.create_head") as create_head:
+            with patch("git.Repo.branches") as branches:
+                create_head.__get__ = MagicMock()
+                branches.__get__ = MagicMock(return_value=["not_new_branch"])
+                repo = GitRepoWrapper("")
 
-        # Act
-        repo.create_branch("new_branch")
+                # Act
+                repo.create_branch("new_branch")
 
-        # Assert
-        repo.create_head.assert_called_once()
+                # Assert
+                repo._repo.create_head.assert_called_once()
 
     def test_GIVEN_a_branch_name_which_matches_an_existing_branch_WHEN_a_new_branch_is_requested_THEN_not_new_branch_is_requested_and_an_exception_is_thrown(self):
         # Arrange
-        branch = "new_branch"
-        repo = GitRepo("")
-        repo.create_head = MagicMock()
-        repo.branches = [branch]
+        with patch("git.Repo.create_head") as create_head:
+            with patch("git.Repo.branches") as branches:
+                branch = "new_branch"
+                create_head.__get__ = MagicMock()
+                branches.__get__ = MagicMock(return_value=[branch])
+                repo = GitRepoWrapper("")
 
-        # Act
-        try:
-            repo.create_branch(branch)
-        except GitUtilsException:
-            pass
-        # Assert
-        except Exception as e:
-            raise AssertionError("Unknown exception when creating a Mock repo branch: {}".format(e))
-        else:
-            raise AssertionError("No exception raised by trying to create a branch with name matching an existing branch")
+                # Act
+                try:
+                    repo.create_branch(branch)
+                except GitUtilsException:
+                    pass
+                # Assert
+                except Exception as e:
+                    raise AssertionError("Unknown exception when creating a Mock repo branch: {}".format(e))
+                else:
+                    raise AssertionError("No exception raised by trying to create a branch with name matching an existing branch")
 
-        repo.create_head.assert_not_called()
+                repo._repo.create_head.assert_not_called()

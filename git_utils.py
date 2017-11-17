@@ -15,7 +15,7 @@ class GitUtilsException(Exception):
         LOGGER.error(message)
 
 
-class GitRepo(object):
+class GitRepoWrapper(object):
     """
     A git repository we wish to manipulate as part of the creation of a boilerplate IOC
     """
@@ -24,31 +24,31 @@ class GitRepo(object):
         """
         :param system_path: The local path to the git repo
         """
-        self.repo = git.Repo(path=system_path)
+        self._repo = git.Repo(path=system_path)
 
     def create_branch(self, branch_name):
         """
         :param branch_name: The name of the branch to create
         """
-        if branch_name in self.repo.branches:
+        if branch_name in self._repo.branches:
             raise GitUtilsException("Unable to create branch {} in repo {}. Branch already exists".format(
-                branch_name, self.repo.git_dir))
+                branch_name, self._repo.git_dir))
 
-        LOGGER.info("Creating branch {} in repo {}".format(branch_name, self.repo.git_dir))
-        self.repo.create_head(branch_name)
+        LOGGER.info("Creating branch {} in repo {}".format(branch_name, self._repo.git_dir))
+        self._repo.create_head(branch_name)
 
     def add_modified(self):
         """
         Add all modified files to git
         """
-        self.repo.index.add(A=True)
+        self._repo.index.add(A=True)
 
     def commit(self, commit_message):
         """
         Commits all staged changes to git
         :param commit_message: The message to associate with the commit
         """
-        self.repo.index.commit(commit_message)
+        self._repo.index.commit(commit_message)
 
     def create_submodule(self, name):
         """
@@ -56,5 +56,5 @@ class GitRepo(object):
         :param name:
         :return:
         """
-        self.repo.create_submodule()
-        self.repo.index.commit("Added submodule {}".format(name))
+        self._repo.create_submodule()
+        self._repo.index.commit("Added submodule {}".format(name))
