@@ -50,7 +50,6 @@ class GitRepo(object):
         """
         self.repo.index.commit(commit_message)
 
-
     def create_submodule(self, name):
         """
 

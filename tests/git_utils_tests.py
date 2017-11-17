@@ -29,24 +29,26 @@ class GitRepoTests(unittest.TestCase):
 
     def test_GIVEN_a_branch_name_which_is_not_an_existing_branch_WHEN_a_new_branch_is_requested_THEN_a_new_branch_is_requested_from_the_git_module(self):
         # Arrange
-        git.Repo.create_head = MagicMock()
-        git.Repo.active_branch = MagicMock(return_value=["not_new_branch"])
+        repo = GitRepo("")
+        repo.create_head = MagicMock()
+        repo.active_branch = MagicMock(return_value=["not_new_branch"])
 
         # Act
-        GitRepo("").create_branch("new_branch")
+        repo.create_branch("new_branch")
 
         # Assert
-        git.Repo.create_head.assert_called_once()
+        repo.create_head.assert_called_once()
 
     def test_GIVEN_a_branch_name_which_matches_an_existing_branch_WHEN_a_new_branch_is_requested_THEN_not_new_branch_is_requested_and_an_exception_is_thrown(self):
         # Arrange
         branch = "new_branch"
-        git.Repo.create_head = MagicMock()
-        git.Repo.branches = [branch]
+        repo = GitRepo("")
+        repo.create_head = MagicMock()
+        repo.branches = [branch]
 
         # Act
         try:
-            GitRepo("").create_branch(branch)
+            repo.create_branch(branch)
         except GitUtilsException:
             pass
         # Assert
@@ -55,4 +57,4 @@ class GitRepoTests(unittest.TestCase):
         else:
             raise AssertionError("No exception raised by trying to create a branch with name matching an existing branch")
 
-        git.Repo.create_head.assert_not_called()
+        repo.create_head.assert_not_called()
