@@ -5,8 +5,6 @@ import unittest
 from xmlrunner import XMLTestRunner
 import argparse
 
-from tests.git_utils_tests import GitRepoTests, GitUtilsExceptionTests
-
 DEFAULT_TEST_LOCATION = "test-reports\\"
 
 
@@ -19,7 +17,7 @@ def run_tests(test_reports_path=DEFAULT_TEST_LOCATION):
     """
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
-    for case in [GitRepoTests, GitUtilsExceptionTests]:
+    for case in []:
         suite.addTests(loader.loadTestsFromTestCase(case))
 
     return XMLTestRunner(output=str(os.path.join(test_reports_path)), stream=sys.stdout).run(suite).wasSuccessful()
