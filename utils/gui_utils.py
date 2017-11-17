@@ -66,7 +66,8 @@ def create_opi(name, branch):
         opis.append(new_entry)
 
         with open(opi_info_path, "w") as f:
-            f.write(etree.tostring(opi_xml, pretty_print=True, encoding='UTF-8', xml_declaration=True, standalone="yes"))
+            f.write(
+                etree.tostring(opi_xml, pretty_print=True, encoding='UTF-8', xml_declaration=True, standalone="yes"))
 
     # Add changes to git
     LOGGER.info("Pushing changes to branch")

@@ -1,7 +1,7 @@
 """ Contains main method for creating a vanilla IOC from scratch """
 from run_tests import run_tests
-from utils import gui_utils
-from utils.command_line_utils import ArgumentDescriptor, parse_args
+from utils.gui_utils import create_opi
+from utils.command_line_utils import parse_args
 from utils.logging_utils import logger
 
 LOGGER = logger("IOC generator")
@@ -36,11 +36,6 @@ def generate_device(name, ticket, submodule=True, opi=True, tests=True, emulator
         # Add submodule to support make file
         pass
 
-
-        # Create a blank OPI file
-        # Add the file to opi_info.xml
-        pass
-
     def create_ioc_system_tests():
         # Change IOC system tests branch
         # Create a blank test directory
@@ -59,7 +54,7 @@ def generate_device(name, ticket, submodule=True, opi=True, tests=True, emulator
     if emulator:
         create_device_emulator()
     if opi:
-        gui_utils.create_opi(name, branch)
+        create_opi(name, branch)
 
 
 def main():
@@ -71,10 +66,9 @@ def main():
 
     args = parse_args(
         "Generate boilerplate code for IBEX device support",
-        [ArgumentDescriptor("name", str, "Name of the device"), ArgumentDescriptor("ticket", int, "Ticket number")]
+        [{"name": "name", "type": str, "description": "Name of the device"},
+         {"name": "ticket", "type": int, "description": "Ticket number"}]
     )
-    import utils
-    utils.gui_utils.LOCAL = True
     generate_device(args.name, args.ticket)
 
 

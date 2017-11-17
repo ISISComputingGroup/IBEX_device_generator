@@ -3,8 +3,7 @@ import os
 import sys
 import unittest
 from xmlrunner import XMLTestRunner
-import argparse
-from utils.command_line_utils import ArgumentDescriptor, parse_args
+from utils.command_line_utils import parse_args
 
 DEFAULT_TEST_LOCATION = "test-reports\\"
 
@@ -28,12 +27,11 @@ def main():
     """
     Routine to run when script executed from the command line
     """
-    args = parse_args("Runs tests for the IOC generation script",
-               [ArgumentDescriptor("reports_path",
-                                   str,
-                                   "The folder in which test reports should be stored",
-                                   DEFAULT_TEST_LOCATION)]
-               )
+    args = parse_args(
+        "Runs tests for the IOC generation script",
+        [{"name": "reports_path", "type": str, "description": "The folder in which test reports should be stored",
+          "default": DEFAULT_TEST_LOCATION}]
+    )
     run_tests(args.reports_path)
 
 

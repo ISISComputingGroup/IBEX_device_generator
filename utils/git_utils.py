@@ -4,8 +4,6 @@ to maintain than the PythonGit API.
 """
 from git import Repo, GitCommandError, InvalidGitRepositoryError
 
-# Do everything locally without pushing to remote repo
-LOCAL = True
 
 class RepoWrapper(object):
     """
@@ -35,8 +33,7 @@ class RepoWrapper(object):
             branch_is_new = branch not in self._repo.branches
             self._repo.git.checkout(branch, b=branch_is_new)
             self._repo.git.checkout(branch)
-            if not LOCAL:
-                self._repo.git.push("origin", branch, set_upstream=True)
+            self._repo.git.push("origin", branch, set_upstream=True)
         except GitCommandError as e:
             raise RuntimeError("Error whilst executing preparing git branch, {}".format(e))
 
@@ -54,7 +51,6 @@ class RepoWrapper(object):
             try:
                 self._repo.git.add(A=True)
                 self._repo.git.commit(m=message)
-                if not LOCAL:
-                    self._repo.git.push()
+                self._repo.git.push()
             except GitCommandError as e:
                 raise RuntimeError("Error whilst pushing changes to git, {}".format(e))
