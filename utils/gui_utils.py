@@ -1,5 +1,5 @@
 """ Utilities for modifying the gui for a new IOC """
-from git_utils import RepoWrapper
+from common_utils import create_component
 from system_paths import CLIENT
 from templates.paths import BLANK_OPI
 from system_paths import OPI_RESOURCES
@@ -84,22 +84,10 @@ def _update_opi_info(name):
             etree.tostring(opi_xml, pretty_print=True, encoding='UTF-8', xml_declaration=True, standalone="yes"))
 
 
-def create_opi(name, branch):
+def create_opi(device, branch):
     """
-    Creates a blank OPI as part of the GUI
-    :param name: Name of the IOC to create the GUI for
-    :param branch: Name of the branch to put the changes on
+    Creates a blank OPI as part of the GUI and add it to the OPI info
+    :param device: Name of the device to create the GUI for
     """
-    try:
-        repo = RepoWrapper(CLIENT)
-        repo.prepare_new_branch(branch)
-        _update_opi_info(name)
-        repo.push_all_changes("Add template OPI file")
-    except (RuntimeError, IOError) as e:
-        LOGGER.error(str(e))
-        return
-    except Exception as e:
-        LOGGER.error("Encountered unknown error: {}".format(e))
-        return
-    except RuntimeWarning as e:
-        LOGGER.warning(str(e))
+    _add_new_opi_file(device)
+    _update_opi_info(device)

@@ -1,8 +1,11 @@
 """ Contains main method for creating a vanilla IOC from scratch """
 from run_tests import run_tests
+from utils.common_utils import create_component
 from utils.gui_utils import create_opi
+from utils.emulator_utils import create_emulator
 from utils.command_line_utils import parse_args
 from utils.logging_utils import logger
+from system_paths import CLIENT, EMULATORS
 
 LOGGER = logger("IOC generator")
 
@@ -18,43 +21,21 @@ def generate_device(name, ticket, submodule=True, opi=True, tests=True, emulator
     :param emulator: Whether to create a device emulator
     """
 
-    branch = "Ticket{}_Add_IOC_{}".format(ticket, name)
+    underscore_separated_name = name.lower().replace(" ", "_")
+    camel_case_name = name.title().replace(" ", "")
+    branch = "Ticket{}_Add_IOC_{}".format(ticket, camel_case_name)
 
-    def create_ioc_directory():
-        # Change IOC branch
-        # Make the IOC directory
-        # Create template IOC
-        # Make any file adjustments to the IOC
-        # Commit the changes to Git
-        pass
-
-    def create_support_submodule():
-        # Create submodule in github
-        # Change EPICS branch
-        # Add repo as submodule
-        # Add macro
-        # Add submodule to support make file
-        pass
-
-    def create_ioc_system_tests():
-        # Change IOC system tests branch
-        # Create a blank test directory
-        # Add the tests to run_all_tests.bat
-        pass
-
-    def create_device_emulator():
-        # Change device emulator branch
-        pass
-
-    create_ioc_directory()
+    # Still need to create the IOC directory
     if submodule:
-        create_support_submodule()
+        pass
     if tests:
-        create_ioc_system_tests()
+        pass
     if emulator:
-        create_device_emulator()
+        create_component(camel_case_name, branch, EMULATORS, logger("Emulators"),
+                         create_emulator, "Add template emulator")
     if opi:
-        create_opi(name, branch)
+        create_component(underscore_separated_name, branch, CLIENT, logger("GUI"),
+                         create_opi, "Add template OPI file")
 
 
 def main():
