@@ -3,7 +3,9 @@ Utilities for interacting with Git. This is largely done via the command line be
 to maintain than the PythonGit API.
 """
 from git import Repo, GitCommandError, InvalidGitRepositoryError
+from utils.logging_utils import logger
 
+LOGGER = logger("GIT")
 
 class RepoWrapper(object):
     """
@@ -47,10 +49,12 @@ class RepoWrapper(object):
         if not allow_master and self._repo.active_branch is "master":
             raise RuntimeError("Attempting to commit to master branch")
 
-        if len(self._repo.index.diff(None))>0:
+        if len(self._repo.index.diff(None)) > 0:
             try:
                 self._repo.git.add(A=True)
                 self._repo.git.commit(m=message)
                 self._repo.git.push()
             except GitCommandError as e:
                 raise RuntimeError("Error whilst pushing changes to git, {}".format(e))
+        else:
+            LOGGER.warn("Could not commit '{}'. No changes.".format(message))
