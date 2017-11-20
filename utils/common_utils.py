@@ -5,6 +5,7 @@ import subprocess
 from os import access, chmod, W_OK, devnull
 from stat import S_IWUSR
 from shutil import rmtree as shutil_rmtree
+from sys import version_info
 
 
 def create_component(device, branch, path, action, commit_message, **kwargs):
@@ -17,10 +18,10 @@ def create_component(device, branch, path, action, commit_message, **kwargs):
     :param commit_message: Message to attach to the changes
     """
     try:
-        # repo = RepoWrapper(path)
-        # repo.prepare_new_branch(branch)
+        repo = RepoWrapper(path)
+        repo.prepare_new_branch(branch)
         action(device, **kwargs)
-        # repo.push_all_changes(commit_message)
+        repo.push_all_changes(commit_message)
     except (RuntimeError, IOError) as e:
         logging.error(str(e))
         return
@@ -45,11 +46,22 @@ def run_command(command, working_dir):
 
 
 def replace_in_file(target, substitutions):
+    """
+    Replaces matching content in a file
+
+    :param target: Path to file where we are going to make substitutions
+    :param substitutions: A collection of substitutions to make. Each substitution should be in the form
+    (original, final)
+    """
     logging.info("Making substitutions into file {}: {}".format(target, substitutions))
     with open(target) as f:
         lines = f.readlines()
 
     def substitute(input_str):
+        """
+        :param input_str: The original string
+        :return: The original string after substitutions have beeen made
+        """
         output_str = input_str
         for s in substitutions:
             output_str = output_str.replace(s[0], s[1])
@@ -60,11 +72,39 @@ def replace_in_file(target, substitutions):
 
 
 def rmtree(delete_path):
+    """
+    Enahnced version of shutil rmtree that can cope with windows permission issues
+
+    :param delete_path: The directory to the path to delete
+    """
     logging.info("Deleting folder {}".format(delete_path))
+
     def onerror(func, path, exc_info):
+        """
+        Error handler for ``shutil.rmtree``.
+
+        If the error is due to an access error (read only file)
+        it attempts to add write permission and then retries.
+
+        If the error is for another reason it re-raises the error.
+
+        :param func: Action taken on the path
+        :param path: Path that is being manipulated
+        :param exc_info: Whether to log execution info
+        """
         if not access(path, W_OK):  # Is the error an access error ?
             chmod(path, S_IWUSR)
             func(path)
-        else:
-            raise
+        elif exc_info:
+            raise OSError("Unable to delete file at {}".format(path))
     shutil_rmtree(delete_path, onerror=onerror)
+
+
+def get_input(prompt):
+    """
+    Standard input function to use which will adapt based on Python version
+
+    :param prompt: Text to display to the user
+    :return: Input from prompt
+    """
+    return input(prompt) if version_info[0] >= 3 else raw_input(prompt)

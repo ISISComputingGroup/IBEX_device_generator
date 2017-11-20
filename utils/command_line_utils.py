@@ -13,7 +13,7 @@ def parse_args(description, arguments):
                                      description=description)
     for a in arguments:
         if "default" not in a.keys():
-            a["default"]=None
+            a["default"] = None
         parser.add_argument("--{}".format(a["name"]), type=a["type"], help=a["description"], default=a["default"])
 
     return parser.parse_args()

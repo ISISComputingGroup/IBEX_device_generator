@@ -1,7 +1,7 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
 from system_paths import IOC_ROOT, PERL, PERL_IOC_GENERATOR, EPICS_BASE_BUILD, EPICS
 from templates.paths import BASIC_DB, BASIC_CONFIG_XML
-from common_utils import run_command, replace_in_file, rmtree
+from common_utils import run_command, replace_in_file, rmtree, get_input
 from os import path, mkdir, rmdir, walk
 from shutil import copyfile
 import logging
@@ -13,7 +13,7 @@ def _get_path(device):
 
 def _check_for_ioc_dir(ioc_path):
     if path.exists(ioc_path):
-        if raw_input("IOC path {} already exists. Shall I try and delete it? (Y/N) ".format(ioc_path)).upper() == "Y":
+        if get_input("IOC path {} already exists. Shall I try and delete it? (Y/N) ".format(ioc_path)).upper() == "Y":
             rmtree(ioc_path)
         else:
             raise RuntimeError("IOC directory {} already exists. Aborting".format(ioc_path))
@@ -77,7 +77,7 @@ def _replace_macros(device, device_count):
 
 
 def _clean_up(ioc_path):
-    logging.info("Removing unecessary files from {}".format(ioc_path))
+    logging.info("Removing unnecessary files from {}".format(ioc_path))
     for root, dirs, files in walk(ioc_path):
         for d in dirs:
             if d == "protocol":
@@ -97,7 +97,7 @@ def _add_to_ioc_makefile(device):
     last_line = ""
     marker = "IOCDIRS += "
     for line in old_lines:
-        if marker in last_line and not marker in line:
+        if marker in last_line and marker not in line:
             new_lines.append(marker + device)
         new_lines.append(line)
 
