@@ -3,8 +3,9 @@ from run_tests import run_tests
 from utils.common_utils import create_component
 from utils.gui_utils import create_opi
 from utils.emulator_utils import create_emulator
+from utils.ioc_utils import create_ioc
 from utils.command_line_utils import parse_args
-from system_paths import CLIENT, EMULATORS_ROOT
+from system_paths import CLIENT, EMULATORS_ROOT, IOC_ROOT
 import logging
 
 
@@ -13,11 +14,12 @@ def _configure_logging():
     logging.getLogger().setLevel(logging.INFO)
 
 
-def generate_device(name, ticket, submodule=True, opi=True, tests=True, emulator=True):
+def generate_device(name, ticket, device_count, submodule=True, opi=True, tests=True, emulator=True):
     """
     Creates the boilerplate components for an IOC
     :param name: The name of the IOC
     :param ticket: The ticket number this relates to
+    :param device_count: Number of IOCs to generate
     :param submodule: Whether to create a support submodule
     :param opi: Whether to create an empty OPI
     :param tests: Whether to create IOC system tests
@@ -28,15 +30,16 @@ def generate_device(name, ticket, submodule=True, opi=True, tests=True, emulator
 
     underscore_separated_name = name.lower().replace(" ", "_")
     camel_case_name = name.title().replace(" ", "")
+    capitals_name = name.upper().replace(" ", "")
     branch = "Ticket{}_Add_IOC_{}".format(ticket, camel_case_name)
 
-    # Still need to create the IOC directory
+    create_component(capitals_name, branch, IOC_ROOT, create_ioc, "Add template IOC", device_count=device_count)
     if submodule:
         pass
     if tests:
         pass
-    if emulator:
-        create_component(camel_case_name, branch, EMULATORS_ROOT, create_emulator, "Add template emulator")
+    # if emulator:
+    #     create_component(camel_case_name, branch, EMULATORS_ROOT, create_emulator, "Add template emulator")
     # if opi:
     #     create_component(underscore_separated_name, branch, CLIENT, create_opi, "Add template OPI file")
 
@@ -51,9 +54,10 @@ def main():
     args = parse_args(
         "Generate boilerplate code for IBEX device support",
         [{"name": "name", "type": str, "description": "Name of the device"},
-         {"name": "ticket", "type": int, "description": "Ticket number"}]
+         {"name": "ticket", "type": int, "description": "Ticket number"},
+         {"name": "device_count", "type": int, "description": "Number of duplicate IOCs to generate", "default": 2}]
     )
-    generate_device(args.name, args.ticket)
+    generate_device(args.name, args.ticket, args.device_count)
 
 
 if __name__ == "__main__":
