@@ -10,7 +10,7 @@ import logging
 
 
 def _configure_logging():
-    logging.basicConfig(format="'%(asctime)-15s, %(levelname)s: %(message)s'")
+    logging.basicConfig(format="%(asctime)-15s, %(levelname)s: %(message)s")
     logging.getLogger().setLevel(logging.INFO)
 
 

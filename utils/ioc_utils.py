@@ -50,13 +50,12 @@ def _run_ioc_template_setup(device, device_count):
 
 
 def _add_template_db(device):
-    db_dir = path.join(_get_path(device), "{}-IOC-01App".format(device))
-    dst = path.join(db_dir, "Db")
-    logging.info("Copying basic Db file to {}".format(dst))
-    if not path.exists(dst):
+    db_dir = path.join(_get_path(device), "{}-IOC-01App".format(device), "Db")
+    logging.info("Copying basic Db file to {}".format(db_dir))
+    if not path.exists(db_dir):
         raise AssertionError("Tried creating basic Db file before IOC creation. Db folder {} does not exist"
-                             .format(dst))
-    copyfile(BASIC_DB, path.join(dst, "{}.db".format(device)))
+                             .format(db_dir))
+    copyfile(BASIC_DB, path.join(db_dir, "{}.db".format(device)))
 
     # Make sure Db is included in the build
     replace_in_file(path.join(db_dir, "Makefile"), [("#DB += xxx.db", "DB += {}.db".format(device))])

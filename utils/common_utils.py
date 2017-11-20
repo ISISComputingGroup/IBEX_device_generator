@@ -2,7 +2,7 @@
 from git_utils import RepoWrapper
 import logging
 import subprocess
-from os import access, chmod, W_OK
+from os import access, chmod, W_OK, devnull
 from stat import S_IWUSR
 from shutil import rmtree as shutil_rmtree
 
@@ -38,11 +38,14 @@ def run_command(command, working_dir):
     :param working_dir: The directory to run the command in
     """
     logging.info("Running command: {}".format(" ".join(command)))
-    cmd = subprocess.Popen(command, cwd=working_dir, stderr=subprocess.STDOUT, stdin=subprocess.PIPE)
+    with open(devnull, 'w') as null_out:
+        cmd = subprocess.Popen(command, cwd=working_dir, stdout=null_out, stderr=subprocess.STDOUT,
+                               stdin=subprocess.PIPE)
     cmd.wait()
 
 
 def replace_in_file(target, substitutions):
+    logging.info("Making substitutions into file {}: {}".format(target, substitutions))
     with open(target) as f:
         lines = f.readlines()
 
@@ -57,6 +60,7 @@ def replace_in_file(target, substitutions):
 
 
 def rmtree(delete_path):
+    logging.info("Deleting folder {}".format(delete_path))
     def onerror(func, path, exc_info):
         if not access(path, W_OK):  # Is the error an access error ?
             chmod(path, S_IWUSR)
