@@ -1,6 +1,6 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
-from system_paths import IOC_ROOT, PERL, PERL_IOC_GENERATOR, EPICS_BASE_BUILD
-from templates.paths import BASIC_DB
+from system_paths import IOC_ROOT, PERL, PERL_IOC_GENERATOR, EPICS_BASE_BUILD, EPICS
+from templates.paths import BASIC_DB, BASIC_CONFIG_XML
 from common_utils import run_command, replace_in_file, rmtree
 from os import path, mkdir, rmdir, walk
 from shutil import copyfile
@@ -59,8 +59,14 @@ def _add_template_db(device):
     copyfile(BASIC_DB, path.join(dst, "{}.db".format(device)))
 
     # Make sure Db is included in the build
-    inc_db_str = "DB += {}.db"
-    replace_in_file(path.join(db_dir, "Makefile"), [("#" + inc_db_str.format("xxx"), inc_db_str.format(device))])
+    replace_in_file(path.join(db_dir, "Makefile"), [("#DB += xxx.db", "DB += {}.db".format(device))])
+
+
+def _add_template_config_xml(device, device_count):
+    for i in range(1, device_count+1):
+        copyfile(BASIC_CONFIG_XML,
+                 path.join(_get_path(device), "iocBoot", "ioc{}-IOC-{:02d}".format(device, i), "config.xml"))
+    run_command(["make", "iocstartups"], EPICS)
 
 
 def _replace_macros(device, device_count):
@@ -68,7 +74,7 @@ def _replace_macros(device, device_count):
         st_cmd_file = path.join(_get_path(device), "iocBoot", "ioc{}-IOC-{:02d}".format(device, i), "st.cmd")
         if not path.exists(st_cmd_file):
             AssertionError("Attempting to replace macros before command file has been created")
-        replace_in_file(st_cmd_file, [("_SUPPORT_MACRO_", device), ("_DB_NAME", device)])
+        replace_in_file(st_cmd_file, [("_SUPPORT_MACRO_", device), ("_DB_NAME_", device)])
 
 
 def _clean_up(ioc_path):
@@ -110,6 +116,7 @@ def create_ioc(device, device_count):
     _make_ioc_dir(_get_path(device))
     _run_ioc_template_setup(device, device_count)
     _add_template_db(device)
+    _add_template_config_xml(device, device_count)
     _replace_macros(device, device_count)
     _clean_up(_get_path(device))
     _build(_get_path(device))

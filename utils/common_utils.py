@@ -45,8 +45,15 @@ def run_command(command, working_dir):
 def replace_in_file(target, substitutions):
     with open(target) as f:
         lines = f.readlines()
+
+    def substitute(input_str):
+        output_str = input_str
+        for s in substitutions:
+            output_str = output_str.replace(s[0], s[1])
+        return output_str
+
     with open(target, "w") as f:
-        f.writelines([l.replace(s[0], s[1]) for s in substitutions for l in lines])
+        f.writelines(substitute(line) for line in lines)
 
 
 def rmtree(delete_path):
