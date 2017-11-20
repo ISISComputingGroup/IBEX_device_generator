@@ -4,10 +4,13 @@ from utils.common_utils import create_component
 from utils.gui_utils import create_opi
 from utils.emulator_utils import create_emulator
 from utils.command_line_utils import parse_args
-from utils.logging_utils import logger
-from system_paths import CLIENT, EMULATORS
+from system_paths import CLIENT, EMULATORS_ROOT
+import logging
 
-LOGGER = logger("IOC generator")
+
+def _configure_logging():
+    logging.basicConfig(format="'%(asctime)-15s, %(levelname)s: %(message)s'")
+    logging.getLogger().setLevel(logging.INFO)
 
 
 def generate_device(name, ticket, submodule=True, opi=True, tests=True, emulator=True):
@@ -21,6 +24,8 @@ def generate_device(name, ticket, submodule=True, opi=True, tests=True, emulator
     :param emulator: Whether to create a device emulator
     """
 
+    _configure_logging()
+
     underscore_separated_name = name.lower().replace(" ", "_")
     camel_case_name = name.title().replace(" ", "")
     branch = "Ticket{}_Add_IOC_{}".format(ticket, camel_case_name)
@@ -31,11 +36,9 @@ def generate_device(name, ticket, submodule=True, opi=True, tests=True, emulator
     if tests:
         pass
     if emulator:
-        create_component(camel_case_name, branch, EMULATORS, logger("Emulators"),
-                         create_emulator, "Add template emulator")
-    if opi:
-        create_component(underscore_separated_name, branch, CLIENT, logger("GUI"),
-                         create_opi, "Add template OPI file")
+        create_component(camel_case_name, branch, EMULATORS_ROOT, create_emulator, "Add template emulator")
+    # if opi:
+    #     create_component(underscore_separated_name, branch, CLIENT, create_opi, "Add template OPI file")
 
 
 def main():

@@ -1,14 +1,10 @@
 """ Utilities for modifying the gui for a new IOC """
-from common_utils import create_component
-from system_paths import CLIENT
 from templates.paths import BLANK_OPI
 from system_paths import OPI_RESOURCES
 from shutil import copyfile
 from os import path
 from lxml import etree
-from logging_utils import logger
-
-LOGGER = logger("GUI")
+import logging
 
 
 def _get_opi_file_name(name):
@@ -25,7 +21,7 @@ def _add_new_opi_file(name):
     :param name: Device name
     """
     dst = path.join(OPI_RESOURCES, _get_opi_file_name(name))
-    LOGGER.info("Copying template OPI file to {}".format(dst))
+    logging.info("Copying template OPI file to {}".format(dst))
     copyfile(BLANK_OPI, dst)
 
 
@@ -68,7 +64,7 @@ def _update_opi_info(name):
     Add some basic template information to the opi_info.xml file
     :param name: Name of the device
     """
-    LOGGER.info("Adding template information to opi info")
+    logging.info("Adding template information to opi info")
     opi_info_path = path.join(OPI_RESOURCES, "opi_info.xml")
     with open(opi_info_path) as f:
         # Remove blank on input or pretty printing won't work later
@@ -84,7 +80,7 @@ def _update_opi_info(name):
             etree.tostring(opi_xml, pretty_print=True, encoding='UTF-8', xml_declaration=True, standalone="yes"))
 
 
-def create_opi(device, branch):
+def create_opi(device):
     """
     Creates a blank OPI as part of the GUI and add it to the OPI info
     :param device: Name of the device to create the GUI for

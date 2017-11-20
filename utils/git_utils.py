@@ -3,9 +3,7 @@ Utilities for interacting with Git. This is largely done via the command line be
 to maintain than the PythonGit API.
 """
 from git import Repo, GitCommandError, InvalidGitRepositoryError
-from utils.logging_utils import logger
-
-LOGGER = logger("GIT")
+import logging
 
 
 class RepoWrapper(object):
@@ -27,17 +25,20 @@ class RepoWrapper(object):
         """
         :param branch: Name of the new branch
         """
-        LOGGER.info("Preparing new branch, {}, for repo {}".format(branch, self._repo.working_tree_dir))
+        logging.info("Preparing new branch, {}, for repo {}".format(branch, self._repo.working_tree_dir))
         try:
-            self._repo.git.stash('save')
             self._repo.git.reset("HEAD", hard=True)
-            self._repo.git.clean(f=True, d=True)  # No -x. Some repos have file names too long in ignored dirs
+            try:
+                self._repo.git.clean(f=True, d=True, x=True)
+            except GitCommandError:  # Fall back on no -x. Some repos (e.g. GUI) have paths that are too long
+                self._repo.git.clean(f=True, d=True)
             self._repo.git.checkout("master", force=True)
             self._repo.git.pull()
             branch_is_new = branch not in self._repo.branches
             self._repo.git.checkout(branch, b=branch_is_new)
             self._repo.git.checkout(branch)
             self._repo.git.push("origin", branch, set_upstream=True)
+            logging.info("Branch {} ready".format(branch))
         except GitCommandError as e:
             raise RuntimeError("Error whilst executing preparing git branch, {}".format(e))
 
@@ -48,17 +49,19 @@ class RepoWrapper(object):
         :param message: The commit message to include with the push
         :param allow_master: Can commit changes to the master branch
         """
-        LOGGER.info("Pushing all changes to current branch, {}, for repo {}".format(
+        logging.info("Pushing all changes to current branch, {}, for repo {}".format(
             self._repo.active_branch, self._repo.working_tree_dir))
         if not allow_master and self._repo.active_branch is "master":
             raise RuntimeError("Attempting to commit to master branch")
 
-        if len(self._repo.index.diff(None)) > 0:
-            try:
-                self._repo.git.add(A=True)
+        try:
+            self._repo.git.add(A=True)
+            n_files = len(self._repo.index.diff("HEAD"))
+            if n_files > 0:
                 self._repo.git.commit(m=message)
                 self._repo.git.push()
-            except GitCommandError as e:
-                raise RuntimeError("Error whilst pushing changes to git, {}".format(e))
-        else:
-            LOGGER.warn("Could not commit '{}'. No changes.".format(message))
+                logging.info("{} files pushed to {}: {}".format(n_files, self._repo.active_branch, message))
+            else:
+                logging.warn("Commit aborted. No files changed")
+        except GitCommandError as e:
+            raise RuntimeError("Error whilst pushing changes to git, {}".format(e))
