@@ -1,5 +1,6 @@
 """ Utilities for running scripts from the command line """
 import argparse
+from sys import version_info
 
 
 def parse_args(description, arguments):
@@ -17,3 +18,13 @@ def parse_args(description, arguments):
         parser.add_argument("--{}".format(a["name"]), type=a["type"], help=a["description"], default=a["default"])
 
     return parser.parse_args()
+
+
+def get_input(prompt):
+    """
+    Standard input function to use which will adapt based on Python version
+
+    :param prompt: Text to display to the user
+    :return: Input from prompt
+    """
+    return input(prompt) if version_info[0] >= 3 else raw_input(prompt)

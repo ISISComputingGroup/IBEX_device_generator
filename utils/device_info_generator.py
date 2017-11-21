@@ -1,7 +1,7 @@
 """ Helper to generate information about the device based on the name used in device setup """
 from os.path import join
 from system_paths import OPI_RESOURCES, EPICS, EPICS_SUPPORT, IOC_TEST_FRAMEWORK_ROOT
-from common_utils import get_input
+from command_line_utils import get_input
 from system_paths import LEWIS_EMULATORS
 
 

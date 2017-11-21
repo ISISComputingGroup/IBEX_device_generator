@@ -3,9 +3,9 @@ Utilities for interacting with Git. This is largely done via the command line be
 to maintain than the PythonGit API.
 """
 from git import Repo, GitCommandError, InvalidGitRepositoryError
-from os.path import exists, join
 from templates.paths import SUPPORT_README
-from shutil import copyfile
+from file_system_utils import copy_file
+from os.path import join
 import logging
 
 
@@ -21,8 +21,8 @@ class RepoWrapper(object):
             self._repo = Repo(path)
         except InvalidGitRepositoryError:
             self._repo = Repo.init(path)
-        except Exception:
-            raise RuntimeError("Unable to attach to git repository at path {}".format(path))
+        except Exception as e:
+            raise RuntimeError("Unable to attach to git repository at path {}: {}".format(path, e))
 
     def clone_from(self, url):
         """
@@ -81,25 +81,18 @@ class RepoWrapper(object):
         except GitCommandError as e:
             raise RuntimeError("Error whilst pushing changes to git, {}".format(e))
 
-    def init(self):
+    def add_initial_commit(self):
         """
-        :return: Initialises the git repo and makes an initial commit
+        :return: Adds a starting commit to a repo
         """
-        if not exists(join(self._repo.working_dir, ".git")):
-            try:
-                self._repo.init()
-            except GitCommandError as e:
-                raise RuntimeError("Error whilst initialising git repository {}: {}".format(self._repo.working_dir, e))
-
-        readme = join(self._repo.working_dir, "README.md")
-        if not exists(readme):
-            try:
-                copyfile(SUPPORT_README, readme)
-                self._repo.git.add(A=True)
-                self._repo.git.commit(m="Initial commit")
-                self._repo.git.push(u="origin")
-            except (OSError, GitCommandError) as e:
-                raise RuntimeError("Error whilst creating initial commit in {}: {}".format(self._repo.working_dir, e))
+        try:
+            copy_file(SUPPORT_README, join(self._repo.working_dir, "README.md"))
+            self._repo.git.add(A=True)
+            self._repo.git.commit(m="Initial commit")
+            self._repo.git.push(u="origin")
+        except (OSError, GitCommandError) as e:
+            raise RuntimeError("Error whilst creating initial commit in {}: {}"
+                               .format(self._repo.working_dir, e))
 
     def create_submodule(self, url, path):
         """
