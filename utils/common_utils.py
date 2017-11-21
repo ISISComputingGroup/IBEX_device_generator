@@ -109,3 +109,20 @@ def get_input(prompt):
     :return: Input from prompt
     """
     return input(prompt) if version_info[0] >= 3 else raw_input(prompt)
+
+
+def mkdir(path):
+    """
+    :param path: The path to the dir to create
+    :return:
+    """
+    if path.exists(path):
+        if get_input("Path {} already exists. Shall I try and delete it? (Y/N) ".format(path)).upper() == "Y":
+            rmtree(path)
+        else:
+            raise OSError("Directory {} already exists. Aborting".format(path))
+    else:
+        try:
+            mkdir(path)
+        except OSError as e:
+            raise OSError("Unable to create directory {}: {}".format(path, e))

@@ -1,32 +1,14 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
 from system_paths import IOC_ROOT, PERL, PERL_IOC_GENERATOR, EPICS_BASE_BUILD, EPICS
 from templates.paths import BASIC_DB, BASIC_CONFIG_XML
-from common_utils import run_command, replace_in_file, rmtree, get_input
-from os import path, mkdir, rmdir, walk
+from common_utils import run_command, replace_in_file, rmtree, get_input, mkdir
+from os import path, walk
 from shutil import copyfile
 import logging
+from device_info_generator import DeviceInfoGenerator
 
 
-def _get_path(device):
-    return path.join(IOC_ROOT, device)
-
-
-def _check_for_ioc_dir(ioc_path):
-    if path.exists(ioc_path):
-        if get_input("IOC path {} already exists. Shall I try and delete it? (Y/N) ".format(ioc_path)).upper() == "Y":
-            rmtree(ioc_path)
-        else:
-            raise RuntimeError("IOC directory {} already exists. Aborting".format(ioc_path))
-
-
-def _make_ioc_dir(ioc_path):
-    try:
-        mkdir(ioc_path)
-    except OSError as e:
-        raise OSError("Unable to create directory for IOC {}: {}".format(ioc_path, e))
-
-
-def _run_ioc_template_setup(device, device_count):
+def _run_ioc_template_setup(info_generator, device_count):
     """
     Runs the EPICS perl scripts associated with IOC creation. Passes in the IBEX type flag to use our own templates
     found in C:\\Instrument\\Apps\\EPICS\\base\\master\\templates
@@ -40,40 +22,41 @@ def _run_ioc_template_setup(device, device_count):
         mkdir(ibex_bin)
 
     for i in range(1, device_count+1):
-        app_name = "{}-IOC-{:02d}".format(device, i)
+        app_name = info_generator.ioc_app_name(i)
         logging.info("Generating IOC {}".format(app_name))
-        run_command([PERL, PERL_IOC_GENERATOR, "-t", "ioc", app_name], _get_path(device))
+        run_command([PERL, PERL_IOC_GENERATOR, "-t", "ioc", app_name], info_generator.ioc_path())
         run_command([PERL, PERL_IOC_GENERATOR, "-i", "-t", "ioc", "-a", "IBEX", "-p", app_name, app_name],
-                    _get_path(device))
+                    info_generator.ioc_path())
 
-    rmdir(ibex_bin)
+    rmtree(ibex_bin)
 
 
-def _add_template_db(device):
-    db_dir = path.join(_get_path(device), "{}-IOC-01App".format(device), "Db")
+def _add_template_db(info_generator):
+    db_dir = path.join(info_generator.ioc_path(), "{}App".format(info_generator.ioc_app_name(1)), "Db")
     logging.info("Copying basic Db file to {}".format(db_dir))
     if not path.exists(db_dir):
         raise AssertionError("Tried creating basic Db file before IOC creation. Db folder {} does not exist"
                              .format(db_dir))
-    copyfile(BASIC_DB, path.join(db_dir, "{}.db".format(device)))
+    copyfile(BASIC_DB, path.join(db_dir, "{}.db".format(info_generator.ioc_name())))
 
     # Make sure Db is included in the build
-    replace_in_file(path.join(db_dir, "Makefile"), [("#DB += xxx.db", "DB += {}.db".format(device))])
+    replace_in_file(path.join(db_dir, "Makefile"), [("#DB += xxx.db", "DB += {}.db".format(info_generator.ioc_name()))])
 
 
-def _add_template_config_xml(device, device_count):
+def _add_template_config_xml(info_generator, device_count):
     for i in range(1, device_count+1):
         copyfile(BASIC_CONFIG_XML,
-                 path.join(_get_path(device), "iocBoot", "ioc{}-IOC-{:02d}".format(device, i), "config.xml"))
+                 path.join(info_generator.ioc_path(), "iocBoot", info_generator.ioc_app_name(i), "config.xml"))
     run_command(["make", "iocstartups"], EPICS)
 
 
-def _replace_macros(device, device_count):
+def _replace_macros(info_generator, device_count):
     for i in range(1, device_count+1):
-        st_cmd_file = path.join(_get_path(device), "iocBoot", "ioc{}-IOC-{:02d}".format(device, i), "st.cmd")
+        st_cmd_file = path.join(info_generator.ioc_path(), "iocBoot", info_generator.ioc_app_name(i), "st.cmd")
         if not path.exists(st_cmd_file):
             AssertionError("Attempting to replace macros before command file has been created")
-        replace_in_file(st_cmd_file, [("_SUPPORT_MACRO_", device), ("_DB_NAME_", device)])
+        replace_in_file(st_cmd_file, [("_SUPPORT_MACRO_", info_generator.ioc_name()),
+                                      ("_DB_NAME_", info_generator.ioc_name())])
 
 
 def _clean_up(ioc_path):
@@ -88,7 +71,7 @@ def _build(ioc_path):
     run_command(["make"], ioc_path)
 
 
-def _add_to_ioc_makefile(device):
+def _add_to_ioc_makefile(info_generator):
     ioc_makefile = path.join(IOC_ROOT, "Makefile")
     with open(ioc_makefile) as f:
         old_lines = f.readlines()
@@ -98,7 +81,7 @@ def _add_to_ioc_makefile(device):
     marker = "IOCDIRS += "
     for line in old_lines:
         if marker in last_line and marker not in line:
-            new_lines.append(marker + device)
+            new_lines.append(marker + info_generator.ioc_name())
         new_lines.append(line)
 
     with open(ioc_makefile, "w") as f:
@@ -111,16 +94,20 @@ def create_ioc(device, device_count):
     :param device: Name of the device to create the emulator for
     :param device_count: Number of IOCs to generate
     """
-    if len(device) > 8:
-        raise NotImplementedError("Script will not currently generate valid IOCs for device names with more than 8 "
-                                  "characters")
+    while not 1 <= device_count <= 9:
+        try:
+            device_count = int(get_input("{} IOCs currently requested. The current script requires a number"
+                                         " between 1 and 9. Please enter a new value: ".format(device_count)))
+        except (ValueError, TypeError) as e:
+            logging.warning("That was not a valid input, please try again: {}".format(e))
 
-    _check_for_ioc_dir(_get_path(device))
-    _make_ioc_dir(_get_path(device))
-    _run_ioc_template_setup(device, device_count)
-    _add_template_db(device)
-    _add_template_config_xml(device, device_count)
-    _replace_macros(device, device_count)
-    _clean_up(_get_path(device))
-    _build(_get_path(device))
-    _add_to_ioc_makefile(device)
+    info_generator = DeviceInfoGenerator(device)
+    mkdir(info_generator.ioc_path())
+
+    _run_ioc_template_setup(info_generator, device_count)
+    _add_template_db(info_generator)
+    _add_template_config_xml(info_generator, device_count)
+    _replace_macros(info_generator, device_count)
+    _clean_up(info_generator.ioc_path())
+    _build(info_generator.ioc_path())
+    _add_to_ioc_makefile(info_generator)

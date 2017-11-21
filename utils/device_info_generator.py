@@ -1,6 +1,6 @@
 """ Helper to generate information about the device based on the name used in device setup """
 from os.path import join
-from system_paths import OPI_RESOURCES
+from system_paths import OPI_RESOURCES, EPICS, EPICS_SUPPORT
 from common_utils import get_input
 from system_paths import LEWIS_EMULATORS
 
@@ -100,3 +100,41 @@ class DeviceInfoGenerator(object):
         :return: The device name used for the lewis emulator
         """
         return self._title_case_no_spaces()
+
+    def ioc_path(self):
+        """
+        :return: The path to the IOC
+        """
+        return join(EPICS, "ioc", "master", self.ioc_name())
+
+    def ioc_app_name(self, index):
+        """
+        :param index: The IOC application name for the given index
+        :return:
+        """
+        app_name = "{}-IOC-{:02d}".format(self.ioc_name(), index)
+
+    def support_dir(self):
+        """
+        :return: The path to the support directory for the device
+        """
+        return join(EPICS_SUPPORT, self._lower_case_underscore_separated_name())
+
+    def support_master_dir(self):
+        """
+        :return: The path to the support submodule "master" submodule folder
+        """
+        return join(self.support_dir(), "master")
+
+    def support_repo_name(self):
+        """
+        :return: The name of the support repo for the device
+        """
+        return "EPICS-{}".format(self._title_case_no_spaces())
+
+    def support_repo_url(self):
+        """
+        :return: The URL to the support repo
+        """
+        return "https://github.com/ISISComputingGroup/{}.git".format(self.support_repo_name())
+

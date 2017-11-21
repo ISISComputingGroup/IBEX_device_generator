@@ -32,12 +32,13 @@ def generate_device(name, ticket, device_count, submodule=True, opi=True, tests=
     _configure_logging()
 
     underscore_separated_name = name.lower().replace(" ", "_")
-    branch = "Ticket{}_Add_IOC_{}".format(ticket, DeviceInfoGenerator(name).ioc_name())
+    device_info = DeviceInfoGenerator(name)
+    branch = "Ticket{}_Add_IOC_{}".format(ticket, device_info.ioc_name())
 
     # create_component(capitals_name, branch, IOC_ROOT, create_ioc, "Add template IOC", device_count=device_count)
     if submodule:
-        create_component(underscore_separated_name, branch, EPICS, create_submodule, "Add support submodule to EPICS", epics=True)
-        create_component(underscore_separated_name, branch, join(EPICS_SUPPORT, underscore_separated_name, "master"),
+        create_component(name, branch, EPICS, create_submodule, "Add support submodule to EPICS", epics=True)
+        create_component(name, branch, device_info.support_master(),
                          set_up_template_support_directory, "Creating support submodule template")
     #if tests:
     #    create_component(underscore_separated_name, branch, IOC_TEST_FRAMEWORK_ROOT, create_test_framework,
