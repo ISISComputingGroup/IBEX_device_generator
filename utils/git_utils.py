@@ -21,9 +21,10 @@ class RepoWrapper(object):
         except Exception:
             raise RuntimeError("Unable to attach to git repository at path {}".format(path))
 
-    def prepare_new_branch(self, branch):
+    def prepare_new_branch(self, branch, epics=False):
         """
         :param branch: Name of the new branch
+        :param epics: Is this the main epics repo?
         """
         logging.info("Preparing new branch, {}, for repo {}".format(branch, self._repo.working_tree_dir))
         try:
@@ -37,7 +38,7 @@ class RepoWrapper(object):
             branch_is_new = branch not in self._repo.branches
             self._repo.git.checkout(branch, b=branch_is_new)
             self._repo.git.checkout(branch)
-            self._repo.git.push("origin", branch, set_upstream=True)
+            # self._repo.git.push("origin", branch, set_upstream=True)
             logging.info("Branch {} ready".format(branch))
         except GitCommandError as e:
             raise RuntimeError("Error whilst executing preparing git branch, {}".format(e))
@@ -59,7 +60,7 @@ class RepoWrapper(object):
             n_files = len(self._repo.index.diff("HEAD"))
             if n_files > 0:
                 self._repo.git.commit(m=message)
-                self._repo.git.push()
+                # self._repo.git.push()
                 logging.info("{} files pushed to {}: {}".format(n_files, self._repo.active_branch, message))
             else:
                 logging.warn("Commit aborted. No files changed")
