@@ -10,6 +10,7 @@ from utils.command_line_utils import parse_args
 from system_paths import CLIENT, EMULATORS_ROOT, IOC_ROOT, IOC_TEST_FRAMEWORK_ROOT, EPICS, EPICS_SUPPORT
 import logging
 from os.path import join
+from utils.device_info_generator import DeviceInfoGenerator
 
 def _configure_logging():
     logging.basicConfig(format="%(asctime)-15s, %(levelname)s: %(message)s")
@@ -31,9 +32,7 @@ def generate_device(name, ticket, device_count, submodule=True, opi=True, tests=
     _configure_logging()
 
     underscore_separated_name = name.lower().replace(" ", "_")
-    camel_case_name = name.title().replace(" ", "")
-    capitals_name = name.upper().replace(" ", "")
-    branch = "Ticket{}_Add_IOC_{}".format(ticket, camel_case_name)
+    branch = "Ticket{}_Add_IOC_{}".format(ticket, DeviceInfoGenerator(name).ioc_name())
 
     # create_component(capitals_name, branch, IOC_ROOT, create_ioc, "Add template IOC", device_count=device_count)
     if submodule:
@@ -44,9 +43,9 @@ def generate_device(name, ticket, device_count, submodule=True, opi=True, tests=
     #    create_component(underscore_separated_name, branch, IOC_TEST_FRAMEWORK_ROOT, create_test_framework,
     #                     "Add device to test framework")
     # if emulator:
-    #     create_component(camel_case_name, branch, EMULATORS_ROOT, create_emulator, "Add template emulator")
+    #     create_component(name, branch, EMULATORS_ROOT, create_emulator, "Add template emulator")
     # if opi:
-    #     create_component(underscore_separated_name, branch, CLIENT, create_opi, "Add template OPI file")
+    #     create_component(name, branch, CLIENT, create_opi, "Add template OPI file")
 
 
 def main():

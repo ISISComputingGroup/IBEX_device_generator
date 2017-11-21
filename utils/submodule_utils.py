@@ -15,7 +15,8 @@ def _create_remote_repo(device):
     """
     message = """Please create the repo repo on github (https://github.com/organizations/ISISComputingGroup/repositories
     /new) and enter the name here. Leave it blank to use the default ({}) """.format("EPICS-"+device)
-    return get_input(message)
+    requested_repo_name = get_input(message)
+    return requested_repo_name if len(requested_repo_name)>0 else "EPICS-{}".format(device)
 
 
 def _add_to_makefile(device):
@@ -46,7 +47,16 @@ def create_submodule(device):
         mkdir(submodule_path)
     copyfile(SUPPORT_SUBMODULE_MAKEFILE, path.join(submodule_path, "Makefile"))
     repo_name = _create_remote_repo(device)
-    RepoWrapper(EPICS).submodule.add("https://github.com/ISISComputingGroup/{}.git".format(repo_name), "master")
+    repo_url = "https://github.com/ISISComputingGroup/{}.git".format(repo_name)
+    epics_repo = RepoWrapper(EPICS)._repo
+    epics_repo.clone_from(url=repo_url, to_path=path.join(submodule_path, "master"))
+    if not path.exists(path.join(submodule_path, "master", ".git")):
+        support_repo = RepoWrapper(path.join(submodule_path, "master"))._repo
+        support_repo.init()
+        support_repo.add(A=True)
+        support_repo.commit(m="Initial commit")
+        support_repo.push(u="origin")
+    epics_repo.create_submodule(repo_url, path.join(submodule_path, "master"))
     _add_to_makefile(device)
 
 
