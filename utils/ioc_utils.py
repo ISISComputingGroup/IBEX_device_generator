@@ -111,6 +111,10 @@ def create_ioc(device, device_count):
     :param device: Name of the device to create the emulator for
     :param device_count: Number of IOCs to generate
     """
+    if len(device) > 8:
+        raise NotImplementedError("Script will not currently generate valid IOCs for device names with more than 8 "
+                                  "characters")
+
     _check_for_ioc_dir(_get_path(device))
     _make_ioc_dir(_get_path(device))
     _run_ioc_template_setup(device, device_count)
