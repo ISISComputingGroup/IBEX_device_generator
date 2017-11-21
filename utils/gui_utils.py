@@ -5,7 +5,6 @@ from shutil import copyfile
 from os import path
 from lxml import etree
 import logging
-from device_info_generator import DeviceInfoGenerator
 
 
 def _generate_opi_entry(opi_key, opi_file_name, descriptive_device_name):
@@ -67,16 +66,11 @@ def _update_opi_info(opi_key, opi_file_name, descriptive_device_name):
             etree.tostring(opi_xml, pretty_print=True, encoding='UTF-8', xml_declaration=True, standalone="yes"))
 
 
-def create_opi(device):
+def create_opi(device_info):
     """
     Creates a blank OPI as part of the GUI and add it to the OPI info
-    :param device: Name of the device to create the GUI for
+    :param device_info: Provides name-based information about the device
     """
-    device_info = DeviceInfoGenerator(device)
-
-    # Add the OPI file
     logging.info("Copying template OPI file to {}".format(device_info.opi_file_path()))
     copyfile(OPI, device_info.opi_file_path())
-
-    # Update opi_info.xml
     _update_opi_info(device_info.opi_key(), device_info.opi_file_name(), device_info.log_name())

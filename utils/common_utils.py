@@ -5,7 +5,7 @@ import subprocess
 from os import devnull
 
 
-def create_component(device, branch, path, action, commit_message, epics=False):
+def create_component(device, branch, path, action, commit_message, epics=False, **kwargs):
     """
     Creates part of the IBEX device support
     :param device: Name of the device used in the action
@@ -18,7 +18,7 @@ def create_component(device, branch, path, action, commit_message, epics=False):
     try:
         repo = RepoWrapper(path)
         repo.prepare_new_branch(branch, epics)
-        action(device)
+        action(device, **kwargs)
         repo.push_all_changes(commit_message)
     except (RuntimeError, IOError) as e:
         logging.error(str(e))

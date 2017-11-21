@@ -2,13 +2,11 @@
 from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS
 from templates.paths import SUPPORT_MAKEFILE
 from common_utils import run_command
-from command_line_utils import get_input
 from file_system_utils import mkdir
 from os import path, remove
 from shutil import copyfile
 import logging
 from git_utils import RepoWrapper
-from device_info_generator import DeviceInfoGenerator
 
 
 def _add_to_makefile(name):
@@ -30,12 +28,11 @@ def _add_to_makefile(name):
         f.writelines(new_lines)
 
 
-def create_submodule(device):
+def create_submodule(device_info):
     """
     Creates a submodule and links it into the main EPICS repo
-    :param device: Name of the device
+    :param device_info: Provides name-based information about the device
     """
-    device_info = DeviceInfoGenerator(device)
     mkdir(device_info.support_dir())
     copyfile(SUPPORT_MAKEFILE, path.join(device_info.support_dir(), "Makefile"))
     master_dir = device_info.support_master_dir()
@@ -44,12 +41,11 @@ def create_submodule(device):
     _add_to_makefile(device_info.support_app_name())
 
 
-def apply_support_dir_template(device):
+def apply_support_dir_template(device_info):
     """
-    :param device:
+    :param device_info: Provides name-based information about the device
     :return:
     """
-    device_info = DeviceInfoGenerator(device)
     run_command([PERL, PERL_SUPPORT_GENERATOR, "-t", "streamSCPI", device_info.support_app_name()],
                 device_info.support_master_dir())
     remove(device_info.support_db_path())

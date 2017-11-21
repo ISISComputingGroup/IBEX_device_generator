@@ -31,21 +31,21 @@ def generate_device(name, ticket, device_count, submodule=True, opi=True, tests=
 
     _configure_logging()
 
-    underscore_separated_name = name.lower().replace(" ", "_")
     device_info = DeviceInfoGenerator(name)
     branch = "Ticket{}_Add_IOC_{}".format(ticket, device_info.ioc_name())
 
-    # create_component(capitals_name, branch, IOC_ROOT, create_ioc, "Add template IOC", device_count=device_count)
+    create_component(device_info, branch, IOC_ROOT, create_ioc, "Add template IOC", device_count=device_count)
     if submodule:
-        #create_component(name, branch, EPICS, create_submodule, "Add support submodule to EPICS", epics=True)
-        create_component(name, branch, device_info.support_master_dir(),
+        create_component(device_info, branch, EPICS, create_submodule, "Add support submodule to EPICS", epics=True)
+        create_component(device_info, branch, device_info.support_master_dir(),
                          apply_support_dir_template, "Creating template file structure in support submodule")
-    #if tests:
-    #    create_component(name, branch, IOC_TEST_FRAMEWORK_ROOT, create_test_framework, "Add device to test framework")
-    # if emulator:
-    #     create_component(name, branch, EMULATORS_ROOT, create_emulator, "Add template emulator")
-    # if opi:
-    #     create_component(name, branch, CLIENT, create_opi, "Add template OPI file")
+    if tests:
+        create_component(device_info, branch, IOC_TEST_FRAMEWORK_ROOT, create_test_framework,
+                         "Add device to test framework")
+    if emulator:
+        create_component(device_info, branch, EMULATORS_ROOT, create_emulator, "Add template emulator")
+    if opi:
+        create_component(device_info, branch, CLIENT, create_opi, "Add template OPI file")
 
 
 def main():

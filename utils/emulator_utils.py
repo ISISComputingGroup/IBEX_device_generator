@@ -3,7 +3,6 @@ from templates.paths import EMULATOR_TEMPLATE
 from file_system_utils import copy_tree
 from os import path, walk
 import logging
-from device_info_generator import DeviceInfoGenerator
 
 
 def _copy_files(emulator_dir):
@@ -28,11 +27,10 @@ def _replace_default_name(emulator_dir, emulator_name):
                 f.writelines(lines)
 
 
-def create_emulator(device):
+def create_emulator(device_info):
     """
     Creates a vanilla emulator in the DeviceEmulator submodule
-    :param device: Name of the device to create the emulator for
+    :param device_info: Provides name-based information about the device
     """
-    info_generator = DeviceInfoGenerator(device)
-    _copy_files(info_generator.emulator_dir())
-    _replace_default_name(info_generator.emulator_dir(), info_generator.emulator_name())
+    _copy_files(device_info.emulator_dir())
+    _replace_default_name(device_info.emulator_dir(), device_info.emulator_name())

@@ -3,7 +3,6 @@ from templates.paths import TESTS_TEMPLATE
 from system_paths import IOC_TEST_FRAMEWORK_ROOT
 from os import path
 from file_system_utils import replace_in_file, copy_file
-from device_info_generator import DeviceInfoGenerator
 import logging
 
 
@@ -49,11 +48,9 @@ def _add_to_run_all_tests(device_info):
             f.writelines([l+unix_linesep for l in lines])
 
 
-def create_test_framework(device):
+def create_test_framework(device_info):
     """
     Creates a vanilla integration of the device into the IOC test framework
-    :param device: Name of the device to create the emulator for
     """
-    device_info = DeviceInfoGenerator(device)
     _add_to_run_all_tests(device_info)
     _add_template_test_file(device_info)
