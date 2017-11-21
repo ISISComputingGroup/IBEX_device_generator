@@ -4,8 +4,10 @@ import logging
 import subprocess
 from os import access, chmod, W_OK, devnull, remove
 from os.path import exists
+from os import mkdir as mkdir_external
 from stat import S_IWUSR
-from shutil import rmtree as shutil_rmtree
+from shutil import rmtree as rmtree_external
+from shutil import copyfile as copyfile_external
 from sys import version_info
 
 
@@ -99,7 +101,7 @@ def rmtree(delete_path):
             func(path)
         elif exc_info:
             raise OSError("Unable to delete file at {}".format(path))
-    shutil_rmtree(delete_path, onerror=onerror)
+    rmtree_external(delete_path, onerror=onerror)
 
 
 def get_input(prompt):
@@ -123,7 +125,7 @@ def mkdir(path):
         else:
             raise OSError("Directory {} already exists. Aborting".format(path))
     try:
-        mkdir(path)
+        mkdir_external(path)
     except OSError as e:
         raise OSError("Unable to create directory {}: {}".format(path, e))
 
@@ -140,6 +142,6 @@ def copy_file(src, dst):
         else:
             raise OSError("File {} already exists. Aborting".format(dst))
     try:
-        copy_file(src, dst)
+        copyfile_external(src, dst)
     except OSError as e:
         raise OSError("Unable to copy file from {} to {}: {}".format(src, dst, e))
