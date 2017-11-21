@@ -6,6 +6,7 @@ from os import mkdir as mkdir_external
 from stat import S_IWUSR
 from shutil import rmtree as rmtree_external
 from shutil import copyfile as copyfile_external
+from shutil import copytree as copytree_external
 from command_line_utils import get_input
 
 
@@ -86,12 +87,31 @@ def copy_file(src, dst):
     :param src: Place to copy from
     :param dst: Place to copy to
     """
+    _copy(src, dst, remove, copyfile_external)
+
+
+def copy_tree(src, dst):
+    """
+    Copy a folder from one place to another
+    :param src: Place to copy from
+    :param dst: Place to copy to
+    """
+    _copy(src, dst, rmtree, copytree_external)
+
+
+def _copy(src, dst, copy_func, remove_func):
+    """
+    :param src: Place to copy from
+    :param dst: Place to copy to
+    :param copy_func: External function to perform copy
+    :param remove_func: External function to perform remove
+    """
     if exists(dst):
         if get_input("{} already exists. Shall I try and delete it? (Y/N) ".format(dst)).upper() == "Y":
-            remove(dst)
+            remove_func(dst)
         else:
             raise OSError("File {} already exists. Aborting".format(dst))
     try:
-        copyfile_external(src, dst)
+        copy_func(src, dst)
     except OSError as e:
-        raise OSError("Unable to copy file from {} to {}: {}".format(src, dst, e))
+        raise OSError("Unable to copy from {} to {}: {}".format(src, dst, e))
