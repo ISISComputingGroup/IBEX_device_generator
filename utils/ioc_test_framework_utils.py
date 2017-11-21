@@ -1,23 +1,24 @@
 """ Utilities for integrating the device into the IOC test framework """
-from templates.paths import TEMPLATE_TESTS
+from templates.paths import TESTS_TEMPLATE
 from system_paths import IOC_TEST_FRAMEWORK_ROOT
 from shutil import copyfile
 from os import path
-from common_utils import replace_in_file
+from common_utils import replace_in_file, copy_file
+from device_info_generator import DeviceInfoGenerator
 import logging
 
 
-def _add_template_test_file(device):
+def _add_template_test_file(device_info):
     """
     :param device: Name of the device
     """
-    dst = path.join(IOC_TEST_FRAMEWORK_ROOT, "tests", "{}.py".format(device))
+    dst = device_info.ioc_test_framework_file_path()
     logging.info("Copying template ioc test framework tests to {}".format(dst))
-    if path.exists(dst):
-        raise RuntimeError("Unable to create template tests in {}, file already exists".format(dst))
-    copyfile(TEMPLATE_TESTS, dst)
+    copy_file(TESTS_TEMPLATE, dst)
 
-    replace_in_file(dst, [("_DEVICE_", device.upper()), ("_Device_", device.title()), ("_device_", device.lower())])
+    replace_in_file(dst, [("_DEVICE_", device_info.ioc_name()),
+                          ("_Device_", device_info.test_class_identifier()),
+                          ("_device_", device_info.emulator_name())])
 
 
 def _add_to_run_all_tests(device):
@@ -51,10 +52,11 @@ def _add_to_run_all_tests(device):
             f.writelines([l+unix_linesep for l in lines])
 
 
-def create_test_framework(device):
+def create_test_framework(name):
     """
     Creates a vanilla integration of the device into the IOC test framework
     :param device: Name of the device to create the emulator for
     """
-    _add_to_run_all_tests(device)
-    _add_template_test_file(device)
+    device_info = DeviceInfoGenerator(name)
+    _add_to_run_all_tests(device_info)
+    _add_template_test_file(device_info)

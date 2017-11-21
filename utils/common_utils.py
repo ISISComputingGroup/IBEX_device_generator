@@ -2,7 +2,8 @@
 from git_utils import RepoWrapper
 import logging
 import subprocess
-from os import access, chmod, W_OK, devnull
+from os import access, chmod, W_OK, devnull, remove
+from os.path import exists
 from stat import S_IWUSR
 from shutil import rmtree as shutil_rmtree
 from sys import version_info
@@ -74,7 +75,7 @@ def replace_in_file(target, substitutions):
 
 def rmtree(delete_path):
     """
-    Enahnced version of shutil rmtree that can cope with windows permission issues
+    Enhanced version of shutil rmtree that can cope with windows permission issues
 
     :param delete_path: The directory to the path to delete
     """
@@ -116,13 +117,29 @@ def mkdir(path):
     :param path: The path to the dir to create
     :return:
     """
-    if path.exists(path):
-        if get_input("Path {} already exists. Shall I try and delete it? (Y/N) ".format(path)).upper() == "Y":
+    if exists(path):
+        if get_input("{} already exists. Shall I try and delete it? (Y/N) ".format(path)).upper() == "Y":
             rmtree(path)
         else:
             raise OSError("Directory {} already exists. Aborting".format(path))
-    else:
-        try:
-            mkdir(path)
-        except OSError as e:
-            raise OSError("Unable to create directory {}: {}".format(path, e))
+    try:
+        mkdir(path)
+    except OSError as e:
+        raise OSError("Unable to create directory {}: {}".format(path, e))
+
+
+def copy_file(src, dst):
+    """
+    Copy a file from one place to another
+    :param src: Place to copy from
+    :param dst: Place to copy to
+    """
+    if exists(dst):
+        if get_input("{} already exists. Shall I try and delete it? (Y/N) ".format(dst)).upper() == "Y":
+            remove(dst)
+        else:
+            raise OSError("File {} already exists. Aborting".format(dst))
+    try:
+        copyfile(src, dst)
+    except OSError as e:
+        raise OSError("Unable to copy file from {} to {}: {}".format(src, dst, e))

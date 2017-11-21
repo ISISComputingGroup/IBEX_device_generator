@@ -43,7 +43,7 @@ def create_submodule(device):
         _add_to_makefile(device)
 
 
-def set_up_template_support_directory(device):
+def apply_support_dir_template(device):
     """
     :param device:
     :return:

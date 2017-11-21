@@ -1,6 +1,6 @@
 """ Helper to generate information about the device based on the name used in device setup """
 from os.path import join
-from system_paths import OPI_RESOURCES, EPICS, EPICS_SUPPORT
+from system_paths import OPI_RESOURCES, EPICS, EPICS_SUPPORT, IOC_TEST_FRAMEWORK_ROOT
 from common_utils import get_input
 from system_paths import LEWIS_EMULATORS
 
@@ -110,9 +110,9 @@ class DeviceInfoGenerator(object):
     def ioc_app_name(self, index):
         """
         :param index: The IOC application name for the given index
-        :return:
+        :return: The name of the application
         """
-        app_name = "{}-IOC-{:02d}".format(self.ioc_name(), index)
+        return "{}-IOC-{:02d}".format(self.ioc_name(), index)
 
     def support_dir(self):
         """
@@ -138,3 +138,20 @@ class DeviceInfoGenerator(object):
         """
         return "https://github.com/ISISComputingGroup/{}.git".format(self.support_repo_name())
 
+    def ioc_test_framework_device_name(self):
+        """
+        :return: The name used to identify the device in the IOC test framework
+        """
+        return self._lower_case_underscore_separated_name()
+
+    def ioc_test_framework_file_path(self):
+        """
+        :return: The path to the IOC test framework test case file
+        """
+        return join(IOC_TEST_FRAMEWORK_ROOT, "tests", "{}.py".format(self.ioc_test_framework_device_name()))
+
+    def test_class_identifier(self):
+        """
+        :return: The name prepended to the IOC test framework test class
+        """
+        return self._title_case_no_spaces()

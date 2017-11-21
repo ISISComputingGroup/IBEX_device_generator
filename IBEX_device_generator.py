@@ -5,7 +5,7 @@ from utils.gui_utils import create_opi
 from utils.emulator_utils import create_emulator
 from utils.ioc_utils import create_ioc
 from utils.ioc_test_framework_utils import create_test_framework
-from utils.submodule_utils import create_submodule, set_up_template_support_directory
+from utils.submodule_utils import create_submodule, apply_support_dir_template
 from utils.command_line_utils import parse_args
 from system_paths import CLIENT, EMULATORS_ROOT, IOC_ROOT, IOC_TEST_FRAMEWORK_ROOT, EPICS, EPICS_SUPPORT
 import logging
@@ -38,11 +38,10 @@ def generate_device(name, ticket, device_count, submodule=True, opi=True, tests=
     # create_component(capitals_name, branch, IOC_ROOT, create_ioc, "Add template IOC", device_count=device_count)
     if submodule:
         create_component(name, branch, EPICS, create_submodule, "Add support submodule to EPICS", epics=True)
-        create_component(name, branch, device_info.support_master(),
-                         set_up_template_support_directory, "Creating support submodule template")
+        create_component(name, branch, device_info.support_master_dir(),
+                         apply_support_dir_template, "Creating template file structure in support submodule")
     #if tests:
-    #    create_component(underscore_separated_name, branch, IOC_TEST_FRAMEWORK_ROOT, create_test_framework,
-    #                     "Add device to test framework")
+    #    create_component(name, branch, IOC_TEST_FRAMEWORK_ROOT, create_test_framework, "Add device to test framework")
     # if emulator:
     #     create_component(name, branch, EMULATORS_ROOT, create_emulator, "Add template emulator")
     # if opi:
