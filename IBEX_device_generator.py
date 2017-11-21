@@ -37,7 +37,7 @@ def generate_device(name, ticket, device_count, submodule=True, opi=True, tests=
 
     # create_component(capitals_name, branch, IOC_ROOT, create_ioc, "Add template IOC", device_count=device_count)
     if submodule:
-        create_component(name, branch, EPICS, create_submodule, "Add support submodule to EPICS", epics=True)
+        #create_component(name, branch, EPICS, create_submodule, "Add support submodule to EPICS", epics=True)
         create_component(name, branch, device_info.support_master_dir(),
                          apply_support_dir_template, "Creating template file structure in support submodule")
     #if tests:

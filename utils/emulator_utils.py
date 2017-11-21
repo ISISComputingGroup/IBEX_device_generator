@@ -14,15 +14,16 @@ def _copy_files(emulator_dir):
     copy_tree(EMULATOR_TEMPLATE, emulator_dir)
 
 
-def _replace_default_name(info_generator):
+def _replace_default_name(emulator_dir, emulator_name):
     """
-    :param device: Name of the device
+    :param emulator_dir: Directory where the emulator lives
+    :param emulator_name: Name given to the emulator
     """
     default_name = "DEVICENAME"
-    for root, dirs, files in walk(info_generator.emulator_dir()):
+    for root, dirs, files in walk(emulator_dir):
         for filename in files:
             with open(path.join(root, filename)) as f:
-                lines = [l.replace(default_name, info_generator.emulator_name()) for l in f.readlines()]
+                lines = [l.replace(default_name, emulator_name) for l in f.readlines()]
             with open(path.join(root, filename), "w") as f:
                 f.writelines(lines)
 
@@ -33,5 +34,5 @@ def create_emulator(device):
     :param device: Name of the device to create the emulator for
     """
     info_generator = DeviceInfoGenerator(device)
-    _copy_files(info_generator)
-    _replace_default_name(info_generator)
+    _copy_files(info_generator.emulator_dir())
+    _replace_default_name(info_generator.emulator_dir(), info_generator.emulator_name())

@@ -20,4 +20,4 @@ OPI_RESOURCES = join(CLIENT_SRC, "uk.ac.stfc.isis.ibex.opis", "resources")
 
 IOC_TEST_FRAMEWORK_ROOT = join(EPICS_SUPPORT, "IocTestFramework", "master")
 
-PERL_SUPPORT_GENERATOR = join(EPICS_BASE_BUILD, "windows-x64", "makeBaseApp.pl")
+PERL_SUPPORT_GENERATOR = join(EPICS_SUPPORT, "asyn", "master", "bin", "windows-x64", "makeSupport.pl")

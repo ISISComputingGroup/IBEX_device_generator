@@ -2,9 +2,9 @@
 Utilities for interacting with Git. This is largely done via the command line because it's simpler and easier
 to maintain than the PythonGit API.
 """
-from git import Repo, GitCommandError, InvalidGitRepositoryError
+from git import Repo, GitCommandError, InvalidGitRepositoryError, NoSuchPathError
 from templates.paths import SUPPORT_README
-from file_system_utils import copy_file
+from file_system_utils import copy_file, mkdir
 from os.path import join
 import logging
 
@@ -19,16 +19,19 @@ class RepoWrapper(object):
         """
         try:
             self._repo = Repo(path)
-        except InvalidGitRepositoryError:
+        except (InvalidGitRepositoryError, NoSuchPathError):
+            mkdir(path)
             self._repo = Repo.init(path)
         except Exception as e:
             raise RuntimeError("Unable to attach to git repository at path {}: {}".format(path, e))
 
-    def clone_from(self, url):
+    @staticmethod
+    def clone_from(to_path, url):
         """
+        :param to_path: The path to clone the repo to
         :param url: The remote git repository to clone from
         """
-        self._repo.clone_from(url=url, to_path=self._repo.working_dir)
+        Repo.clone_from(url=url, to_path=to_path)
 
     def prepare_new_branch(self, branch, epics=False):
         """
@@ -94,12 +97,15 @@ class RepoWrapper(object):
             raise RuntimeError("Error whilst creating initial commit in {}: {}"
                                .format(self._repo.working_dir, e))
 
-    def create_submodule(self, url, path):
+    def create_submodule(self, name, url, path):
         """
+        :param name: Name of the submodule
         :param url: Url to the submodule repo
         :param path: Local system path to the submodule
         """
         try:
-            self._repo.create_submodule(url=url, path=path)
+            self._repo.create_submodule(name, path, url=url, branch="master")
         except GitCommandError as e:
             logging.error("Unable to create submodule from {}: {}".format(path, e))
+        except Exception as e:
+            raise RuntimeError("Unknown error {} of type {} whilst creating submodule in {}".format(e, type(e), path))

@@ -2,6 +2,7 @@
 from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS
 from templates.paths import SUPPORT_MAKEFILE
 from common_utils import run_command
+from command_line_utils import get_input
 from file_system_utils import mkdir
 from os import path, remove
 from shutil import copyfile
@@ -10,7 +11,10 @@ from git_utils import RepoWrapper
 from device_info_generator import DeviceInfoGenerator
 
 
-def _add_to_makefile(device):
+def _add_to_makefile(name):
+    """
+    :param name: Name of the device
+    """
     makefile = path.join(EPICS_SUPPORT, "Makefile")
     with open(makefile) as f:
         old_lines = f.readlines()
@@ -19,7 +23,7 @@ def _add_to_makefile(device):
     marker = "SUPPDIRS += "
     for line in old_lines:
         if marker in last_line and marker not in line:
-            new_lines.append(marker + device)
+            new_lines.append(marker + name)
         new_lines.append(line)
 
     with open(makefile, "w") as f:
@@ -34,14 +38,10 @@ def create_submodule(device):
     device_info = DeviceInfoGenerator(device)
     mkdir(device_info.support_dir())
     copyfile(SUPPORT_MAKEFILE, path.join(device_info.support_dir(), "Makefile"))
-    try:
-        support_repo = RepoWrapper(device_info.support_master_dir())
-        support_repo.clone_from(device_info.support_repo_url())
-    except RuntimeError as e:
-        logging.error(str(e))
-    else:
-        RepoWrapper(EPICS).create_submodule(device_info.support_repo_url(), device_info.support_master_dir())
-        _add_to_makefile(device)
+    master_dir = device_info.support_master_dir()
+    RepoWrapper(EPICS).create_submodule(device_info.support_app_name(), device_info.support_repo_url(), master_dir)
+    logging.info("Initializing device support repository {}".format(master_dir))
+    _add_to_makefile(device_info.support_app_name())
 
 
 def apply_support_dir_template(device):
