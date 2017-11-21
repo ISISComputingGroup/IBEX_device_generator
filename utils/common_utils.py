@@ -140,6 +140,6 @@ def copy_file(src, dst):
         else:
             raise OSError("File {} already exists. Aborting".format(dst))
     try:
-        copyfile(src, dst)
+        copy_file(src, dst)
     except OSError as e:
         raise OSError("Unable to copy file from {} to {}: {}".format(src, dst, e))

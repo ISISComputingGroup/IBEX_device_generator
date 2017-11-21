@@ -48,6 +48,7 @@ def apply_support_dir_template(device):
     :param device:
     :return:
     """
-    master = path.join(EPICS_SUPPORT, device, "master")
-    run_command([PERL, PERL_SUPPORT_GENERATOR, "-t", "streamSCPI", device], master)
-    remove(path.join(master, "{}Sup".format(device), "dev{}.db".format(device)))
+    device_info = DeviceInfoGenerator(device)
+    run_command([PERL, PERL_SUPPORT_GENERATOR, "-t", "streamSCPI", device_info.support_app_name()],
+                device_info.support_master_dir())
+    remove(device_info.support_db_path())
