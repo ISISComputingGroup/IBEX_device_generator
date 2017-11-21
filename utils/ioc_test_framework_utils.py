@@ -10,7 +10,7 @@ import logging
 
 def _add_template_test_file(device_info):
     """
-    :param device: Name of the device
+    :param device_info: Information for the device based on the given name
     """
     dst = device_info.ioc_test_framework_file_path()
     logging.info("Copying template ioc test framework tests to {}".format(dst))
@@ -21,13 +21,11 @@ def _add_template_test_file(device_info):
                           ("_device_", device_info.emulator_name())])
 
 
-def _add_to_run_all_tests(device):
+def _add_to_run_all_tests(device_info):
     """
-    :param device: Name of the device
+    :param device_info: Information for the device based on the given name
     """
     run_all_tests_src = path.join(IOC_TEST_FRAMEWORK_ROOT, "run_all_tests.bat")
-    ioc_device_name = device.upper()
-    emulator_device_name = device.lower()
 
     separator = "echo ---------------------------------------"
     case_separator = "echo;"
@@ -44,19 +42,19 @@ def _add_to_run_all_tests(device):
         for case in [("Dev", dev_sim_call_format), ("Rec", rec_sim_call_format)]:
             lines = [blank,
                      separator,
-                     title_format.format(ioc_device_name, case[0]),
-                     case[1].format(emulator_device_name, ioc_device_name),
+                     title_format.format(device_info.ioc_name(), case[0]),
+                     case[1].format(device_info.emulator_name(), device_info.ioc_name()),
                      separator,
                      case_separator]
             unix_linesep = "\r"  # check in Unix line endings
             f.writelines([l+unix_linesep for l in lines])
 
 
-def create_test_framework(name):
+def create_test_framework(device):
     """
     Creates a vanilla integration of the device into the IOC test framework
     :param device: Name of the device to create the emulator for
     """
-    device_info = DeviceInfoGenerator(name)
+    device_info = DeviceInfoGenerator(device)
     _add_to_run_all_tests(device_info)
     _add_template_test_file(device_info)

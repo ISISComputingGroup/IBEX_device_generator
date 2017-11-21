@@ -33,9 +33,10 @@ def create_submodule(device):
     device_info = DeviceInfoGenerator(device)
     mkdir(device_info.support_dir())
     copyfile(SUPPORT_MAKEFILE, path.join(device_info.support_dir(), "Makefile"))
-    RepoWrapper(EPICS).clone_from(device_info.support_repo_url())
+    support_repo = RepoWrapper(device_info.support_master_dir())
+    support_repo.clone_from(device_info.support_repo_url())
     try:
-        RepoWrapper(device_info.support_master_dir()).init()
+        support_repo.init()
     except RuntimeError as e:
         logging.error(str(e))
     else:
