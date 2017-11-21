@@ -35,6 +35,9 @@ class RepoWrapper(object):
                 self._repo.git.clean(f=True, d=True)
             self._repo.git.checkout("master", force=True)
             self._repo.git.pull()
+            if epics:
+                for s in self._repo.submodules:
+                    s.update(init=True)
             branch_is_new = branch not in self._repo.branches
             self._repo.git.checkout(branch, b=branch_is_new)
             self._repo.git.checkout(branch)
@@ -60,7 +63,7 @@ class RepoWrapper(object):
             n_files = len(self._repo.index.diff("HEAD"))
             if n_files > 0:
                 self._repo.git.commit(m=message)
-                # self._repo.git.push()
+                # self._repo.git.push(recurse_submodule="check")
                 logging.info("{} files pushed to {}: {}".format(n_files, self._repo.active_branch, message))
             else:
                 logging.warn("Commit aborted. No files changed")

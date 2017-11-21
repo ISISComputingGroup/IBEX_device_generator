@@ -1,11 +1,12 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
-from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR
+from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS
 from templates.paths import SUPPORT_SUBMODULE_MAKEFILE
 from common_utils import run_command, replace_in_file, rmtree, get_input
 from os import path, mkdir, remove
 from shutil import copyfile
 import git
 import logging
+from git_utils import RepoWrapper
 
 
 def _create_remote_repo(device):
@@ -13,7 +14,7 @@ def _create_remote_repo(device):
     :param device: Name of the device
     """
     message = """Please create the repo repo on github (https://github.com/organizations/ISISComputingGroup/repositories
-    /new) and enter the name here. Leave it blank to use the default ({})""".format("EPICS-"+device)
+    /new) and enter the name here. Leave it blank to use the default ({}) """.format("EPICS-"+device)
     return get_input(message)
 
 
@@ -45,7 +46,7 @@ def create_submodule(device):
         mkdir(submodule_path)
     copyfile(SUPPORT_SUBMODULE_MAKEFILE, path.join(submodule_path, "Makefile"))
     repo_name = _create_remote_repo(device)
-    git.submodule.add("https://github.com/ISISComputingGroup/{}.git".format(repo_name), "master")
+    RepoWrapper(EPICS).submodule.add("https://github.com/ISISComputingGroup/{}.git".format(repo_name), "master")
     _add_to_makefile(device)
 
 
