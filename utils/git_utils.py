@@ -4,7 +4,7 @@ to maintain than the PythonGit API.
 """
 from git import Repo, GitCommandError, InvalidGitRepositoryError
 from os.path import exists, join
-from templates.paths import README
+from templates.paths import SUPPORT_README
 from shutil import copyfile
 import logging
 
@@ -94,7 +94,7 @@ class RepoWrapper(object):
         readme = join(self._repo.working_dir, "README.md")
         if not exists(readme):
             try:
-                copyfile(README, readme)
+                copyfile(SUPPORT_README, readme)
                 self._repo.git.add(A=True)
                 self._repo.git.commit(m="Initial commit")
                 self._repo.git.push(u="origin")

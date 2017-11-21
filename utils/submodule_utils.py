@@ -1,6 +1,6 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
 from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS
-from templates.paths import SUPPORT_SUBMODULE_MAKEFILE, README
+from templates.paths import SUPPORT_MAKEFILE, SUPPORT_README
 from common_utils import run_command, replace_in_file, rmtree, get_input, mkdir
 from os import path, remove
 from shutil import copyfile
@@ -32,7 +32,7 @@ def create_submodule(device):
     """
     device_info = DeviceInfoGenerator(device)
     mkdir(device_info.support_dir())
-    copyfile(SUPPORT_SUBMODULE_MAKEFILE, path.join(device_info.support_dir(), "Makefile"))
+    copyfile(SUPPORT_MAKEFILE, path.join(device_info.support_dir(), "Makefile"))
     RepoWrapper(EPICS).clone_from(device_info.support_repo_url())
     try:
         RepoWrapper(device_info.support_master_dir()).init()

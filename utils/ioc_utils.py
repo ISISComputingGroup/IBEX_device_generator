@@ -1,6 +1,6 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
 from system_paths import IOC_ROOT, PERL, PERL_IOC_GENERATOR, EPICS_BASE_BUILD, EPICS
-from templates.paths import BASIC_DB, BASIC_CONFIG_XML
+from templates.paths import DB, CONFIG_XML
 from common_utils import run_command, replace_in_file, rmtree, get_input, mkdir
 from os import path, walk
 from shutil import copyfile
@@ -37,7 +37,7 @@ def _add_template_db(info_generator):
     if not path.exists(db_dir):
         raise AssertionError("Tried creating basic Db file before IOC creation. Db folder {} does not exist"
                              .format(db_dir))
-    copyfile(BASIC_DB, path.join(db_dir, "{}.db".format(info_generator.ioc_name())))
+    copyfile(DB, path.join(db_dir, "{}.db".format(info_generator.ioc_name())))
 
     # Make sure Db is included in the build
     replace_in_file(path.join(db_dir, "Makefile"), [("#DB += xxx.db", "DB += {}.db".format(info_generator.ioc_name()))])
@@ -45,7 +45,7 @@ def _add_template_db(info_generator):
 
 def _add_template_config_xml(info_generator, device_count):
     for i in range(1, device_count+1):
-        copyfile(BASIC_CONFIG_XML,
+        copyfile(CONFIG_XML,
                  path.join(info_generator.ioc_path(), "iocBoot", info_generator.ioc_app_name(i), "config.xml"))
     run_command(["make", "iocstartups"], EPICS)
 

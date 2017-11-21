@@ -1,5 +1,5 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
-from templates.paths import TEMPLATE_EMULATOR
+from templates.paths import EMULATOR_TEMPLATE
 from system_paths import LEWIS_EMULATORS
 from shutil import copytree
 from os import path, walk
@@ -15,7 +15,7 @@ def _copy_files(info_generator):
     logging.info("Copying template emulator to {}".format(dst))
     if path.exists(dst):
         raise RuntimeError("Unable to create template emulator in {}, directory already exists".format(dst))
-    copytree(TEMPLATE_EMULATOR, dst)
+    copytree(EMULATOR_TEMPLATE, dst)
 
 
 def _replace_default_name(info_generator):

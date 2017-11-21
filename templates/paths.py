@@ -2,10 +2,10 @@
 from os.path import join, dirname, abspath
 
 ROOT = dirname(abspath(__file__))
-BLANK_OPI = join(ROOT, "blank.opi")
-TEMPLATE_EMULATOR = join(ROOT, "emulator")
-BASIC_DB = join(ROOT, "ioc", "basic.db")
-BASIC_CONFIG_XML = join(ROOT, "ioc", "config.xml")
-TESTS_TEMPLATE = join(ROOT, "tests.py")
-SUPPORT_SUBMODULE_MAKEFILE = join(ROOT, "Makefile")
-README = join(ROOT, "README.md")
+OPI = join(ROOT, "blank.opi")
+EMULATOR_TEMPLATE = join(ROOT, "emulator")
+DB = join(ROOT, "ioc", "basic.db")
+CONFIG_XML = join(ROOT, "ioc", "config.xml")
+TESTS_TEMPLATE = join(ROOT, "ioc_test_framework", "tests.py")
+SUPPORT_MAKEFILE = join(ROOT, "support", "Makefile")
+SUPPORT_README = join(ROOT, "support", "README.md")

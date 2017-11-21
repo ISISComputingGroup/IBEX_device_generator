@@ -1,5 +1,5 @@
 """ Utilities for modifying the gui for a new IOC """
-from templates.paths import BLANK_OPI
+from templates.paths import OPI
 from system_paths import OPI_RESOURCES
 from shutil import copyfile
 from os import path
@@ -14,7 +14,7 @@ def _add_new_opi_file(info_generator):
     """
     dst = info_generator.opi_file_path()
     logging.info("Copying template OPI file to {}".format(dst))
-    copyfile(BLANK_OPI, dst)
+    copyfile(OPI, dst)
 
 
 def _generate_opi_entry(info_generator):
