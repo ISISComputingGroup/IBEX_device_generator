@@ -36,6 +36,8 @@ def create_submodule(device_info):
     mkdir(device_info.support_dir())
     copyfile(SUPPORT_MAKEFILE, path.join(device_info.support_dir(), "Makefile"))
     master_dir = device_info.support_master_dir()
+    get_input("Attempting to create repository using remote {}. Press return to confirm it exists"
+              .format(device_info.support_repo_url()))
     RepoWrapper(EPICS).create_submodule(device_info.support_app_name(), device_info.support_repo_url(), master_dir)
     logging.info("Initializing device support repository {}".format(master_dir))
     _add_to_makefile(device_info.support_app_name())
