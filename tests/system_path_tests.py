@@ -1,9 +1,7 @@
 """ Tests against the system paths """
 import unittest
 from os.path import exists
-from system_paths import INSTRUMENT, EPICS, IOC_ROOT, PERL, EPICS_BASE_BUILD, PERL_IOC_GENERATOR, EPICS_SUPPORT, \
-    EPICS_MASTER_RELEASE, EMULATORS_ROOT, LEWIS_EMULATORS, CLIENT, CLIENT_SRC, OPI_RESOURCES, IOC_TEST_FRAMEWORK_ROOT, \
-    PERL_SUPPORT_GENERATOR
+from system_paths import *
 
 
 class SystemPathTests(unittest.TestCase):
