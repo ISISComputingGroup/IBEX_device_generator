@@ -1,10 +1,7 @@
+""" Test the GUI utilities """
 import unittest
 from utils.gui_utils import _generate_opi_entry
 from lxml import etree
-
-TEST_CASES = dict()
-TEST_CASES["my_ioc"] = """
-"""
 
 
 class GuiUtilsTests(unittest.TestCase):

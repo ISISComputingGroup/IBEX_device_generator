@@ -5,6 +5,7 @@ from system_paths import INSTRUMENT, EPICS, IOC_ROOT, PERL, EPICS_BASE_BUILD, PE
     EPICS_MASTER_RELEASE, EMULATORS_ROOT, LEWIS_EMULATORS, CLIENT, CLIENT_SRC, OPI_RESOURCES, IOC_TEST_FRAMEWORK_ROOT, \
     PERL_SUPPORT_GENERATOR
 
+
 class SystemPathTests(unittest.TestCase):
 
     def test_GIVEN_system_paths_THEN_all_paths_exist(self):

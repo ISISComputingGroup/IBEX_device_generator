@@ -72,10 +72,9 @@ class DeviceInfoGenerator(object):
         return self._name
 
     @staticmethod
-    def _is_valid_ioc_name(name, auto=False):
+    def _is_valid_ioc_name(name):
         """
         :param name: Name to check for validity
-        :param auto: Accept the default name automatically
         :return: True is name valid, else False
         """
         return name.isalnum() and name.upper() == name and 1 <= len(name) <= 8
@@ -91,7 +90,6 @@ class DeviceInfoGenerator(object):
         name = name[:8]
         assert self._is_valid_ioc_name(name)
         return name
-
 
     def ioc_name(self, auto=False):
         """

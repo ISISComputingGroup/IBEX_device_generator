@@ -41,8 +41,7 @@ def _add_template_db(device_info):
 
 def _add_template_config_xml(device_info, device_count):
     for i in range(1, device_count+1):
-        copy_file(CONFIG_XML,
-                 path.join(device_info.ioc_boot_path(i), "config.xml"))
+        copy_file(CONFIG_XML, path.join(device_info.ioc_boot_path(i), "config.xml"))
     run_command(["make", "iocstartups"], EPICS)
 
 

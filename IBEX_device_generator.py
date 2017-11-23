@@ -12,6 +12,7 @@ import logging
 from os.path import join
 from utils.device_info_generator import DeviceInfoGenerator
 
+
 def _configure_logging():
     logging.basicConfig(format="%(asctime)-15s, %(levelname)s: %(message)s")
     logging.getLogger().setLevel(logging.INFO)
