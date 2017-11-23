@@ -1,9 +1,21 @@
 import unittest
+from utils.gui_utils import _generate_opi_entry
+from lxml import etree
+
+TEST_CASES = dict()
+TEST_CASES["my_ioc"] = """
+"""
 
 
 class GuiUtilsTests(unittest.TestCase):
-    def setUp(self):
-        pass
 
-    def test_stub(self):
-        pass
+    def test_GIVEN_simple_opi_properties_WHEN_an_opi_is_generated_THEN_the_output_matches_the_standard_format(self):
+        # Arrange
+        expected = "<entry><key>RING</key><value><categories/><type>UNKNOWN</type><path>sauron.opi</path>" \
+                   "<description>The OPI for the the one ring</description><macros/></value></entry>"
+
+        # Act
+        actual = etree.tostring(_generate_opi_entry("RING", "sauron.opi", "the one ring"))
+
+        # Assert
+        self.assertEqual(actual, expected)
