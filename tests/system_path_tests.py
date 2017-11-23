@@ -15,4 +15,5 @@ class SystemPathTests(unittest.TestCase):
                 IOC_TEST_FRAMEWORK_ROOT, PERL_SUPPORT_GENERATOR
 
         # Assert
-        self.assertTrue(all([exists(p) for p in paths]))
+        for p in paths:
+            self.assertTrue(exists(p))
