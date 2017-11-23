@@ -2,7 +2,7 @@
 from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS
 from templates.paths import SUPPORT_MAKEFILE
 from common_utils import run_command
-from file_system_utils import mkdir, add_to_makefile_list
+from file_system_utils import mkdir, add_to_makefile_list, get_input
 from os import path, remove
 from shutil import copyfile
 import logging
@@ -32,8 +32,12 @@ def create_submodule(device_info):
 def apply_support_dir_template(device_info):
     """
     :param device_info: Provides name-based information about the device
-    :return:
     """
-    run_command([PERL, PERL_SUPPORT_GENERATOR, "-t", "streamSCPI", device_info.support_app_name()],
-                device_info.support_master_dir())
+    cmd = [PERL, PERL_SUPPORT_GENERATOR, "-t", "streamSCPI", device_info.support_app_name()]
+    run_command(cmd, device_info.support_master_dir())
+    if not path.exists(device_info.support_db_path()):
+        logging.warning("The makeSupport.pl didn't run correctly. It's very temperamental. "
+                        "Please run the following command manually from an EPICS terminal")
+        logging.warning("cd {} && {}".format(device_info.support_master_dir(), " ".join(cmd)))
+        get_input("Press return to continue...")
     remove(device_info.support_db_path())

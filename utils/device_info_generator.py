@@ -15,7 +15,7 @@ class DeviceInfoGenerator(object):
         :param raw_name: The raw input name of the device
         """
         self._name = raw_name
-        self._user_supplied_ioc_name = None
+        self._ioc_name = None
 
     def _lower_case_underscore_separated_name(self):
         """
@@ -41,6 +41,12 @@ class DeviceInfoGenerator(object):
         """
         return self._name.upper().replace(" ", "")
 
+    def _original_case_no_spaces(self):
+        """
+        :return: The name of the device in its original case with spaces removed
+        """
+        return self._name.replace(" ", "")
+
     def opi_file_name(self):
         """
         :return: The name of the OPI file for this device
@@ -63,31 +69,48 @@ class DeviceInfoGenerator(object):
         """
         :return: The name of the device used to identify it in the logs
         """
-        return self._title_case_with_spaces()
+        return self._name
 
     @staticmethod
-    def _is_valid_ioc_name(name):
+    def _is_valid_ioc_name(name, auto=False):
         """
         :param name: Name to check for validity
+        :param auto: Accept the default name automatically
         :return: True is name valid, else False
         """
         return name.isalnum() and name.upper() == name and 1 <= len(name) <= 8
 
-    def ioc_name(self):
+    def _auto_generated_ioc_name(self):
         """
+        :return: An auto-generated valid IOC name
+        """
+        import re
+        name = re.sub(r'\W+', '', self._name)  # Make alphanumeric
+        name = name.upper()
+        name = name.replace(' ', '')
+        name = name[:8]
+        assert self._is_valid_ioc_name(name)
+        return name
+
+
+    def ioc_name(self, auto=False):
+        """
+        :param auto: Accept the auto-generated name
         :return: The name of the IOC based on the input name. Must be between 1 and 8 characters
         """
-        if self._is_valid_ioc_name(self._upper_case_spaces_removed_no_truncation()):
-            ioc_name = self._upper_case_spaces_removed_no_truncation()
-        elif self._user_supplied_ioc_name is not None:
-            ioc_name = self._user_supplied_ioc_name
-        else:
-            self._user_supplied_ioc_name = self._name
-            while self._is_valid_ioc_name(self._user_supplied_ioc_name):
-                self._user_supplied_ioc_name = get_input(
-                    "Device name, {}, is invalid. Please enter a valid IOC name: ".format(self._user_supplied_ioc_name))
-            ioc_name = self._user_supplied_ioc_name
-        return ioc_name
+        if self._ioc_name is None:
+            default_ioc_name = self._upper_case_spaces_removed_no_truncation()
+            if self._is_valid_ioc_name(default_ioc_name):
+                proposed_name = default_ioc_name
+            elif auto:
+                proposed_name = self._auto_generated_ioc_name()
+            else:
+                proposed_name = default_ioc_name
+                while not self._is_valid_ioc_name(proposed_name):
+                    proposed_name = get_input(
+                        "Device name, {}, is invalid. Please enter a valid IOC name: ".format(self._ioc_name))
+            self._ioc_name = proposed_name
+        return self._ioc_name
 
     def emulator_dir(self):
         """
@@ -101,18 +124,20 @@ class DeviceInfoGenerator(object):
         """
         return self._title_case_no_spaces()
 
-    def ioc_path(self):
+    def ioc_path(self, auto=False):
         """
+        :param auto: Accept the auto-generated IOC name by default
         :return: The path to the IOC
         """
-        return join(EPICS, "ioc", "master", self.ioc_name())
+        return join(EPICS, "ioc", "master", self.ioc_name(auto))
 
-    def ioc_app_name(self, index):
+    def ioc_app_name(self, index, auto=False):
         """
+        :param auto: Accept the auto-generated IOC name by default
         :param index: The IOC application name for the given index
         :return: The name of the application
         """
-        return "{}-IOC-{:02d}".format(self.ioc_name(), index)
+        return "{}-IOC-{:02d}".format(self.ioc_name(auto), index)
 
     def support_dir(self):
         """
