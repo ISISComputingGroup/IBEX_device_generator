@@ -71,7 +71,7 @@ class DeviceInfoGenerator(object):
         :param name: Name to check for validity
         :return: True is name valid, else False
         """
-        return name.isalnum() and name.upper() == name and 1 <= name <= 8
+        return name.isalnum() and name.upper() == name and 1 <= len(name) <= 8
 
     def ioc_name(self):
         """
@@ -168,3 +168,10 @@ class DeviceInfoGenerator(object):
         """
         return join(self.support_master_dir(), "{}Sup".format(self.support_app_name()),
                     "dev{}.db".format(self.support_app_name()))
+
+    def ioc_boot_path(self, index):
+        """
+        :param index: Index of the IOC
+        :return: Path to the iocboot directory
+        """
+        return join(self.ioc_path(), "iocBoot", "ioc{}".format(self.ioc_app_name(index)))

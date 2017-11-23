@@ -1,5 +1,6 @@
 """ Utilities common to all steps """
 from git_utils import RepoWrapper
+from command_line_utils import ask_to_continue
 import logging
 import subprocess
 from os import devnull
@@ -22,12 +23,12 @@ def create_component(device, branch, path, action, commit_message, epics=False, 
         repo.push_all_changes(commit_message)
     except (RuntimeError, IOError) as e:
         logging.error(str(e))
-        return
     except RuntimeWarning as e:
         logging.warning(str(e))
     except Exception as e:
         logging.error("Encountered unknown error: {}".format(e))
-        return
+    finally:
+        ask_to_continue()
 
 
 def run_command(command, working_dir):

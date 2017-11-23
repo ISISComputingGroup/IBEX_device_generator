@@ -52,9 +52,8 @@ class RepoWrapper(object):
             if epics:
                 for s in self._repo.submodules:
                     s.update(init=True)
-            branch_is_new = branch not in self._repo.branches
+            branch_is_new = branch.upper() not in [b.name.upper() for b in self._repo.branches]  # Case insensitive
             self._repo.git.checkout(branch, b=branch_is_new)
-            self._repo.git.checkout(branch)
             # self._repo.git.push("origin", branch, set_upstream=True)
             logging.info("Branch {} ready".format(branch))
         except GitCommandError as e:

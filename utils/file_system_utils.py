@@ -99,7 +99,7 @@ def copy_tree(src, dst):
     _copy(src, dst, rmtree, copytree_external)
 
 
-def _copy(src, dst, copy_func, remove_func):
+def _copy(src, dst, remove_func, copy_func):
     """
     :param src: Place to copy from
     :param dst: Place to copy to
