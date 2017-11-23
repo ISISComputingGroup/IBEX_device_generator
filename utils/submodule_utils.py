@@ -2,7 +2,7 @@
 from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS
 from templates.paths import SUPPORT_MAKEFILE
 from common_utils import run_command
-from file_system_utils import mkdir
+from file_system_utils import mkdir, add_to_makefile_list
 from os import path, remove
 from shutil import copyfile
 import logging
@@ -13,19 +13,7 @@ def _add_to_makefile(name):
     """
     :param name: Name of the device
     """
-    makefile = path.join(EPICS_SUPPORT, "Makefile")
-    with open(makefile) as f:
-        old_lines = f.readlines()
-    new_lines = []
-    last_line = ""
-    marker = "SUPPDIRS += "
-    for line in old_lines:
-        if marker in last_line and marker not in line:
-            new_lines.append(marker + name)
-        new_lines.append(line)
-
-    with open(makefile, "w") as f:
-        f.writelines(new_lines)
+    add_to_makefile_list(EPICS_SUPPORT, "SUPPDIRS", name)
 
 
 def create_submodule(device_info):

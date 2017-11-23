@@ -2,7 +2,7 @@
 from system_paths import IOC_ROOT, PERL, PERL_IOC_GENERATOR, EPICS_BASE_BUILD, EPICS
 from templates.paths import DB, CONFIG_XML
 from common_utils import run_command
-from file_system_utils import replace_in_file, rmtree, get_input, mkdir, copy_file
+from file_system_utils import replace_in_file, rmtree, get_input, mkdir, copy_file, add_to_makefile_list
 from os import path, walk
 import logging
 
@@ -68,20 +68,7 @@ def _build(ioc_path):
 
 
 def _add_to_ioc_makefile(device_info):
-    ioc_makefile = path.join(IOC_ROOT, "Makefile")
-    with open(ioc_makefile) as f:
-        old_lines = f.readlines()
-
-    new_lines = []
-    last_line = ""
-    marker = "IOCDIRS += "
-    for line in old_lines:
-        if marker in last_line and marker not in line:
-            new_lines.append(marker + device_info.ioc_name())
-        new_lines.append(line)
-
-    with open(ioc_makefile, "w") as f:
-        f.writelines(new_lines)
+    add_to_makefile_list(IOC_ROOT, "IOCDIRS", device_info.ioc_name())
 
 
 def create_ioc(device_info, device_count):

@@ -1,7 +1,7 @@
 """ Utilities for interacting with the file system """
 import logging
 from os import access, chmod, W_OK, remove
-from os.path import exists
+from os.path import exists, join
 from os import mkdir as mkdir_external
 from stat import S_IWUSR
 from shutil import rmtree as rmtree_external
@@ -115,3 +115,28 @@ def _copy(src, dst, remove_func, copy_func):
         copy_func(src, dst)
     except OSError as e:
         raise OSError("Unable to copy from {} to {}: {}".format(src, dst, e))
+
+
+def add_to_makefile_list(directory, list_name, entry):
+    """
+    Adds an entry to a list in a makefile. Finds the last line of the form "list_name += ..." and puts a new line
+    containing the entry after it
+
+    :param directory: Directory containing the makefile
+    :param list_name: The name of the list in the makefile to append to
+    :param entry: The entry to add to the list
+    """
+    logging.info("Adding {} to list {} in Makefile for directory {}".format(entry, list_name, directory))
+    makefile = join(directory, "Makefile")
+    with open(makefile) as f:
+        old_lines = f.readlines()
+    new_lines = []
+    last_line = ""
+    marker = "{} += ".format(list_name)
+    for line in old_lines:
+        if marker in last_line and marker not in line:
+            new_lines.append(marker + entry)
+        new_lines.append(line)
+
+    with open(makefile, "w") as f:
+        f.writelines(new_lines)

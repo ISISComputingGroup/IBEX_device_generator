@@ -34,11 +34,11 @@ def generate_device(name, ticket, device_count, submodule=True, opi=True, tests=
     device_info = DeviceInfoGenerator(name)
     branch = "Ticket{}_Add_IOC_{}".format(ticket, device_info.ioc_name())
 
-    create_component(device_info, branch, IOC_ROOT, create_ioc, "Add template IOC", device_count=device_count)
     if submodule:
         create_component(device_info, branch, EPICS, create_submodule, "Add support submodule to EPICS", epics=True)
         create_component(device_info, branch, device_info.support_master_dir(),
                          apply_support_dir_template, "Creating template file structure in support submodule")
+    create_component(device_info, branch, IOC_ROOT, create_ioc, "Add template IOC", device_count=device_count)
     if tests:
         create_component(device_info, branch, IOC_TEST_FRAMEWORK_ROOT, create_test_framework,
                          "Add device to test framework")

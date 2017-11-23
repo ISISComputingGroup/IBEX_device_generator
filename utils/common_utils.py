@@ -19,10 +19,10 @@ def create_component(device, branch, path, action, commit_message, epics=False, 
     if not ask_do_step(commit_message):
         return
     try:
-        # repo = RepoWrapper(path)
-        # repo.prepare_new_branch(branch, epics)
+        repo = RepoWrapper(path)
+        repo.prepare_new_branch(branch, epics)
         action(device, **kwargs)
-        # repo.push_all_changes(commit_message)
+        repo.push_all_changes(commit_message)
     except (RuntimeError, IOError) as e:
         logging.error(str(e))
     except RuntimeWarning as e:
