@@ -5,7 +5,7 @@ from utils.gui_utils import create_opi
 from utils.emulator_utils import create_emulator
 from utils.ioc_utils import create_ioc
 from utils.ioc_test_framework_utils import create_test_framework
-from utils.submodule_utils import create_submodule, apply_support_dir_template
+from utils.support_utils import create_submodule, apply_support_dir_template
 from utils.command_line_utils import parse_args
 from system_paths import CLIENT, EMULATORS_ROOT, IOC_ROOT, IOC_TEST_FRAMEWORK_ROOT, EPICS, EPICS_SUPPORT
 import logging

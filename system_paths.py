@@ -10,6 +10,7 @@ EPICS_BASE_BUILD = join(EPICS, "base", "master", "bin")
 PERL_IOC_GENERATOR = join(EPICS_BASE_BUILD, "windows-x64", "makeBaseApp.pl")
 
 EPICS_SUPPORT = join(EPICS, "support")
+EPICS_MASTER_RELEASE = join(EPICS, "configure", "MASTER_RELEASE")
 
 EMULATORS_ROOT = join(EPICS_SUPPORT, "DeviceEmulator", "master")
 LEWIS_EMULATORS = join(EMULATORS_ROOT, "lewis_emulators")
