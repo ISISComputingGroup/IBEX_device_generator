@@ -14,8 +14,11 @@ def run_tests(test_reports_path=DEFAULT_TEST_LOCATION):
     """
     Runs the test suite
 
-    :param test_reports_path: Path to test reports
-    :return: True if the tests passed, false otherwise
+    Args:
+        test_reports_path: Path to test reports
+
+    Returns:
+        True if the tests passed, false otherwise
     """
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()

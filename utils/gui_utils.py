@@ -10,10 +10,14 @@ import logging
 def _generate_opi_entry(opi_key, opi_file_name, descriptive_device_name):
     """
     Generates an ElementTree entry for opi info based on a device name
-    :param opi_key: Key to identify to OPI to the GUI
-    :param opi_file_name: File name to the device's opi
-    :param descriptive_device_name: Human readable device name
-    :return: ElementTree template based on the device name
+    
+    Args:
+        opi_key: Key to identify to OPI to the GUI
+        opi_file_name: File name to the device's opi
+        descriptive_device_name: Human readable device name
+    
+    Returns:
+        ElementTree template based on the device name
     """
     entry = etree.Element("entry")
 
@@ -46,9 +50,11 @@ def _generate_opi_entry(opi_key, opi_file_name, descriptive_device_name):
 def _update_opi_info(opi_key, opi_file_name, descriptive_device_name):
     """
     Add some basic template information to the opi_info.xml file
-    :param opi_key: Key to identify to OPI to the GUI
-    :param opi_file_name: File name to the device's opi
-    :param descriptive_device_name: Human readable device name
+
+    Args:
+        opi_key: Key to identify to OPI to the GUI
+        opi_file_name: File name to the device's opi
+        descriptive_device_name: Human readable device name
     """
     logging.info("Adding template information to opi info")
     opi_info_path = path.join(OPI_RESOURCES, "opi_info.xml")
@@ -69,7 +75,9 @@ def _update_opi_info(opi_key, opi_file_name, descriptive_device_name):
 def create_opi(device_info):
     """
     Creates a blank OPI as part of the GUI and add it to the OPI info
-    :param device_info: Provides name-based information about the device
+
+    Args:
+        device_info: Provides name-based information about the device
     """
     logging.info("Copying template OPI file to {}".format(device_info.opi_file_path()))
     copyfile(OPI, device_info.opi_file_path())

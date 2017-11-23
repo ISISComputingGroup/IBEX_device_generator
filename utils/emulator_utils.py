@@ -7,7 +7,8 @@ import logging
 
 def _copy_files(emulator_dir):
     """
-    :param emulator_dir: Directory of the device emulator
+    Args:
+        emulator_dir: Directory of the device emulator
     """
     logging.info("Copying template emulator to {}".format(emulator_dir))
     copy_tree(EMULATOR_TEMPLATE, emulator_dir)
@@ -15,8 +16,9 @@ def _copy_files(emulator_dir):
 
 def _replace_default_name(emulator_dir, emulator_name):
     """
-    :param emulator_dir: Directory where the emulator lives
-    :param emulator_name: Name given to the emulator
+    Args:
+        emulator_dir: Directory where the emulator lives
+        emulator_name: Name given to the emulator
     """
     default_name = "DEVICENAME"
     for root, dirs, files in walk(emulator_dir):
@@ -30,7 +32,9 @@ def _replace_default_name(emulator_dir, emulator_name):
 def create_emulator(device_info):
     """
     Creates a vanilla emulator in the DeviceEmulator submodule
-    :param device_info: Provides name-based information about the device
+
+    Args:
+        device_info: Provides name-based information about the device
     """
     _copy_files(device_info.emulator_dir())
     _replace_default_name(device_info.emulator_dir(), device_info.emulator_name())

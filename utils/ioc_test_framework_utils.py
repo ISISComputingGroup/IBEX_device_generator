@@ -8,7 +8,8 @@ import logging
 
 def _add_template_test_file(device_info):
     """
-    :param device_info: Information for the device based on the given name
+    Args:
+        device_info: Information for the device based on the given name
     """
     dst = device_info.ioc_test_framework_file_path()
     logging.info("Copying template ioc test framework tests to {}".format(dst))
@@ -21,7 +22,8 @@ def _add_template_test_file(device_info):
 
 def _add_to_run_all_tests(device_info):
     """
-    :param device_info: Information for the device based on the given name
+    Args:
+        device_info: Information for the device based on the given name
     """
     run_all_tests_src = path.join(IOC_TEST_FRAMEWORK_ROOT, "run_all_tests.bat")
 
@@ -50,6 +52,9 @@ def _add_to_run_all_tests(device_info):
 def create_test_framework(device_info):
     """
     Creates a vanilla integration of the device into the IOC test framework
+
+    Args:
+        device_info: Name-based information about the device
     """
     _add_to_run_all_tests(device_info)
     _add_template_test_file(device_info)

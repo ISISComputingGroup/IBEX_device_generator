@@ -11,7 +11,8 @@ from git_utils import RepoWrapper
 
 def _add_to_makefile(name):
     """
-    :param name: Name of the device
+    Args:
+        name: Name of the device
     """
     add_to_makefile_list(EPICS_SUPPORT, "SUPPDIRS", name)
 
@@ -19,7 +20,9 @@ def _add_to_makefile(name):
 def _add_macro(device_info):
     """
     Adds a macro to MASTER_RELEASE
-    :param device_info: Name-based device information
+
+    Args:
+        device_info: Name-based device information
     """
     logging.info("Adding macro to MASTER_RELEASE")
     with open(EPICS_MASTER_RELEASE, "a") as f:
@@ -31,7 +34,9 @@ def _add_macro(device_info):
 def create_submodule(device_info):
     """
     Creates a submodule and links it into the main EPICS repo
-    :param device_info: Provides name-based information about the device
+
+    Args:
+        device_info: Provides name-based information about the device
     """
     mkdir(device_info.support_dir())
     copyfile(SUPPORT_MAKEFILE, path.join(device_info.support_dir(), "Makefile"))
@@ -46,7 +51,8 @@ def create_submodule(device_info):
 
 def apply_support_dir_template(device_info):
     """
-    :param device_info: Provides name-based information about the device
+    Args:
+        device_info: Provides name-based information about the device
     """
     cmd = [PERL, PERL_SUPPORT_GENERATOR, "-t", "streamSCPI", device_info.support_app_name()]
     run_command(cmd, device_info.support_master_dir())

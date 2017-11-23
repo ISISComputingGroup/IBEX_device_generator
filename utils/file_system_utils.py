@@ -14,9 +14,10 @@ def replace_in_file(target, substitutions):
     """
     Replaces matching content in a file
 
-    :param target: Path to file where we are going to make substitutions
-    :param substitutions: A collection of substitutions to make. Each substitution should be in the form
-    (original, final)
+    Args:
+        target: Path to file where we are going to make substitutions
+        substitutions: A collection of substitutions to make. Each substitution should be in the form
+        (original, final)
     """
     logging.info("Making substitutions into file {}: {}".format(target, substitutions))
     with open(target) as f:
@@ -24,8 +25,11 @@ def replace_in_file(target, substitutions):
 
     def substitute(input_str):
         """
-        :param input_str: The original string
-        :return: The original string after substitutions have beeen made
+        Args:
+            input_str: The original string
+
+        Returns:
+            The original string after substitutions have beeen made
         """
         output_str = input_str
         for s in substitutions:
@@ -40,7 +44,8 @@ def rmtree(delete_path):
     """
     Enhanced version of shutil rmtree that can cope with windows permission issues
 
-    :param delete_path: The directory to the path to delete
+    Args:
+        delete_path: The directory to the path to delete
     """
     logging.info("Deleting folder {}".format(delete_path))
 
@@ -53,9 +58,10 @@ def rmtree(delete_path):
 
         If the error is for another reason it re-raises the error.
 
-        :param func: Action taken on the path
-        :param path: Path that is being manipulated
-        :param exc_info: Whether to log execution info
+        Args:
+            func: Action taken on the path
+            path: Path that is being manipulated
+            exc_info: Whether to log execution info
         """
         if not access(path, W_OK):  # Is the error an access error ?
             chmod(path, S_IWUSR)
@@ -67,8 +73,8 @@ def rmtree(delete_path):
 
 def mkdir(path):
     """
-    :param path: The path to the dir to create
-    :return:
+    Args:
+        path: The path to the dir to create
     """
     if exists(path):
         if get_input("{} already exists. Shall I try and delete it? (Y/N) ".format(path)).upper() == "Y":
@@ -84,8 +90,10 @@ def mkdir(path):
 def copy_file(src, dst):
     """
     Copy a file from one place to another
-    :param src: Place to copy from
-    :param dst: Place to copy to
+    
+    Args:
+        src: Place to copy from
+        dst: Place to copy to
     """
     _copy(src, dst, remove, copyfile_external)
 
@@ -93,18 +101,21 @@ def copy_file(src, dst):
 def copy_tree(src, dst):
     """
     Copy a folder from one place to another
-    :param src: Place to copy from
-    :param dst: Place to copy to
+    
+    Args:
+        src: Place to copy from
+        dst: Place to copy to
     """
     _copy(src, dst, rmtree, copytree_external)
 
 
 def _copy(src, dst, remove_func, copy_func):
     """
-    :param src: Place to copy from
-    :param dst: Place to copy to
-    :param copy_func: External function to perform copy
-    :param remove_func: External function to perform remove
+    Args:
+        src: Place to copy from
+        dst: Place to copy to
+        copy_func: External function to perform copy
+        remove_func: External function to perform remove
     """
     if exists(dst):
         if get_input("{} already exists. Shall I try and delete it? (Y/N) ".format(dst)).upper() == "Y":
@@ -121,10 +132,11 @@ def add_to_makefile_list(directory, list_name, entry):
     """
     Adds an entry to a list in a makefile. Finds the last line of the form "list_name += ..." and puts a new line
     containing the entry after it
-
-    :param directory: Directory containing the makefile
-    :param list_name: The name of the list in the makefile to append to
-    :param entry: The entry to add to the list
+    
+    Args:
+        directory: Directory containing the makefile
+        list_name: The name of the list in the makefile to append to
+        entry: The entry to add to the list
     """
     logging.info("Adding {} to list {} in Makefile for directory {}".format(entry, list_name, directory))
     makefile = join(directory, "Makefile")

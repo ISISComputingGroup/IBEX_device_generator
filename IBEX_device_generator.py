@@ -21,13 +21,15 @@ def _configure_logging():
 def generate_device(name, ticket, device_count, submodule=True, opi=True, tests=True, emulator=True):
     """
     Creates the boilerplate components for an IOC
-    :param name: The name of the IOC
-    :param ticket: The ticket number this relates to
-    :param device_count: Number of IOCs to generate
-    :param submodule: Whether to create a support submodule
-    :param opi: Whether to create an empty OPI
-    :param tests: Whether to create IOC system tests
-    :param emulator: Whether to create a device emulator
+
+    Args:
+        name: The name of the IOC
+        ticket: The ticket number this relates to
+        device_count: Number of IOCs to generate
+        submodule: Whether to create a support submodule
+        opi: Whether to create an empty OPI
+        tests: Whether to create IOC system tests
+        emulator: Whether to create a device emulator
     """
 
     _configure_logging()

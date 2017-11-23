@@ -15,7 +15,8 @@ class RepoWrapper(object):
     """
     def __init__(self, path):
         """
-        :param path: The path to the git repository
+        Args:
+            path: The path to the git repository
         """
         try:
             self._repo = Repo(path)
@@ -28,8 +29,9 @@ class RepoWrapper(object):
 
     def prepare_new_branch(self, branch, epics=False):
         """
-        :param branch: Name of the new branch
-        :param epics: Is this the main epics repo?
+        Args:
+            branch: Name of the new branch
+            :param epics: Is this the main epics repo?
         """
         logging.info("Preparing new branch, {}, for repo {}".format(branch, self._repo.working_tree_dir))
         if epics:
@@ -56,8 +58,9 @@ class RepoWrapper(object):
         """
         Adds all modified and un-tracked files to git, commits with the message provided and pushes to git
 
-        :param message: The commit message to include with the push
-        :param allow_master: Can commit changes to the master branch
+        Args:
+            message: The commit message to include with the push
+            allow_master: Can commit changes to the master branch
         """
         logging.info("Pushing all changes to current branch, {}, for repo {}".format(
             self._repo.active_branch, self._repo.working_tree_dir))
@@ -78,7 +81,8 @@ class RepoWrapper(object):
 
     def add_initial_commit(self):
         """
-        :return: Adds a starting commit to a repo
+        Returns:
+             Adds a starting commit to a repo
         """
         try:
             copy_file(SUPPORT_README, join(self._repo.working_dir, "README.md"))
@@ -91,9 +95,10 @@ class RepoWrapper(object):
 
     def create_submodule(self, name, url, path):
         """
-        :param name: Name of the submodule
-        :param url: Url to the submodule repo
-        :param path: Local system path to the submodule
+        Args:
+            name: Name of the submodule
+            url: Url to the submodule repo
+            path: Local system path to the submodule
         """
         try:
             self._repo.create_submodule(name, path, url=url, branch="master")
