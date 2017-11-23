@@ -1,6 +1,6 @@
 """ Utilities for running scripts from the command line """
 import argparse
-from sys import version_info, exit
+from sys import version_info
 
 
 def parse_args(description, arguments):
@@ -30,9 +30,10 @@ def get_input(prompt):
     return input(prompt) if version_info[0] >= 3 else raw_input(prompt)
 
 
-def ask_to_continue():
+def ask_do_step(name):
     """
-    Ask the user whether the program should continue
+    Ask the user whether to do a step
+    :param name: Name of the step
+    :return: True or False on whether to perform the step
     """
-    if get_input("Should I continue (Y/N) ").upper() != "Y":
-        exit(0)
+    return get_input("Should I do step: {} (Y/N) ".format(name)).upper() == "Y"

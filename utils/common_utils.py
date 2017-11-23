@@ -1,6 +1,6 @@
 """ Utilities common to all steps """
 from git_utils import RepoWrapper
-from command_line_utils import ask_to_continue
+from command_line_utils import ask_do_step
 import logging
 import subprocess
 from os import devnull
@@ -16,19 +16,19 @@ def create_component(device, branch, path, action, commit_message, epics=False, 
     :param commit_message: Message to attach to the changes
     :param epics: Is this change to the main EPICS repo?
     """
+    if not ask_do_step(commit_message):
+        return
     try:
-        repo = RepoWrapper(path)
-        repo.prepare_new_branch(branch, epics)
+        # repo = RepoWrapper(path)
+        # repo.prepare_new_branch(branch, epics)
         action(device, **kwargs)
-        repo.push_all_changes(commit_message)
+        # repo.push_all_changes(commit_message)
     except (RuntimeError, IOError) as e:
         logging.error(str(e))
     except RuntimeWarning as e:
         logging.warning(str(e))
     except Exception as e:
         logging.error("Encountered unknown error: {}".format(e))
-    finally:
-        ask_to_continue()
 
 
 def run_command(command, working_dir):

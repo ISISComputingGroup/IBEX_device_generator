@@ -22,16 +22,9 @@ class RepoWrapper(object):
         except (InvalidGitRepositoryError, NoSuchPathError):
             mkdir(path)
             self._repo = Repo.init(path)
+            self.add_initial_commit()
         except Exception as e:
             raise RuntimeError("Unable to attach to git repository at path {}: {}".format(path, e))
-
-    @staticmethod
-    def clone_from(to_path, url):
-        """
-        :param to_path: The path to clone the repo to
-        :param url: The remote git repository to clone from
-        """
-        Repo.clone_from(url=url, to_path=to_path)
 
     def prepare_new_branch(self, branch, epics=False):
         """
@@ -54,7 +47,7 @@ class RepoWrapper(object):
                     s.update(init=True)
             branch_is_new = branch.upper() not in [b.name.upper() for b in self._repo.branches]  # Case insensitive
             self._repo.git.checkout(branch, b=branch_is_new)
-            # self._repo.git.push("origin", branch, set_upstream=True)
+            self._repo.git.push("origin", branch, set_upstream=True)
             logging.info("Branch {} ready".format(branch))
         except GitCommandError as e:
             raise RuntimeError("Error whilst executing preparing git branch, {}".format(e))
@@ -76,7 +69,7 @@ class RepoWrapper(object):
             n_files = len(self._repo.index.diff("HEAD"))
             if n_files > 0:
                 self._repo.git.commit(m=message)
-                # self._repo.git.push(recurse_submodule="check")
+                self._repo.git.push(recurse_submodule="check")
                 logging.info("{} files pushed to {}: {}".format(n_files, self._repo.active_branch, message))
             else:
                 logging.warn("Commit aborted. No files changed")
@@ -91,7 +84,7 @@ class RepoWrapper(object):
             copy_file(SUPPORT_README, join(self._repo.working_dir, "README.md"))
             self._repo.git.add(A=True)
             self._repo.git.commit(m="Initial commit")
-            self._repo.git.push(u="origin")
+            self._repo.git.push("origin", "master", set_upstream=True)
         except (OSError, GitCommandError) as e:
             raise RuntimeError("Error whilst creating initial commit in {}: {}"
                                .format(self._repo.working_dir, e))
