@@ -1,7 +1,7 @@
 """ Utilities for integrating the device into the IOC test framework """
 from templates.paths import TESTS_TEMPLATE
 from system_paths import IOC_TEST_FRAMEWORK_ROOT
-from os import path, linesep
+from os import path
 from file_system_utils import replace_in_file, copy_file
 import logging
 
@@ -46,6 +46,7 @@ def _add_to_run_all_tests(device_info):
                      case[1].format(device_info.emulator_name(), device_info.ioc_name()),
                      separator,
                      case_separator]
+            linesep = "\n"
             f.writelines([l+linesep for l in lines])
 
 
