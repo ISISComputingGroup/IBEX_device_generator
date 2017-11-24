@@ -7,7 +7,7 @@ from stat import S_IWUSR
 from shutil import rmtree as rmtree_external
 from shutil import copyfile as copyfile_external
 from shutil import copytree as copytree_external
-from command_line_utils import get_input
+from command_line_utils import ask_do_step
 
 
 def replace_in_file(target, substitutions):
@@ -77,7 +77,7 @@ def mkdir(path):
         path: The path to the dir to create
     """
     if exists(path):
-        if get_input("{} already exists. Shall I try and delete it? (Y/N) ".format(path)).upper() == "Y":
+        if ask_do_step("{} already exists. Delete it?"):
             rmtree(path)
             mkdir_external(path)
         else:
@@ -117,7 +117,7 @@ def _copy(src, dst, remove_func, copy_func):
         remove_func: External function to perform remove
     """
     if exists(dst):
-        if get_input("{} already exists. Shall I try and delete it? (Y/N) ".format(dst)).upper() == "Y":
+        if ask_do_step("{} already exists. Delete it?".format(dst)).upper() == "Y":
             remove_func(dst)
         else:
             raise OSError("File {} already exists. Aborting".format(dst))

@@ -3,7 +3,7 @@ Utilities for interacting with Git. This is largely done via the command line be
 to maintain than the PythonGit API.
 """
 from git import Repo, GitCommandError, InvalidGitRepositoryError, NoSuchPathError
-from command_line_utils import get_input
+from command_line_utils import ask_do_step
 from templates.paths import SUPPORT_README
 from file_system_utils import copy_file, mkdir
 from os.path import join
@@ -36,13 +36,12 @@ class RepoWrapper(object):
             :param epics: Is this the main epics repo?
         """
         logging.info("Preparing new branch, {}, for repo {}".format(branch, self._repo.working_tree_dir))
-        if self._repo.is_dirty() and get_input("Repo is dirty. Shall I clean it? (Y/N) ").upper() == "Y":
+        if self._repo.is_dirty() and ask_do_step(
+                "Repository is dirty, clean it? (Prompts will be given for subsequent steps)"):
             try:
-                if epics:
-                    logging.info("Please be patient. This can take a few minutes for the main EPICS repo")
-                if get_input("Shall I do a hard reset on the repository? (Y/N) ").upper() == "Y":
+                if ask_do_step("Perform a hard reset on the repository"):
                     self._repo.git.reset("HEAD", hard=True)
-                if get_input("Shall I do a git clean -fd on this repository? (Y/N) ").upper() == "Y":
+                if ask_do_step("Perform git clean -fd on the repository"):
                     self._repo.git.clean(f=True, d=True)
             except GitCommandError as e:
                 logging.warning("Error whilst scrubbing repository. I'll try to continue anyway")
