@@ -20,6 +20,6 @@ class SystemPathTests(unittest.TestCase):
         for p in paths:
             if not exists(p):
                 logging.error("Expected path {} does not exist. Please check the path and update the configuration in "
-                              "'system_paths.py' if necessary")
+                              "'system_paths.py' if necessary".format(p))
                 missing_paths += 1
         self.assertEqual(missing_paths, 0)
