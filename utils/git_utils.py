@@ -29,11 +29,10 @@ class RepoWrapper(object):
         except Exception as e:
             raise RuntimeError("Unable to attach to git repository at path {}: {}".format(path, e))
 
-    def prepare_new_branch(self, branch, epics=False):
+    def prepare_new_branch(self, branch):
         """
         Args:
             branch: Name of the new branch
-            :param epics: Is this the main epics repo?
         """
         logging.info("Preparing new branch, {}, for repo {}".format(branch, self._repo.working_tree_dir))
         if self._repo.is_dirty() and ask_do_step(
@@ -44,7 +43,7 @@ class RepoWrapper(object):
                 if ask_do_step("Perform git clean -fd on the repository"):
                     self._repo.git.clean(f=True, d=True)
             except GitCommandError as e:
-                logging.warning("Error whilst scrubbing repository. I'll try to continue anyway")
+                logging.warning("Error whilst scrubbing repository. I'll try to continue anyway: {}").format(e)
 
         try:
             self._repo.git.checkout("master")
