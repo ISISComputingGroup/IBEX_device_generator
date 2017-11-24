@@ -6,6 +6,7 @@ from xmlrunner import XMLTestRunner
 from utils.command_line_utils import parse_args
 from tests.device_info_generator_tests import DeviceInfoGeneratorTests
 from tests.gui_utils_tests import GuiUtilsTests
+from tests.system_path_tests import SystemPathTests
 
 DEFAULT_TEST_LOCATION = "test-reports\\"
 
@@ -22,7 +23,7 @@ def run_tests(test_reports_path=DEFAULT_TEST_LOCATION):
     """
     loader = unittest.TestLoader()
     suite = unittest.TestSuite()
-    for case in [DeviceInfoGeneratorTests, GuiUtilsTests]:
+    for case in [DeviceInfoGeneratorTests, GuiUtilsTests, SystemPathTests]:
         suite.addTests(loader.loadTestsFromTestCase(case))
 
     return XMLTestRunner(output=str(os.path.join(test_reports_path)), stream=sys.stdout).run(suite).wasSuccessful()
