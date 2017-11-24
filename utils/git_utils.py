@@ -36,25 +36,31 @@ class RepoWrapper(object):
             :param epics: Is this the main epics repo?
         """
         logging.info("Preparing new branch, {}, for repo {}".format(branch, self._repo.working_tree_dir))
-        if epics:
-            logging.info("Please be patient. This can take a few minutes for the main EPICS repo")
-        try:
-            self._repo.git.reset("HEAD", hard=True)
+        if self._repo.is_dirty() and get_input("Repo is dirty. Shall I clean it? (Y/N) ").upper() == "Y":
             try:
-                self._repo.git.clean(f=True, d=True, x=True)
-            except GitCommandError:  # Fall back on no -x. Some repos (e.g. GUI) have paths that are too long
-                self._repo.git.clean(f=True, d=True)
-            self._repo.git.checkout("master", force=True)
+                if epics:
+                    logging.info("Please be patient. This can take a few minutes for the main EPICS repo")
+                if get_input("Shall I do a hard reset on the repository? (Y/N) ").upper() == "Y":
+                    self._repo.git.reset("HEAD", hard=True)
+                if get_input("Shall I do a git clean -fd on this repository? (Y/N) ").upper() == "Y":
+                    self._repo.git.clean(f=True, d=True)
+            except GitCommandError as e:
+                logging.warning("Error whilst scrubbing repository. I'll try to continue anyway")
+
+        try:
+            self._repo.git.checkout("master")
             self._repo.git.fetch(recurse_submodules=True)
-            if epics:
-                for s in self._repo.submodules:
-                    s.update(init=True)
+        except GitCommandError as e:
+            raise RuntimeError("Could not switch repo back to master :".format(e))
+
+        try:
             branch_is_new = branch.upper() not in [b.name.upper() for b in self._repo.branches]  # Case insensitive
             self._repo.git.checkout(branch, b=branch_is_new)
             self._repo.git.push("origin", branch, set_upstream=True)
-            logging.info("Branch {} ready".format(branch))
         except GitCommandError as e:
-            raise RuntimeError("Error whilst executing preparing git branch, {}".format(e))
+            raise RuntimeError("Error whilst creating git branch, {}".format(e))
+
+        logging.info("Branch {} ready".format(branch))
 
     def push_all_changes(self, message, allow_master=False):
         """
