@@ -2,7 +2,8 @@
 from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS, EPICS_MASTER_RELEASE
 from templates.paths import SUPPORT_MAKEFILE
 from common_utils import run_command
-from file_system_utils import mkdir, add_to_makefile_list, get_input
+from file_system_utils import mkdir, add_to_makefile_list
+from command_line_utils import get_input
 from os import path, remove
 from shutil import copyfile
 import logging

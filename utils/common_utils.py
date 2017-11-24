@@ -22,7 +22,7 @@ def create_component(device, branch, path, action, commit_message, epics=False, 
         return
     try:
         repo = RepoWrapper(path)
-        repo.prepare_new_branch(branch, epics)
+        repo.prepare_new_branch(branch)
         action(device, **kwargs)
         repo.push_all_changes(commit_message)
     except (RuntimeError, IOError) as e:
