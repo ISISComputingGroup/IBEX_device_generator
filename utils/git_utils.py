@@ -37,7 +37,7 @@ class RepoWrapper(object):
         logging.info("Preparing new branch, {}, for repo {}".format(branch, self._repo.working_tree_dir))
         if self._repo.is_dirty() and ask_do_step(
                 "Repository {} is dirty, clean it? (Prompts will be given for subsequent steps)"
-                        .format(self._repo.working_tree_dir)):
+                "".format(self._repo.working_tree_dir)):
             try:
                 if ask_do_step("Perform a hard reset on the repository"):
                     self._repo.git.reset("HEAD", hard=True)

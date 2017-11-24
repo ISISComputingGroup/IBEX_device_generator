@@ -6,7 +6,7 @@ import subprocess
 from os import devnull
 
 
-def create_component(device, branch, path, action, commit_message, epics=False, **kwargs):
+def create_component(device, branch, path, action, commit_message, **kwargs):
     """
     Creates part of the IBEX device support
     
@@ -16,7 +16,6 @@ def create_component(device, branch, path, action, commit_message, epics=False, 
         path: Path to the repository
         action: Function that takes the device as an argument that creates the component
         commit_message: Message to attach to the changes
-        epics: Is this change to the main EPICS repo?
     """
     if not ask_do_step(commit_message):
         return
