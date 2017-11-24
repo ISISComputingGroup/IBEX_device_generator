@@ -115,9 +115,9 @@ class RepoWrapper(object):
     def contains_submodule(self, url):
         """
         Args:
-            app_name: The url of the remote repository
+            url: The url of the remote repository
 
         Returns:
              True if already a submodule else False
         """
-        return url in [s.url for s in self._repo.submodules]
+        return url.lower() in [s.url.lower() for s in self._repo.submodules]
