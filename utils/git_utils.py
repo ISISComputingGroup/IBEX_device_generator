@@ -36,7 +36,8 @@ class RepoWrapper(object):
         """
         logging.info("Preparing new branch, {}, for repo {}".format(branch, self._repo.working_tree_dir))
         if self._repo.is_dirty() and ask_do_step(
-                "Repository is dirty, clean it? (Prompts will be given for subsequent steps)"):
+                "Repository {} is dirty, clean it? (Prompts will be given for subsequent steps)"
+                        .format(self._repo.working_tree_dir)):
             try:
                 if ask_do_step("Perform a hard reset on the repository"):
                     self._repo.git.reset("HEAD", hard=True)
@@ -46,12 +47,14 @@ class RepoWrapper(object):
                 logging.warning("Error whilst scrubbing repository. I'll try to continue anyway: {}").format(e)
 
         try:
+            logging.info("Switching repo {} to master".format(branch, self._repo.working_tree_dir))
             self._repo.git.checkout("master")
             self._repo.git.fetch(recurse_submodules=True)
         except GitCommandError as e:
             raise RuntimeError("Could not switch repo back to master :".format(e))
 
         try:
+            logging.info("Creating/switching to branch {}".format(branch))
             branch_is_new = branch.upper() not in [b.name.upper() for b in self._repo.branches]  # Case insensitive
             self._repo.git.checkout(branch, b=branch_is_new)
             self._repo.git.push("origin", branch, set_upstream=True)
