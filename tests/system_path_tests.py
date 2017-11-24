@@ -1,12 +1,13 @@
 """ Tests against the system paths """
 import unittest
+import logging
 from os.path import exists
 from system_paths import *
 
 
 class SystemPathTests(unittest.TestCase):
 
-    def test_GIVEN_system_paths_THEN_all_paths_exist(self):
+    def test_GIVEN_immutable_system_paths_THEN_all_paths_exist(self):
         # Arrange
         paths = (
             INSTRUMENT, EPICS, IOC_ROOT, PERL, EPICS_BASE_BUILD, PERL_IOC_GENERATOR, EPICS_SUPPORT,
@@ -16,4 +17,7 @@ class SystemPathTests(unittest.TestCase):
 
         # Assert
         for p in paths:
-            self.assertTrue(exists(p))
+            if not exists(p):
+                logging.error("Expected path {} does not exist. Please check the path and update the configuration in "
+                              "'system_paths.py' if necessary")
+                self.fail()
