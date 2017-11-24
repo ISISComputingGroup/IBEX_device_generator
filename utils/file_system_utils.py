@@ -79,12 +79,11 @@ def mkdir(path):
     if exists(path):
         if get_input("{} already exists. Shall I try and delete it? (Y/N) ".format(path)).upper() == "Y":
             rmtree(path)
+            mkdir_external(path)
         else:
-            raise OSError("Directory {} already exists. Aborting".format(path))
-    try:
+            pass  # Do nothing if the dir exists and the user requests no deletion
+    else:
         mkdir_external(path)
-    except OSError as e:
-        raise OSError("Unable to create directory {}: {}".format(path, e))
 
 
 def copy_file(src, dst):

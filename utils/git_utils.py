@@ -7,6 +7,7 @@ from command_line_utils import get_input
 from templates.paths import SUPPORT_README
 from file_system_utils import copy_file, mkdir
 from os.path import join
+from time import sleep
 import logging
 
 
@@ -44,7 +45,7 @@ class RepoWrapper(object):
             except GitCommandError:  # Fall back on no -x. Some repos (e.g. GUI) have paths that are too long
                 self._repo.git.clean(f=True, d=True)
             self._repo.git.checkout("master", force=True)
-            self._repo.git.pull()
+            self._repo.git.fetch(recurse_submodules=True)
             if epics:
                 for s in self._repo.submodules:
                     s.update(init=True)
@@ -107,17 +108,26 @@ class RepoWrapper(object):
                           .format(name))
             else:
                 self._repo.create_submodule(name, path, url=url, branch="master")
+        except InvalidGitRepositoryError as e:
+            logging.error("Cannot add {} as a submodule, it does not exist: {}".format(path, e))
         except GitCommandError as e:
-            logging.error("Unable to create submodule from {}: {}".format(path, e))
+            logging.error("Git command failed to create submodule from {}: {}".format(path, e))
         except Exception as e:
             raise RuntimeError("Unknown error {} of type {} whilst creating submodule in {}".format(e, type(e), path))
 
     def contains_submodule(self, url):
         """
+        Check if the repository already contains the submodule. Can be a little slow to update after a reset so on
+        a simple retry loop
+
         Args:
             url: The url of the remote repository
 
         Returns:
              True if already a submodule else False
         """
-        return url.lower() in [s.url.lower() for s in self._repo.submodules]
+        for i in range(10):
+            if url.lower() in [s.url.lower() for s in self._repo.submodules]:
+                return True
+            sleep(0.1)
+        return False
