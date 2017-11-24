@@ -7,9 +7,8 @@ from utils.ioc_utils import create_ioc
 from utils.ioc_test_framework_utils import create_test_framework
 from utils.support_utils import create_submodule, apply_support_dir_template
 from utils.command_line_utils import parse_args
-from system_paths import CLIENT, EMULATORS_ROOT, IOC_ROOT, IOC_TEST_FRAMEWORK_ROOT, EPICS, EPICS_SUPPORT
+from system_paths import CLIENT, EMULATORS_ROOT, IOC_ROOT, IOC_TEST_FRAMEWORK_ROOT, EPICS
 import logging
-from os.path import join
 from utils.device_info_generator import DeviceInfoGenerator
 
 
@@ -33,7 +32,7 @@ def generate_device(name, ticket, device_count):
     device_info = DeviceInfoGenerator(name)
     branch = "Ticket{}_Add_IOC_{}".format(ticket, device_info.ioc_name())
 
-    create_component(device_info, branch, EPICS, create_submodule, "Add support submodule to EPICS", epics=True)
+    create_component(device_info, branch, EPICS, create_submodule, "Add support submodule to EPICS")
     create_component(device_info, branch, device_info.support_master_dir(),
                      apply_support_dir_template, "Creating template file structure in support submodule")
     create_component(device_info, branch, IOC_ROOT, create_ioc, "Add template IOC", device_count=device_count)
@@ -56,7 +55,15 @@ def main():
          {"name": "ticket", "type": int, "description": "Ticket number"},
          {"name": "device_count", "type": int, "description": "Number of duplicate IOCs to generate", "default": 2}]
     )
-    generate_device(args.name, args.ticket, args.device_count)
+
+    no_argument_formatter = "No value provided for required argument '--{}'"
+    if args.name is not None and args.ticket is not None:
+        generate_device(args.name, args.ticket, args.device_count)
+    else:
+        if args.name is None:
+            logging.error(no_argument_formatter.format("name"))
+        if args.ticket is None:
+            logging.error(no_argument_formatter.format("ticket"))
 
 
 if __name__ == "__main__":
