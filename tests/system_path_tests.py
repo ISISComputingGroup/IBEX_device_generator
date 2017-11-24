@@ -16,8 +16,10 @@ class SystemPathTests(unittest.TestCase):
         )
 
         # Assert
+        missing_paths = 0
         for p in paths:
             if not exists(p):
                 logging.error("Expected path {} does not exist. Please check the path and update the configuration in "
                               "'system_paths.py' if necessary")
-                self.fail()
+                missing_paths += 1
+        self.assertEqual(missing_paths, 0)
