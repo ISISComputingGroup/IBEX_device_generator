@@ -106,3 +106,13 @@ class RepoWrapper(object):
             logging.error("Unable to create submodule from {}: {}".format(path, e))
         except Exception as e:
             raise RuntimeError("Unknown error {} of type {} whilst creating submodule in {}".format(e, type(e), path))
+
+    def contains_submodule(self, url):
+        """
+        Args:
+            app_name: The url of the remote repository
+
+        Returns:
+             True if already a submodule else False
+        """
+        return url in [s.url for s in self._repo.submodules]
