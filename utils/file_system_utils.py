@@ -77,7 +77,7 @@ def mkdir(path):
         path: The path to the dir to create
     """
     if exists(path):
-        if ask_do_step("{} already exists. Delete it?"):
+        if ask_do_step("{} already exists. Delete it?".format(path)):
             rmtree(path)
             mkdir_external(path)
         else:
@@ -117,7 +117,7 @@ def _copy(src, dst, remove_func, copy_func):
         remove_func: External function to perform remove
     """
     if exists(dst):
-        if ask_do_step("{} already exists. Delete it?".format(dst)).upper() == "Y":
+        if ask_do_step("{} already exists. Delete it?".format(dst)):
             remove_func(dst)
         else:
             raise OSError("File {} already exists. Aborting".format(dst))
