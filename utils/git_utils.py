@@ -5,8 +5,8 @@ to maintain than the PythonGit API.
 from git import Repo, GitCommandError, InvalidGitRepositoryError, NoSuchPathError
 from command_line_utils import ask_do_step, get_input
 from templates.paths import SUPPORT_README
-from file_system_utils import copy_file, mkdir
-from os.path import join
+from file_system_utils import copy_file, mkdir, rmtree
+from os.path import join, exists
 from time import sleep
 import logging
 
@@ -110,10 +110,15 @@ class RepoWrapper(object):
             path: Local system path to the submodule
         """
         try:
+            git_modules_path = join(self._repo.working_tree_dir, ".git", "modules", name)
             if self.contains_submodule(url):
                 get_input("Submodule {} already exists. Confirm this is as expected and press return to continue"
                           .format(name))
             else:
+                if exists(git_modules_path) and ask_do_step(
+                        "The submodule {} is not part of this repo, yet {} exists. Shall I delete it?"
+                        "".format(name, git_modules_path)):
+                    rmtree(git_modules_path)
                 self._repo.create_submodule(name, path, url=url, branch="master")
         except InvalidGitRepositoryError as e:
             logging.error("Cannot add {} as a submodule, it does not exist: {}".format(path, e))
