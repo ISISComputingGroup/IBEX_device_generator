@@ -2,7 +2,8 @@
 from system_paths import IOC_ROOT, PERL, PERL_IOC_GENERATOR, EPICS_BASE_BUILD, EPICS
 from templates.paths import DB, CONFIG_XML
 from common_utils import run_command
-from file_system_utils import replace_in_file, rmtree, get_input, mkdir, copy_file, add_to_makefile_list
+from file_system_utils import replace_in_file, rmtree, mkdir, copy_file, add_to_makefile_list
+from command_line_utils import get_input
 from os import path, walk
 import logging
 
