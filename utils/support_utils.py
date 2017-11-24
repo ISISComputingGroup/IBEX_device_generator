@@ -43,11 +43,7 @@ def create_submodule(device_info):
     master_dir = device_info.support_master_dir()
     get_input("Attempting to create repository using remote {}. Press return to confirm it exists"
               .format(device_info.support_repo_url()))
-    epics_repo = RepoWrapper(EPICS)
-    if epics_repo.contains_support_submodule(device_info.support_repo_url()):
-        get_input("Submodule already exists. Confirm this is as expected and press return to continue")
-    else:
-        RepoWrapper(EPICS).create_submodule(device_info.support_app_name(), device_info.support_repo_url(), master_dir)
+    RepoWrapper(EPICS).create_submodule(device_info.support_app_name(), device_info.support_repo_url(), master_dir)
     logging.info("Initializing device support repository {}".format(master_dir))
     _add_to_makefile(device_info.support_app_name())
     _add_macro(device_info)

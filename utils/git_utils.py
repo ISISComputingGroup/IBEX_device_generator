@@ -3,6 +3,7 @@ Utilities for interacting with Git. This is largely done via the command line be
 to maintain than the PythonGit API.
 """
 from git import Repo, GitCommandError, InvalidGitRepositoryError, NoSuchPathError
+from command_line_utils import get_input
 from templates.paths import SUPPORT_README
 from file_system_utils import copy_file, mkdir
 from os.path import join
@@ -101,7 +102,11 @@ class RepoWrapper(object):
             path: Local system path to the submodule
         """
         try:
-            self._repo.create_submodule(name, path, url=url, branch="master")
+            if self.contains_submodule(url):
+                get_input("Submodule {} already exists. Confirm this is as expected and press return to continue"
+                          .format(name))
+            else:
+                self._repo.create_submodule(name, path, url=url, branch="master")
         except GitCommandError as e:
             logging.error("Unable to create submodule from {}: {}".format(path, e))
         except Exception as e:
