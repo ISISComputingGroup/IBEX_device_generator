@@ -47,7 +47,7 @@ class RepoWrapper(object):
                 logging.warning("Error whilst scrubbing repository. I'll try to continue anyway: {}").format(e)
 
         try:
-            logging.info("Switching repo {} to master".format(self._repo.working_tree_dir))
+            logging.info("Switching repo {} to master and fetching latest changes".format(self._repo.working_tree_dir))
             self._repo.git.checkout("master")
             self._repo.git.fetch(recurse_submodules=True)
         except GitCommandError as e:
