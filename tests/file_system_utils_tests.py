@@ -10,15 +10,15 @@ class FileSystemUtilsTests(unittest.TestCase):
         device_name = "NEW_IOC"
         list_name = "IOCDIRS"
         iocdirs_input = [
-            "{} += OLD_IOC".format(list_name),
-            "",
+            "{} += OLD_IOC\n".format(list_name),
+            "\n",
         ]
 
         # Act
         actual_output = _add_entry_to_list(iocdirs_input, list_name, device_name)
 
         # Assert
-        self.assertEqual("{} += {}".format(list_name, device_name), actual_output[1])
+        self.assertEqual("{} += {}\n".format(list_name, device_name), actual_output[1])
 
     def test_GIVEN_entry_list_name_and_realistic_make_text_WHEN_add_entry_to_list_text_THEN_entry_exists_in_list_text(self):
         # Arrange

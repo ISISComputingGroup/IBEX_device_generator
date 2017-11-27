@@ -142,7 +142,7 @@ def _add_entry_to_list(text, list_name, entry):
     marker = "{} += ".format(list_name)
     for line in text:
         if marker in last_line and marker not in line:
-            new_text.append(marker + entry)
+            new_text.append(marker + entry + "\n")
         new_text.append(line)
         last_line = line
     return new_text
