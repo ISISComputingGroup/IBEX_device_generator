@@ -20,19 +20,12 @@ def _run_ioc_template_setup(device_info, device_count):
     if device_count > 99:
         raise ValueError("Cannot generate more than 99 IOCs for a single device")
 
-    # Needed or makeBaseApp.pl won't permit use of the IBEX templates in IOCBOOT
-    ibex_bin = path.join(EPICS_BASE_BUILD, "IBEX")
-    if not path.exists(ibex_bin):
-        mkdir(ibex_bin)
-
     for i in range(1, device_count+1):
         app_name = device_info.ioc_app_name(i)
         logging.info("Generating IOC {}".format(app_name))
         run_command([PERL, PERL_IOC_GENERATOR, "-t", "ioc", app_name], device_info.ioc_path())
-        run_command([PERL, PERL_IOC_GENERATOR, "-i", "-t", "ioc", "-a", "IBEX", "-p", app_name, app_name],
+        run_command([PERL, PERL_IOC_GENERATOR, "-i", "-t", "ioc", "-p", app_name, app_name],
                     device_info.ioc_path())
-
-    rmtree(ibex_bin)
 
 
 def _add_template_db(device_info):
