@@ -43,7 +43,7 @@ class RepoWrapper(object):
                     "    1: Stash uncommited changes\n"
                     "    2: Clean (-fd). All uncommited changes will be lost\n"
                     "    3: Reset hard to HEAD. All unpushed changes will be lost\n"
-                    "    [Default: 0] "))
+                    "    [Default: 0] ".format(self._repo.working_tree_dir)))
             except (ValueError, TypeError):
                 option = 0
             logging.info("Option {} selected".format(option))
