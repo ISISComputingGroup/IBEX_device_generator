@@ -63,3 +63,4 @@ def apply_support_dir_template(device_info):
         logging.warning("cd {} && {}".format(device_info.support_master_dir(), " ".join(cmd)))
         get_input("Press return to continue...")
     remove(device_info.support_db_path())
+    run_command(["make"], device_info.support_master_dir())
