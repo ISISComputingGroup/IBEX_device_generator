@@ -51,11 +51,11 @@ class RepoWrapper(object):
                 if option == 1:
                     logging.info("Local changes will be stashed")
                     self._repo.stash(include_untracked=True)
-                elif option == 2:
-                    ask_do_step("Git clean -fd requested. All uncommited changes will be lost. Are you sure?")
+                elif option == 2 and ask_do_step(
+                        "Git clean -fd requested. All uncommited changes will be lost. Are you sure?"):
                     self._repo.git.clean(f=True, d=True)
-                elif option == 3:
-                    ask_do_step("Git reset HEAD --hard requested. All unpushed changes will be lost. Are you sure?")
+                elif option == 3 and ask_do_step(
+                        "Git reset HEAD --hard requested. All unpushed changes will be lost. Are you sure?"):
                     self._repo.git.reset("HEAD", hard=True)
                 else:
                     logging.info("No clean requested")
