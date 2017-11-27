@@ -3,7 +3,9 @@ Generates the boilerplate structure required for developing an IBEX IOC
 
 Run the script with the following command
 
+```
 python IBEX_device_generator.py --name=[NAME] --ticket=[TICKET] --device_count=2
+```
 
 where:
 
