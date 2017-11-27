@@ -7,9 +7,9 @@ python IBEX_device_generator.py --name=[NAME] --ticket=[TICKET] --device_count=2
 
 where:
 
-- name: the name of the device. It is used of generating the name of the IOC, the branches it creates, the device emulator etc.
-- ticket: is the ticket number. It is used for naming the branches created during the script
-- device_count: the number of IOCs to generate. This argument is optional and defaults to 2
+- **name**: the name of the device. It is used of generating the name of the IOC, the branches it creates, the device emulator etc.
+- **ticket**: is the ticket number. It is used for naming the branches created during the script
+- **device_count**: the number of IOCs to generate. This argument is optional and defaults to 2
 
 The script runs the following steps:
 
