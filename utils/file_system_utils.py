@@ -127,6 +127,27 @@ def _copy(src, dst, remove_func, copy_func):
         raise OSError("Unable to copy from {} to {}: {}".format(src, dst, e))
 
 
+def _add_entry_to_list(text, list_name, entry):
+    """
+    Args:
+        text: The original text
+        list_name: The name of the list to add to
+        entry: The entry to add to the list
+
+    Returns: The original text with the requested entry added to the named list
+
+    """
+    new_text = []
+    last_line = ""
+    marker = "{} += ".format(list_name)
+    for line in text:
+        if marker in last_line and marker not in line:
+            new_text.append(marker + entry)
+        new_text.append(line)
+        last_line = line
+    return new_text
+
+
 def add_to_makefile_list(directory, list_name, entry):
     """
     Adds an entry to a list in a makefile. Finds the last line of the form "list_name += ..." and puts a new line
@@ -141,13 +162,6 @@ def add_to_makefile_list(directory, list_name, entry):
     makefile = join(directory, "Makefile")
     with open(makefile) as f:
         old_lines = f.readlines()
-    new_lines = []
-    last_line = ""
-    marker = "{} += ".format(list_name)
-    for line in old_lines:
-        if marker in last_line and marker not in line:
-            new_lines.append(marker + entry)
-        new_lines.append(line)
 
     with open(makefile, "w") as f:
-        f.writelines(new_lines)
+        f.writelines(_add_entry_to_list(old_lines, list_name, entry))
