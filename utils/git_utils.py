@@ -43,14 +43,14 @@ class RepoWrapper(object):
                     "    1: Stash uncommited changes\n"
                     "    2: Clean (-fd). All uncommited changes will be lost\n"
                     "    3: Reset hard to HEAD. All unpushed changes will be lost\n"
-                    "    [Default: 0]"))
+                    "    [Default: 0] "))
             except (ValueError, TypeError):
                 option = 0
             logging.info("Option {} selected".format(option))
             try:
                 if option == 1:
                     logging.info("Local changes will be stashed")
-                    self._repo.stash(include_untracked=True)
+                    self._repo.git.stash(include_untracked=True)
                 elif option == 2 and ask_do_step(
                         "Git clean -fd requested. All uncommited changes will be lost. Are you sure?"):
                     self._repo.git.clean(f=True, d=True)
