@@ -35,14 +35,30 @@ class RepoWrapper(object):
             branch: Name of the new branch
         """
         logging.info("Preparing new branch, {}, for repo {}".format(branch, self._repo.working_tree_dir))
-        if self._repo.is_dirty() and ask_do_step(
-                "Repository {} is dirty, clean it? (Prompts will be given for subsequent steps)"
-                "".format(self._repo.working_tree_dir)):
+        if self._repo.is_dirty():
             try:
-                if ask_do_step("Perform a hard reset on the repository"):
-                    self._repo.git.reset("HEAD", hard=True)
-                if ask_do_step("Perform git clean -fd on the repository"):
+                option = int(get_input(
+                    "Repository {} is dirty, clean it? \n"
+                    "    0: No clean\n"
+                    "    1: Stash uncommited changes\n"
+                    "    2: Clean (-fd). All uncommited changes will be lost\n"
+                    "    3: Reset hard to HEAD. All unpushed changes will be lost\n"
+                    "    [Default: 0]"))
+            except (ValueError, TypeError):
+                option = 0
+            logging.info("Option {} selected".format(option))
+            try:
+                if option == 1:
+                    logging.info("Local changes will be stashed")
+                    self._repo.stash(include_untracked=True)
+                elif option == 2:
+                    ask_do_step("Git clean -fd requested. All uncommited changes will be lost. Are you sure?")
                     self._repo.git.clean(f=True, d=True)
+                elif option == 3:
+                    ask_do_step("Git reset HEAD --hard requested. All unpushed changes will be lost. Are you sure?")
+                    self._repo.git.reset("HEAD", hard=True)
+                else:
+                    logging.info("No clean requested")
             except GitCommandError as e:
                 logging.warning("Error whilst scrubbing repository. I'll try to continue anyway: {}").format(e)
 
