@@ -1,6 +1,7 @@
 """ Utilities for modifying the gui for a new IOC """
 from templates.paths import OPI
 from system_paths import OPI_RESOURCES
+from file_system_utils import replace_in_file
 from shutil import copyfile
 from os import path
 from lxml import etree
@@ -81,4 +82,6 @@ def create_opi(device_info):
     """
     logging.info("Copying template OPI file to {}".format(device_info.opi_file_path()))
     copyfile(OPI, device_info.opi_file_path())
+    replace_in_file(device_info.opi_file_path(), [("$(DEVICE)", "$({})".format(device_info.ioc_name()))])
+
     _update_opi_info(device_info.opi_key(), device_info.opi_file_name(), device_info.log_name())
