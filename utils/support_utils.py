@@ -1,8 +1,8 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
 from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS, EPICS_MASTER_RELEASE
-from templates.paths import SUPPORT_MAKEFILE
+from templates.paths import SUPPORT_MAKEFILE, SUPPORT_GITIGNORE
 from common_utils import run_command
-from file_system_utils import mkdir, add_to_makefile_list
+from file_system_utils import mkdir, add_to_makefile_list, replace_in_file
 from command_line_utils import get_input
 from os import path, remove
 from shutil import copyfile
@@ -62,5 +62,11 @@ def apply_support_dir_template(device_info):
                         "Please run the following command manually from an EPICS terminal")
         logging.warning("cd {} && {}".format(device_info.support_master_dir(), " ".join(cmd)))
         get_input("Press return to continue...")
+
+    # Some manual tweaks to the auto template
     remove(device_info.support_db_path())
+    copyfile(SUPPORT_GITIGNORE, path.join(device_info.support_master_dir(), ".gitignore"))
+    replace_in_file(path.join(device_info.support_app_path(), "Makefile"),
+                    [("DB += dev{}.proto".format(device_info.support_app_name()), "")])
+
     run_command(["make"], device_info.support_master_dir())
