@@ -20,4 +20,4 @@ The script runs the following steps:
 - Create `device_count` template IOCs, build them and run `make iocstartups`
 - Create a standalone Lewis emulator
 - Add a sample test suite to the IOC test framework and add it to `run_all_tests.bat`
-- Create a blank IOC and add it to `opi_info.xml`
+- Create a blank OPI and add it to `opi_info.xml`
