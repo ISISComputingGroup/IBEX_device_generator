@@ -106,6 +106,19 @@ def _add_to_ioc_makefile(name):
     add_to_makefile_list(IOC_ROOT, "IOCDIRS", name)
 
 
+def _add_macro_to_release_file(device_info):
+    """
+    Adds a macro for the support directory to IOC release file
+
+    Args:
+        device_info: Name-based device information
+    """
+    logging.info("Adding macro to MASTER_RELEASE")
+    with open(path.join(device_info.ioc_path(), "configure", "RELEASE"), "a") as f:
+        f.write("{macro}=$(SUPPORT)/{name}/master\n".format(
+            macro=device_info.ioc_name(), name=device_info.support_app_name()))
+
+
 def create_ioc(device_info, device_count):
     """
     Creates a vanilla IOC in the EPICS IOC submodule
@@ -130,3 +143,4 @@ def create_ioc(device_info, device_count):
     _clean_up(device_info.ioc_path())
     _build(device_info.ioc_path())
     _add_to_ioc_makefile(device_info.ioc_name())
+    _add_macro_to_release_file()

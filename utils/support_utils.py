@@ -18,20 +18,6 @@ def _add_to_makefile(name):
     add_to_makefile_list(EPICS_SUPPORT, "SUPPDIRS", name)
 
 
-def _add_macro(device_info):
-    """
-    Adds a macro to MASTER_RELEASE
-
-    Args:
-        device_info: Name-based device information
-    """
-    logging.info("Adding macro to MASTER_RELEASE")
-    with open(EPICS_MASTER_RELEASE, "a") as f:
-        f.write("# Auto-generated macro for {}\n".format(device_info.log_name()))
-        f.write("{macro}=$(SUPPORT)/{name}/master\n".format(
-            macro=device_info.ioc_name(), name=device_info.support_app_name()))
-
-
 def create_submodule(device_info):
     """
     Creates a submodule and links it into the main EPICS repo
@@ -47,7 +33,6 @@ def create_submodule(device_info):
     RepoWrapper(EPICS).create_submodule(device_info.support_app_name(), device_info.support_repo_url(), master_dir)
     logging.info("Initializing device support repository {}".format(master_dir))
     _add_to_makefile(device_info.support_app_name())
-    _add_macro(device_info)
 
 
 def apply_support_dir_template(device_info):
