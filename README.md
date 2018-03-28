@@ -1,5 +1,5 @@
 # IOC_Generator
-Generates the boilerplate structure required for developing an IBEX IOC
+Generates the boilerplate structure required for developing an IBEX IOC. It will only add the items you request by prompting you before each item.
 
 Run the script with the following command
 
