@@ -40,6 +40,8 @@ def generate_device(name, ticket, device_count):
                      "Add device to test framework")
     create_component(device_info, branch, EMULATORS_ROOT, create_emulator, "Add template emulator")
     create_component(device_info, branch, CLIENT, create_opi, "Add template OPI file")
+    logging.info("Now place manuals for the device into the private share in the manuals directory. "
+                 "Using the form <Company making item>__<Specific item>")
 
 
 def main():
