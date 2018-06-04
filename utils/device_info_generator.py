@@ -111,7 +111,7 @@ class DeviceInfoGenerator(object):
                 proposed_name = default_ioc_name
                 while not self._is_valid_ioc_name(proposed_name):
                     proposed_name = get_input(
-                        "Device name, {}, is invalid. Please enter a valid IOC name: ".format(self._ioc_name))
+                        "Device name, {}, is invalid. Please enter a valid IOC name: ".format(proposed_name))
             self._ioc_name = proposed_name
         return self._ioc_name
 

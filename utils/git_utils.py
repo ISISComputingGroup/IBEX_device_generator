@@ -67,7 +67,7 @@ class RepoWrapper(object):
             self._repo.git.checkout("master")
             self._repo.git.fetch(recurse_submodules=True)
         except GitCommandError as e:
-            raise RuntimeError("Could not switch repo back to master :".format(e))
+            raise RuntimeError("Could not switch repo back to master: {}".format(e))
 
         try:
             logging.info("Creating/switching to branch {}".format(branch))
