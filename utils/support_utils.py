@@ -1,8 +1,8 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
 from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS, EPICS_MASTER_RELEASE
-from templates.paths import SUPPORT_MAKEFILE, SUPPORT_GITIGNORE
+from templates.paths import SUPPORT_MAKEFILE, SUPPORT_GITIGNORE, DB
 from common_utils import run_command
-from file_system_utils import mkdir, add_to_makefile_list, replace_in_file
+from file_system_utils import mkdir, add_to_makefile_list, replace_in_file, copy_file
 from command_line_utils import get_input
 from os import path, remove
 from shutil import copyfile
@@ -40,6 +40,7 @@ def apply_support_dir_template(device_info):
     Args:
         device_info: Provides name-based information about the device
     """
+    mkdir(device_info.support_master_dir())
     cmd = [PERL, PERL_SUPPORT_GENERATOR, "-t", "streamSCPI", device_info.support_app_name()]
     run_command(cmd, device_info.support_master_dir())
     if not path.exists(device_info.support_db_path()):
@@ -52,6 +53,24 @@ def apply_support_dir_template(device_info):
     remove(device_info.support_db_path())
     copyfile(SUPPORT_GITIGNORE, path.join(device_info.support_master_dir(), ".gitignore"))
     replace_in_file(path.join(device_info.support_app_path(), "Makefile"),
-                    [("DB += dev{}.proto".format(device_info.support_app_name()), "")])
+                    [("DB += {}.proto".format(device_info.support_app_name()), "")])
+    _add_template_db(device_info)
 
     run_command(["make"], device_info.support_master_dir())
+
+
+def _add_template_db(device_info):
+    """
+    Add the basic DB file to the support module
+
+    Args:
+        device_info: Name-based information about the device
+    """
+    db_dir = path.join(device_info.support_app_path())
+    logging.info("Copying basic Db file to {}".format(db_dir))
+    copy_file(DB, path.join(db_dir, "{}.db".format(device_info.support_app_name())))
+
+    # Make sure Db is included in the build
+    replace_in_file(path.join(db_dir, "Makefile"), [("#DB += xxx.db", "DB += {}.db".format(device_info.support_app_name()))])
+
+

@@ -28,21 +28,6 @@ def _run_ioc_template_setup(device_info, device_count):
                     device_info.ioc_path())
 
 
-def _add_template_db(device_info):
-    """
-    Add the basic DB file to the IOC
-
-    Args:
-        device_info: Name-based information about the device
-    """
-    db_dir = path.join(device_info.ioc_path(), "{}App".format(device_info.ioc_app_name(1)), "Db")
-    logging.info("Copying basic Db file to {}".format(db_dir))
-    copy_file(DB, path.join(db_dir, "{}.db".format(device_info.ioc_name())))
-
-    # Make sure Db is included in the build
-    replace_in_file(path.join(db_dir, "Makefile"), [("#DB += xxx.db", "DB += {}.db".format(device_info.ioc_name()))])
-
-
 def _add_template_config_xml(device_info, device_count):
     """
     Add the basic config.xml file to the IOC
@@ -69,7 +54,8 @@ def _replace_macros(device_info, device_count):
         if not path.exists(st_cmd_file):
             AssertionError("Attempting to replace macros before command file has been created")
         replace_in_file(st_cmd_file, [("_SUPPORT_MACRO_", device_info.ioc_name()),
-                                      ("_DB_NAME_", device_info.ioc_name())])
+                                      ("_DB_NAME_", device_info.ioc_name()),
+                                      ("_NAME_LOWER_", device_info.support_app_name())])
 
 
 def _clean_up(ioc_path):
@@ -137,10 +123,9 @@ def create_ioc(device_info, device_count):
     mkdir(device_info.ioc_path())
 
     _run_ioc_template_setup(device_info, device_count)
-    _add_template_db(device_info)
     _add_template_config_xml(device_info, device_count)
     _replace_macros(device_info, device_count)
     _clean_up(device_info.ioc_path())
     _build(device_info.ioc_path())
     _add_to_ioc_makefile(device_info.ioc_name())
-    _add_macro_to_release_file()
+    _add_macro_to_release_file(device_info)
