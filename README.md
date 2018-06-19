@@ -1,7 +1,7 @@
 # IOC_Generator
 Generates the boilerplate structure required for developing an IBEX IOC. It will only add the items you request by prompting you before each item.
 
-Run the script with the following command
+Run the script (e.g. in C:\Instrument\Dev\IBEX_device_generator) with the following command
 
 ```
 python IBEX_device_generator.py --name=[NAME] --ticket=[TICKET] --device_count=2
