@@ -3,27 +3,6 @@ import argparse
 from sys import version_info
 
 
-def parse_args(description, arguments):
-    """
-    Parse the arguments for a script passed in at the command line
-
-    Args:
-        description: Description of the script
-        arguments: Collection of argument descriptors
-
-    Returns: A collection of argument
-
-    """
-    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-                                     description=description)
-    for a in arguments:
-        if "default" not in a.keys():
-            a["default"] = None
-        parser.add_argument("--{}".format(a["name"]), type=a["type"], help=a["description"], default=a["default"])
-
-    return parser.parse_args()
-
-
 def get_input(prompt):
     """
     Standard input function to use which will adapt based on Python version

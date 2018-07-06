@@ -1,4 +1,6 @@
 """ Utilities common to all steps """
+from contextlib import contextmanager
+
 from git_utils import RepoWrapper
 from command_line_utils import ask_do_step
 import logging
@@ -6,7 +8,7 @@ import subprocess
 from os import devnull
 
 
-def create_component(device, branch, path, action, commit_message, **kwargs):
+def create_component(device, branch, path, action, commit_message, use_git, **kwargs):
     """
     Creates part of the IBEX device support
     
@@ -16,14 +18,27 @@ def create_component(device, branch, path, action, commit_message, **kwargs):
         path: Path to the repository
         action: Function that takes the device as an argument that creates the component
         commit_message: Message to attach to the changes
+        use_git: user git; False do not issue git commands
     """
     if not ask_do_step(commit_message):
         return
+
+    @contextmanager
+    def _git_operations():
+        repo = None
+        if use_git:
+            repo = RepoWrapper(path)
+            repo.prepare_new_branch(branch)
+
+        yield
+
+        if repo is not None:
+            repo.push_all_changes(commit_message)
+
     try:
-        repo = RepoWrapper(path)
-        repo.prepare_new_branch(branch)
-        action(device, **kwargs)
-        repo.push_all_changes(commit_message)
+        with _git_operations(use_git):
+            action(device, **kwargs)
+
     except (RuntimeError, IOError) as e:
         logging.error(str(e))
     except RuntimeWarning as e:
