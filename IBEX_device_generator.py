@@ -34,7 +34,7 @@ def generate_device(name, ticket, device_count, use_git):
     device_info = DeviceInfoGenerator(name)
     branch = "Ticket{}_Add_IOC_{}".format(ticket, device_info.ioc_name())
 
-    create_component(device_info, branch, EPICS, create_submodule, "Add support submodule to EPICS", use_git)
+    create_component(device_info, branch, EPICS, create_submodule, "Add support submodule to EPICS", use_git, use_git)
     create_component(device_info, branch, device_info.support_master_dir(),
                      apply_support_dir_template, "Creating template file structure in support submodule", use_git)
     create_component(device_info, branch, IOC_ROOT, create_ioc, "Add template IOC", use_git, device_count=device_count)

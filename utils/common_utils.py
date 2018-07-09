@@ -29,6 +29,7 @@ def create_component(device, branch, path, action, commit_message, use_git, **kw
         if use_git:
             repo = RepoWrapper(path)
             repo.prepare_new_branch(branch)
+            logging.warning("No git so branch not created or cleaned.")
 
         yield
 
@@ -36,7 +37,7 @@ def create_component(device, branch, path, action, commit_message, use_git, **kw
             repo.push_all_changes(commit_message)
 
     try:
-        with _git_operations(use_git):
+        with _git_operations():
             action(device, **kwargs)
 
     except (RuntimeError, IOError) as e:
