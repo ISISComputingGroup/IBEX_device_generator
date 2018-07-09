@@ -10,3 +10,5 @@ TESTS_TEMPLATE = join(ROOT, "ioc_test_framework", "tests.py")
 SUPPORT_MAKEFILE = join(ROOT, "support", "Makefile")
 SUPPORT_README = join(ROOT, "support", "README.md")
 SUPPORT_GITIGNORE = join(ROOT, "support", ".gitignore")
+SUPPORT_LICENCE = join(ROOT, "support", "LICENCE")
+
