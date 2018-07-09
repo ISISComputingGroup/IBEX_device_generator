@@ -1,6 +1,6 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
 from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS, EPICS_MASTER_RELEASE
-from templates.paths import SUPPORT_MAKEFILE, SUPPORT_GITIGNORE, DB
+from templates.paths import SUPPORT_MAKEFILE, SUPPORT_GITIGNORE, SUPPORT_LICENCE, DB
 from common_utils import run_command
 from file_system_utils import mkdir, add_to_makefile_list, replace_in_file, copy_file
 from command_line_utils import get_input
@@ -18,19 +18,25 @@ def _add_to_makefile(name):
     add_to_makefile_list(EPICS_SUPPORT, "SUPPDIRS", name)
 
 
-def create_submodule(device_info):
+def create_submodule(device_info, create_submodule_in_git):
     """
     Creates a submodule and links it into the main EPICS repo
 
     Args:
         device_info: Provides name-based information about the device
+        create_submodule_in_git: True then create submodule in git; False do not do this operation
     """
     mkdir(device_info.support_dir())
     copyfile(SUPPORT_MAKEFILE, path.join(device_info.support_dir(), "Makefile"))
     master_dir = device_info.support_master_dir()
-    get_input("Attempting to create repository using remote {}. Press return to confirm it exists"
-              .format(device_info.support_repo_url()))
-    RepoWrapper(EPICS).create_submodule(device_info.support_app_name(), device_info.support_repo_url(), master_dir)
+    if create_submodule_in_git:
+        get_input("Attempting to create repository using remote {}. Press return to confirm it exists".format(
+            device_info.support_repo_url()))
+        RepoWrapper(EPICS).create_submodule(device_info.support_app_name(), device_info.support_repo_url(), master_dir)
+    else:
+        logging.warning("Because you have chosen no-git the submodule has not been added for your ioc support module. "
+                        "If files are added they will be added to EPICS not a submodule of it.")
+
     logging.info("Initializing device support repository {}".format(master_dir))
     _add_to_makefile(device_info.support_app_name())
 
@@ -52,6 +58,7 @@ def apply_support_dir_template(device_info):
     # Some manual tweaks to the auto template
     remove(device_info.support_db_path())
     copyfile(SUPPORT_GITIGNORE, path.join(device_info.support_master_dir(), ".gitignore"))
+    copyfile(SUPPORT_LICENCE, path.join(device_info.support_master_dir(), "LICENCE"))
     replace_in_file(path.join(device_info.support_app_path(), "Makefile"),
                     [("DB += {}.proto".format(device_info.support_app_name()), "")])
     _add_template_db(device_info)

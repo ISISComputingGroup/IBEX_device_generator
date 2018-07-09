@@ -1,13 +1,13 @@
 """ Runs tests associated with the IOC generation script """
+import argparse
 import os
 import sys
 import unittest
 from xmlrunner import XMLTestRunner
-from utils.command_line_utils import parse_args
-from tests.device_info_generator_tests import DeviceInfoGeneratorTests
-from tests.gui_utils_tests import GuiUtilsTests
-from tests.file_system_utils_tests import FileSystemUtilsTests
-from tests.system_path_tests import SystemPathTests
+from tests.test_device_info_generator import DeviceInfoGeneratorTests
+from tests.test_gui_utils import GuiUtilsTests
+from tests.test_file_system_utils import FileSystemUtilsTests
+from tests.test_system_path import SystemPathTests
 
 DEFAULT_TEST_LOCATION = "test-reports\\"
 
@@ -34,11 +34,12 @@ def main():
     """
     Routine to run when script executed from the command line
     """
-    args = parse_args(
-        "Runs tests for the IOC generation script",
-        [{"name": "reports_path", "type": str, "description": "The folder in which test reports should be stored",
-          "default": DEFAULT_TEST_LOCATION}]
-    )
+    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+                                     description="Runs tests for the IOC generation script")
+    parser.add_argument("--reports_path", type=str, help="The folder in which test reports should be stored",
+                        default=DEFAULT_TEST_LOCATION)
+
+    args = parser.parse_args()
     run_tests(args.reports_path)
 
 
