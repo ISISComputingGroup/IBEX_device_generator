@@ -215,3 +215,12 @@ class DeviceInfoGenerator(object):
         Returns: Path to the iocboot directory
         """
         return join(self.ioc_path(), "iocBoot", "ioc{}".format(self.ioc_app_name(index)))
+
+    def ioc_src_path(self, index):
+        """
+        Args:
+            index: Index of the IOC
+
+        Returns: Path to the ioc source directory
+        """
+        return join(self.ioc_path(), "{}App".format(self.ioc_app_name(index)), "src")
