@@ -6,7 +6,7 @@ from utils.git_utils import RepoWrapper
 from utils.stubs import RepoStub
 
 
-class TestPushingChangesToGit(unittest.TestCase):
+class TestInitChangesToGit(unittest.TestCase):
 
     @patch("utils.git_utils.Repo", new=RepoStub)
     def setUp(self):
