@@ -33,9 +33,7 @@ def create_submodule(device_info, create_submodule_in_git):
     if create_submodule_in_git:
         get_input("Attempting to create repository using remote {}. Press return to confirm it exists".format(
             device_info.support_repo_url()))
-        repo = RepoWrapper(EPICS)
-        submodule = repo.create_submodule(device_info.support_app_name(), device_info.support_repo_url(), master_dir)
-        repo._repo.git.add(submodule.path)
+        RepoWrapper(EPICS).create_submodule(device_info.support_app_name(), device_info.support_repo_url(), master_dir)
     else:
         logging.warning("Because you have chosen no-git the submodule has not been added for your ioc support module. "
                         "If files are added they will be added to EPICS not a submodule of it.")
