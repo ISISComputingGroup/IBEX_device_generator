@@ -125,10 +125,12 @@ class RepoWrapper(object):
         Returns:
              Adds a starting commit to a repo
         """
+        print("inital_commit_called")
         try:
-            copy_file(SUPPORT_README, join(self._repo.working_dir, "README.md"))
-            self._repo.git.add(A=True)
-            self._repo.git.commit(m="Initial commit")
+            readme_path = join(self._repo.working_dir, "README.md")
+            copy_file(SUPPORT_README, readme_path)
+            self._repo.git.add(readme_path)
+            self._repo.git.commit(m="Initial commit.")
             self._repo.git.push("origin", "master", set_upstream=True)
         except (OSError, GitCommandError) as e:
             raise RuntimeError("Error whilst creating initial commit in {}: {}"

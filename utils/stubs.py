@@ -4,6 +4,7 @@ class RepoStub(object):
     def __init__(self, path):
         self._git = GitStub(self)
         self._working_tree_dir = path
+        self.working_dir = ""
         self._index = IndexStub(self)
 
     @property
