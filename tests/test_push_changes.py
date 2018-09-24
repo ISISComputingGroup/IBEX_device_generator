@@ -11,7 +11,8 @@ class TestPushingChangesToGit(unittest.TestCase):
     @patch("utils.git_utils.Repo", new=RepoStub)
     def setUp(self):
         # Given:
-        self.repo = RepoWrapper("path")
+        with patch("utils.git_utils.copy_file") as _:
+            self.repo = RepoWrapper("path")
 
     def test_that_GIVEN_a_clean_Git_repo_WHEN_pushing_changes_with_no_files_THEN_nothing_is_pushed(self):
         # When:
