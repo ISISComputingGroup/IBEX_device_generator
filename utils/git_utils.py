@@ -79,21 +79,37 @@ class RepoWrapper(object):
 
         logging.info("Branch {} ready".format(branch))
 
-    def push_all_changes(self, message, allow_master=False):
+    def push_changes(self, message, files_to_commit="-A", allow_master=False):
         """
-        Adds all modified and un-tracked files to git, commits with the message provided and pushes to git
+        Adds files, commits with the message provided and pushes to git.
 
         Args:
             message: The commit message to include with the push
             allow_master: Can commit changes to the master branch
+            files_to_commit:  Tuple of paths to files to commit. Defaults to "-A" which commits all untracked
+                and modified files.
+
+        Raises:
+            RuntimeError: Attempting to commit to master branch with allow_master=False.
+            RuntimeError: Git command error raised.
         """
+
         logging.info("Pushing all changes to current branch, {}, for repo {}".format(
             self._repo.active_branch, self._repo.working_tree_dir))
         if not allow_master and self._repo.active_branch is "master":
             raise RuntimeError("Attempting to commit to master branch")
 
         try:
-            self._repo.git.add(A=True)
+            if files_to_commit == '-A':
+                self._repo.git.add(A=True)
+            elif isinstance(files_to_commit, str):
+                self._repo.git.add(files_to_commit)
+            elif not files_to_commit:
+                pass
+            else:
+                string_of_files_to_commit = " ".join(files_to_commit)
+                self._repo.git.add(string_of_files_to_commit)
+
             n_files = len(self._repo.index.diff("HEAD"))
             if n_files > 0:
                 self._repo.git.commit(m=message)
@@ -125,6 +141,7 @@ class RepoWrapper(object):
             url: Url to the submodule repo
             path: Local system path to the submodule
         """
+
         try:
             git_modules_path = join(self._repo.working_tree_dir, ".git", "modules", name)
             if self.contains_submodule(url):

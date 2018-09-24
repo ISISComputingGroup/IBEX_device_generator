@@ -8,7 +8,7 @@ import subprocess
 from os import devnull
 
 
-def create_component(device, branch, path, action, commit_message, use_git, **kwargs):
+def create_component(device, branch, path, action, commit_message, use_git, files_to_commit="All", **kwargs):
     """
     Creates part of the IBEX device support
     
@@ -19,6 +19,7 @@ def create_component(device, branch, path, action, commit_message, use_git, **kw
         action: Function that takes the device as an argument that creates the component
         commit_message: Message to attach to the changes
         use_git: user git; False do not issue git commands
+        files_to_commit:  List of paths to commit. Defaults to ["All"].
     """
     if not ask_do_step(commit_message):
         return
@@ -26,15 +27,17 @@ def create_component(device, branch, path, action, commit_message, use_git, **kw
     @contextmanager
     def _git_operations():
         repo = None
-        if use_git:
-            repo = RepoWrapper(path)
-            repo.prepare_new_branch(branch)
-            logging.warning("No git so branch not created or cleaned.")
+        try:
+            if use_git:
+                repo = RepoWrapper(path)
+                repo.prepare_new_branch(branch)
+                logging.warning("No git so branch not created or cleaned.")
 
-        yield
+            yield
 
-        if repo is not None:
-            repo.push_all_changes(commit_message)
+        finally:
+            if repo is not None:
+                repo.push_changes(commit_message, files_to_commit=files_to_commit)
 
     try:
         with _git_operations():

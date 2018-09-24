@@ -26,6 +26,7 @@ def create_submodule(device_info, create_submodule_in_git):
         device_info: Provides name-based information about the device
         create_submodule_in_git: True then create submodule in git; False do not do this operation
     """
+
     mkdir(device_info.support_dir())
     copyfile(SUPPORT_MAKEFILE, path.join(device_info.support_dir(), "Makefile"))
     master_dir = device_info.support_master_dir()
