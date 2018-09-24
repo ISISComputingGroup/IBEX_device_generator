@@ -18,8 +18,8 @@ def run_tests(test_reports_path=DEFAULT_TEST_LOCATION):
     Returns:
         True if the tests passed, false otherwise
     """
-    loader = unittest.TestLoader()
-    suite =loader.discover("tests")
+
+    suite = unittest.TestLoader().discover("tests")
     return XMLTestRunner(output=str(os.path.join(test_reports_path)), stream=sys.stdout).run(suite).wasSuccessful()
 
 

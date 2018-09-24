@@ -38,8 +38,7 @@ def generate_device(name, ticket, device_count, use_git):
     epics_files = [
         os.path.join(EPICS, ".gitmodules"),
         os.path.join(EPICS_SUPPORT, "Makefile"),
-        os.path.join(device_info.support_dir(), "Makefile"),
-        os.path.join(device_info.support_dir(), "master")
+        os.path.join(device_info.support_dir(), "Makefile")
     ]
 
     create_component(device_info, branch, EPICS, create_submodule, "Add support submodule to EPICS", use_git,
