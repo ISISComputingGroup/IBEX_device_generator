@@ -52,13 +52,14 @@ class GitStub(object):
         self.commit_called = 0
         self.add_all_called = 0
 
-    def add(self, files_to_add=None, A=False, *args, **kwargs):
+    def add(self, *args, **kwargs):
         self.add_called += 1
-        if A:
+        if kwargs and kwargs['A']:
             self.add_all_called += 1
-        elif files_to_add is not None:
-            for path in files_to_add.split(" "):
-                self.staged.append(path)
+        elif isinstance(args[0], str):
+            self.staged.append(args[0])
+        elif args[0] is not None:
+            self.staged.extend(args[0])
         else:
             pass
 

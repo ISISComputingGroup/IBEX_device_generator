@@ -102,13 +102,8 @@ class RepoWrapper(object):
         try:
             if files_to_commit == '-A':
                 self._repo.git.add(A=True)
-            elif isinstance(files_to_commit, str):
+            elif files_to_commit:
                 self._repo.git.add(files_to_commit)
-            elif not files_to_commit:
-                pass
-            else:
-                string_of_files_to_commit = " ".join(files_to_commit)
-                self._repo.git.add(string_of_files_to_commit)
 
             n_files = len(self._repo.index.diff("HEAD"))
             if n_files > 0:
@@ -125,7 +120,6 @@ class RepoWrapper(object):
         Returns:
              Adds a starting commit to a repo
         """
-        print("inital_commit_called")
         try:
             readme_path = join(self._repo.working_dir, "README.md")
             copy_file(SUPPORT_README, readme_path)
