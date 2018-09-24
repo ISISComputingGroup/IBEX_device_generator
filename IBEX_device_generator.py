@@ -1,5 +1,6 @@
 """ Contains main method for creating a vanilla IOC from scratch """
 import argparse
+import os
 
 from run_tests import run_tests
 from utils.common_utils import create_component
@@ -8,7 +9,7 @@ from utils.emulator_utils import create_emulator
 from utils.ioc_utils import create_ioc
 from utils.ioc_test_framework_utils import create_test_framework
 from utils.support_utils import create_submodule, apply_support_dir_template
-from system_paths import CLIENT, EMULATORS_ROOT, IOC_ROOT, IOC_TEST_FRAMEWORK_ROOT, EPICS
+from system_paths import CLIENT, EMULATORS_ROOT, IOC_ROOT, IOC_TEST_FRAMEWORK_ROOT, EPICS, EPICS_SUPPORT
 import logging
 from utils.device_info_generator import DeviceInfoGenerator
 
@@ -34,8 +35,15 @@ def generate_device(name, ticket, device_count, use_git):
     device_info = DeviceInfoGenerator(name)
     branch = "Ticket{}_Add_IOC_{}".format(ticket, device_info.ioc_name())
 
+    epics_files = [
+        os.path.join(EPICS, ".gitmodules"),
+        os.path.join(EPICS_SUPPORT, "Makefile"),
+        os.path.join(device_info.support_dir(), "Makefile"),
+        os.path.join(device_info.support_dir(), "master")
+    ]
+
     create_component(device_info, branch, EPICS, create_submodule, "Add support submodule to EPICS", use_git,
-                     create_submodule_in_git=use_git)
+                     create_submodule_in_git=use_git, files_to_commit=epics_files)
     create_component(device_info, branch, device_info.support_master_dir(),
                      apply_support_dir_template, "Creating template file structure in support submodule", use_git)
     create_component(device_info, branch, IOC_ROOT, create_ioc, "Add template IOC", use_git, device_count=device_count)

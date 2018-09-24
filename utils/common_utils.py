@@ -8,7 +8,7 @@ import subprocess
 from os import devnull
 
 
-def create_component(device, branch, path, action, commit_message, use_git, files_to_commit="All", **kwargs):
+def create_component(device, branch, path, action, commit_message, use_git, files_to_commit="-A", **kwargs):
     """
     Creates part of the IBEX device support
     
@@ -19,7 +19,7 @@ def create_component(device, branch, path, action, commit_message, use_git, file
         action: Function that takes the device as an argument that creates the component
         commit_message: Message to attach to the changes
         use_git: user git; False do not issue git commands
-        files_to_commit:  List of paths to commit. Defaults to ["All"].
+        files_to_commit:  List of paths to commit. Defaults to "-A".
     """
     if not ask_do_step(commit_message):
         return
