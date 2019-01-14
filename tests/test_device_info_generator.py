@@ -1,5 +1,8 @@
 """ Tests for the device info generator """
 import unittest
+
+from mock import patch
+
 from utils.device_info_generator import DeviceInfoGenerator
 
 RAW = "raw"
@@ -29,9 +32,9 @@ class DeviceInfoGeneratorTests(unittest.TestCase):
              TESTS: "myioc_2"}
 
         self.test_cases["long_spaces"] =\
-            {RAW: "MyIoc long name", OPI_FILE: "myioc_long_name.opi", OPI_KEY: "MYIOCLONGNAME",
-             LOG: "MyIoc long name", IOC: "MYIOCLON", IOC_APP: "MYIOCLON-IOC-01", EMULATOR: "MyiocLongName",
-             SUPPORT: "myioc_long_name", REPO: "EPICS-MyiocLongName", TESTS: "myioc_long_name"}
+            {RAW: "super_long_name", OPI_FILE: "short.opi", OPI_KEY: "SHORT",
+             LOG: "short", IOC: "SHORT", IOC_APP: "SHORT-IOC-01", EMULATOR: "Short",
+             SUPPORT: "short", REPO: "EPICS-Short", TESTS: "short"}
 
     def _test_case(self, case):
         info = DeviceInfoGenerator(case[RAW])
@@ -51,5 +54,7 @@ class DeviceInfoGeneratorTests(unittest.TestCase):
     def test_GIVEN_an_ioc_shorter_than_8_characters_with_spaces_THEN_info_names_match_values_as_defined_in_test_case(self):
         self._test_case(self.test_cases["short_spaces"])
 
-    def test_GIVEN_an_ioc_longer_than_8_characters_with_spaces_THEN_info_names_match_values_as_defined_in_test_case(self):
+    @patch("utils.device_info_generator.get_input")
+    def test_GIVEN_an_ioc_longer_than_8_characters_with_spaces_THEN_info_names_match_values_as_defined_in_test_case(self, get_input):
+        get_input.return_value = "short"
         self._test_case(self.test_cases["long_spaces"])
