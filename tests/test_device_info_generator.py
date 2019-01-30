@@ -41,7 +41,7 @@ class DeviceInfoGeneratorTests(unittest.TestCase):
         self.assertEqual(case[OPI_FILE], info.opi_file_name())
         self.assertEqual(case[OPI_KEY], info.opi_key())
         self.assertEqual(case[LOG], info.log_name())
-        self.assertEqual(case[IOC], info.ioc_name(auto=True))
+        self.assertEqual(case[IOC], info.ioc_name())
         self.assertEqual(case[IOC_APP], info.ioc_app_name(1, auto=True))
         self.assertEqual(case[EMULATOR], info.emulator_name())
         self.assertEqual(case[SUPPORT], info.support_app_name())
