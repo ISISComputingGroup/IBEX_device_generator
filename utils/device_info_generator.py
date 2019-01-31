@@ -18,6 +18,14 @@ class DeviceInfoGenerator(object):
         self._name = raw_name
         self._ioc_name = None
 
+        while True:
+            proposed_name = self.ioc_name()
+            if self._is_valid_ioc_name(proposed_name):
+                break
+            self._name = get_input(
+                "Device name, {}, is invalid and produces an invalid IOC name {}. Please enter a valid device name: ".
+                format(self._name, proposed_name))
+
     def _lower_case_underscore_separated_name(self):
         """
         Returns: The name in lower case with spaces replaced by underscores
@@ -94,26 +102,11 @@ class DeviceInfoGenerator(object):
         assert self._is_valid_ioc_name(name)
         return name
 
-    def ioc_name(self, auto=False):
+    def ioc_name(self):
         """
-        Args:
-            auto: Accept the auto-generated name
-
         Returns: The name of the IOC based on the input name. Must be between 1 and 8 characters
         """
-        if self._ioc_name is None:
-            default_ioc_name = self._upper_case_spaces_removed_no_truncation()
-            if self._is_valid_ioc_name(default_ioc_name):
-                proposed_name = default_ioc_name
-            elif auto:
-                proposed_name = self._auto_generated_ioc_name()
-            else:
-                proposed_name = default_ioc_name
-                while not self._is_valid_ioc_name(proposed_name):
-                    proposed_name = get_input(
-                        "Device name, {}, is invalid. Please enter a valid IOC name: ".format(proposed_name))
-            self._ioc_name = proposed_name
-        return self._ioc_name
+        return self._upper_case_spaces_removed_no_truncation()
 
     def emulator_dir(self):
         """
@@ -127,14 +120,14 @@ class DeviceInfoGenerator(object):
         """
         return self._title_case_no_spaces()
 
-    def ioc_path(self, auto=False):
+    def ioc_path(self):
         """
         Args:
             auto: Accept the auto-generated IOC name by default
 
         Returns: The path to the IOC
         """
-        return join(EPICS, "ioc", "master", self.ioc_name(auto))
+        return join(EPICS, "ioc", "master", self.ioc_name())
 
     def ioc_app_name(self, index, auto=False):
         """
@@ -144,7 +137,7 @@ class DeviceInfoGenerator(object):
 
         Returns: The name of the application
         """
-        return "{}-IOC-{:02d}".format(self.ioc_name(auto), index)
+        return "{}-IOC-{:02d}".format(self.ioc_name(), index)
 
     def support_dir(self):
         """
