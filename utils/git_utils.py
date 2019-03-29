@@ -103,7 +103,7 @@ class RepoWrapper(object):
             if files_to_commit == '-A':
                 self._repo.git.add(A=True)
             elif files_to_commit:
-                self._repo.git.add(files_to_commit)
+                self._repo.git.add(set(files_to_commit))
 
             n_files = len(self._repo.index.diff("HEAD"))
             if n_files > 0:

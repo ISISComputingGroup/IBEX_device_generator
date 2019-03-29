@@ -5,80 +5,128 @@ from common_utils import run_command
 from file_system_utils import mkdir, add_to_makefile_list, replace_in_file, copy_file
 from command_line_utils import get_input
 from os import path, remove
-from shutil import copyfile
 import logging
 from git_utils import RepoWrapper
 
 
-def _add_to_makefile(name):
-    """
-    Args:
-        name: Name of the device
-    """
-    add_to_makefile_list(EPICS_SUPPORT, "SUPPDIRS", name)
+def _build(device_info):
+    logging.info("Running Make command in directory {}".format(device_info.support_master_dir()))
+    run_command(["make"], device_info.support_master_dir())
 
 
-def create_submodule(device_info, create_submodule_in_git):
-    """
-    Creates a submodule and links it into the main EPICS repo
-
-    Args:
-        device_info: Provides name-based information about the device
-        create_submodule_in_git: True then create submodule in git; False do not do this operation
-    """
-
+def _add_submodule_directory(device_info):
+    logging.info("Creating support directory {0}".format(device_info.support_dir()))
     mkdir(device_info.support_dir())
-    copyfile(SUPPORT_MAKEFILE, path.join(device_info.support_dir(), "Makefile"))
-    master_dir = device_info.support_master_dir()
-    if create_submodule_in_git:
-        get_input("Attempting to create repository using remote {}. Press return to confirm it exists".format(
-            device_info.support_repo_url()))
-        RepoWrapper(EPICS).create_submodule(device_info.support_app_name(), device_info.support_repo_url(), master_dir)
-    else:
-        logging.warning("Because you have chosen no-git the submodule has not been added for your ioc support module. "
-                        "If files are added they will be added to EPICS not a submodule of it.")
-
-    logging.info("Initializing device support repository {}".format(master_dir))
-    _add_to_makefile(device_info.support_app_name())
+    return device_info.support_dir()
 
 
-def apply_support_dir_template(device_info):
-    """
-    Args:
-        device_info: Provides name-based information about the device
-    """
+def _add_submodule_makefile(device_info):
+    makefile = path.join(device_info.support_dir(), "Makefile")
+    copy_file(SUPPORT_MAKEFILE, makefile)
+    return makefile
+
+
+def _add_submodule_to_makefile(device_info):
+    return add_to_makefile_list(EPICS_SUPPORT, "SUPPDIRS", device_info.support_app_name())
+
+
+def _add_submodule_to_git(device_info):
+    get_input("Attempting to create repository using remote {}. Press return to confirm it exists".format(
+        device_info.support_repo_url()))
+    logging.info("Creating submodule at {}".format(device_info.support_master_dir()))
+    RepoWrapper(EPICS).create_submodule(device_info.support_app_name(), device_info.support_repo_url(),
+                                        device_info.support_master_dir())
+    return path.join(EPICS, ".gitmodules")
+
+
+def _run_support_template_setup(device_info):
+    logging.info("Creating files in support directory {0}".format(device_info.support_master_dir()))
     mkdir(device_info.support_master_dir())
     cmd = [PERL, PERL_SUPPORT_GENERATOR, "-t", "streamSCPI", device_info.support_app_name()]
     run_command(cmd, device_info.support_master_dir())
     if not path.exists(device_info.support_db_path()):
-        logging.warning("The makeSupport.pl didn't run correctly. It's very temperamental. "
-                        "Please run the following command manually from an EPICS terminal")
-        logging.warning("cd {} && {}".format(device_info.support_master_dir(), " ".join(cmd)))
+        logging.warning("Folder not found: {0}".format(device_info.support_db_path()))
+        logging.warning("Please run the following command manually from an EPICS terminal:\n"
+                        "cd {} && {}".format(device_info.support_master_dir(), " ".join(cmd)))
         get_input("Press return to continue...")
-
-    # Some manual tweaks to the auto template
-    remove(device_info.support_db_path())
-    copyfile(SUPPORT_GITIGNORE, path.join(device_info.support_master_dir(), ".gitignore"))
-    copyfile(SUPPORT_LICENCE, path.join(device_info.support_master_dir(), "LICENCE"))
-    replace_in_file(path.join(device_info.support_app_path(), "Makefile"),
-                    [("DB += {}.proto".format(device_info.support_app_name()), "")])
-    _add_template_db(device_info)
-
-    run_command(["make"], device_info.support_master_dir())
+    return device_info.support_master_dir()
 
 
-def _add_template_db(device_info):
+def _add_support_makefile_db_entry(device_info):
+    makefile = path.join(device_info.support_app_path(), "Makefile")
+    logging.info("Adding .db entry into {}".format(makefile))
+    replace_in_file(makefile, [("#DB += xxx.db", "DB += {}.db".format(device_info.support_app_name()))])
+    return makefile
+
+
+def _add_support_db(device_info):
+    remove(device_info.support_db_path())  # Remove existing template
+    db = path.join(device_info.support_app_path(), "{}.db".format(device_info.support_app_name()))
+    logging.info("Copying .db file to {}".format(db))
+    copy_file(DB, db)
+    return db
+
+
+def _add_support_makefile_proto_entry(device_info):
+    makefile = path.join(device_info.support_app_path(), "Makefile")
+    replace_in_file(makefile, [("DB += {}.proto".format(device_info.support_app_name()), "")])
+    logging.info("Adding .proto entry into {}".format(makefile))
+    return makefile
+
+
+def _add_support_licence(device_info):
+    licence = path.join(device_info.support_master_dir(), "LICENCE")
+    logging.info("Copying licence file to {}".format(licence))
+    copy_file(SUPPORT_LICENCE, licence)
+    return licence
+
+
+def _add_support_gitignore(device_info):
+    gitignore = path.join(device_info.support_master_dir(), ".gitignore")
+    logging.info("Copying .gitignore file to {}".format(gitignore))
+    copy_file(SUPPORT_GITIGNORE, gitignore)
+    return gitignore
+
+
+def create_submodule(device_info, create_submodule_in_git):
     """
-    Add the basic DB file to the support module
+    Creates a device submodule and links it into the main EPICS repo
 
     Args:
-        device_info: Name-based information about the device
+        device_info (DeviceInfoGenerator): Provides name-based information about the device
+        create_submodule_in_git (bool): True then create submodule in git; False do not do this operation
+    Returns:
+        files_changed (list[Str]): List of unique files that have been changed/created
     """
-    db_dir = path.join(device_info.support_app_path())
-    logging.info("Copying basic Db file to {}".format(db_dir))
-    copy_file(DB, path.join(db_dir, "{}.db".format(device_info.support_app_name())))
+    files_changed = [_add_submodule_directory(device_info),
+                     _add_submodule_makefile(device_info),
+                     _add_submodule_to_makefile(device_info)]
 
-    # Make sure Db is included in the build
-    replace_in_file(path.join(db_dir, "Makefile"), [("#DB += xxx.db", "DB += {}.db".format(device_info.support_app_name()))])
+    if create_submodule_in_git:
+        files_changed.append(_add_submodule_to_git(device_info))
+    else:
+        logging.warning("You have chosen not to create the submodule in git for your ioc support module. "
+                        "If files are added they will be added to EPICS not a submodule of it.")
+
+    return list(set(files_changed))
 
 
+def create_support(device_info):
+    """
+    Creates a devices support directory using template files
+
+    Args:
+        device_info (DeviceInfoGenerator): Provides name-based information about the device
+    Returns:
+        files_changes (list[Str]): List of unique files that have been changed/created
+    """
+    files_changed = [_run_support_template_setup(device_info),
+                     _add_support_gitignore(device_info),
+                     _add_support_licence(device_info),
+                     _add_support_makefile_proto_entry(device_info),
+                     _add_support_db(device_info),
+                     _add_support_makefile_db_entry(device_info)]
+
+    _build(device_info)
+
+    return list(set(files_changed))

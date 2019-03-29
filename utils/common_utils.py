@@ -8,7 +8,7 @@ import subprocess
 from os import devnull
 
 
-def create_component(device, branch, path, action, commit_message, use_git, files_to_commit="-A", **kwargs):
+def create_component(device, branch, path, action, commit_message, use_git, **kwargs):
     """
     Creates part of the IBEX device support
     
@@ -19,30 +19,21 @@ def create_component(device, branch, path, action, commit_message, use_git, file
         action: Function that takes the device as an argument that creates the component
         commit_message: Message to attach to the changes
         use_git: user git; False do not issue git commands
-        files_to_commit:  List of paths to commit. Defaults to "-A".
     """
     if not ask_do_step(commit_message):
         return
 
-    @contextmanager
-    def _git_operations():
-        repo = None
-        try:
-            if use_git:
-                repo = RepoWrapper(path)
-                repo.prepare_new_branch(branch)
-                logging.warning("No git so branch not created or cleaned.")
-
-            yield
-
-        finally:
-            if repo is not None:
-                repo.push_changes(commit_message, files_to_commit=files_to_commit)
-
+    repo = None
     try:
-        with _git_operations():
-            action(device, **kwargs)
+        if use_git:
+            repo = RepoWrapper(path)
+            repo.prepare_new_branch(branch)
+            logging.warning("No git so branch not created or cleaned.")
 
+        files_to_commit = action(device, **kwargs)
+
+        if repo is not None:
+            repo.push_changes(commit_message, files_to_commit=files_to_commit)
     except (RuntimeError, IOError) as e:
         logging.error(str(e))
     except RuntimeWarning as e:

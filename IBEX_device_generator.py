@@ -8,7 +8,7 @@ from utils.gui_utils import create_opi
 from utils.emulator_utils import create_emulator
 from utils.ioc_utils import create_ioc
 from utils.ioc_test_framework_utils import create_test_framework
-from utils.support_utils import create_submodule, apply_support_dir_template
+from utils.support_utils import create_submodule, create_support
 from system_paths import CLIENT, EMULATORS_ROOT, IOC_ROOT, IOC_TEST_FRAMEWORK_ROOT, EPICS, EPICS_SUPPORT
 import logging
 from utils.device_info_generator import DeviceInfoGenerator
@@ -43,8 +43,8 @@ def generate_device(name, ticket, device_count, use_git):
 
     create_component(device_info, branch, EPICS, create_submodule, "Add support submodule to EPICS", use_git,
                      create_submodule_in_git=use_git, files_to_commit=epics_files)
-    create_component(device_info, branch, device_info.support_master_dir(),
-                     apply_support_dir_template, "Creating template file structure in support submodule", use_git)
+    create_component(device_info, branch, device_info.support_master_dir(), create_support,
+                     "Creating template file structure in support submodule", use_git)
     create_component(device_info, branch, IOC_ROOT, create_ioc, "Add template IOC", use_git, device_count=device_count)
     create_component(device_info, branch, IOC_TEST_FRAMEWORK_ROOT, create_test_framework,
                      "Add device to test framework", use_git)

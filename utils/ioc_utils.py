@@ -1,4 +1,5 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
+
 from system_paths import IOC_ROOT, PERL, PERL_IOC_GENERATOR, EPICS, ARCHITECTURE
 from templates.paths import CONFIG_XML, CONFIG_XML_NOT_0
 from common_utils import run_command
@@ -8,41 +9,58 @@ from os import path, walk, remove
 import logging
 
 
+def _add_ioc_directory(device_info):
+    logging.info("Creating support directory {0}".format(device_info.ioc_path))
+    mkdir(device_info.ioc_path())
+    return device_info.ioc_path()
+
+
 def _run_ioc_template_setup(device_info, device_count):
     """
     Runs the EPICS perl scripts associated with IOC creation. Passes in the IBEX type flag to use our own templates
     found in C:\\Instrument\\Apps\\EPICS\\base\\master\\templates
 
     Args:
-        device_info: Name-based information about the device
-        device_count: How many IOC apps to generate
+        device_info (DeviceInfoGenerator): Name-based information about the device
+        device_count (int): How many IOC apps to generate
+    Returns:
+        ioc_path (Str): Path to the IOC directory
     """
-    if device_count > 99:
-        raise ValueError("Cannot generate more than 99 IOCs for a single device")
+    if device_count > 9:
+        raise ValueError("Cannot generate more than 9 IOCs for a single device")
 
     for i in range(1, device_count+1):
         app_name = device_info.ioc_app_name(i)
+        ioc_path = device_info.ioc_path()
         logging.info("Generating IOC {}".format(app_name))
-        run_command([PERL, PERL_IOC_GENERATOR, "-a", ARCHITECTURE, "-t", "ioc", app_name], device_info.ioc_path())
+        run_command([PERL, PERL_IOC_GENERATOR, "-a", ARCHITECTURE, "-t", "ioc", app_name], ioc_path)
         run_command([PERL, PERL_IOC_GENERATOR, "-a", ARCHITECTURE, "-i", "-t", "ioc", "-p", app_name, app_name],
-                    device_info.ioc_path())
+                    ioc_path)
+        return ioc_path
 
 
-def _add_template_config_xml(device_info, device_count):
+def _add_ioc_config_xml(device_info, device_count):
     """
     Add the basic config.xml file to the IOC
 
     Args:
-        device_info: Name-based information about the device
-        device_count: How many IOC apps to generate
+        device_info (DeviceInfoGenerator): Name-based information about the device
+        device_count (int): How many IOC apps to generate
     """
-    copy_file(CONFIG_XML, path.join(device_info.ioc_boot_path(1), "config.xml"))
+    template_config_xml = path.join(device_info.ioc_boot_path(1), "config.xml")
+    copy_file(CONFIG_XML, template_config_xml)
+    files_changed = [template_config_xml]
+
     for i in range(2, device_count+1):
-        copy_file(CONFIG_XML_NOT_0, path.join(device_info.ioc_boot_path(i), "config.xml"))
+        template_config_xml = path.join(device_info.ioc_boot_path(i), "config.xml")
+        copy_file(CONFIG_XML_NOT_0, template_config_xml)
+        files_changed.append(template_config_xml)
     run_command(["make", "iocstartups"], EPICS)
 
+    return files_changed
 
-def _replace_macros(device_info, device_count):
+
+def _replace_ioc_macros(device_info, device_count):
     """
     Replace a couple of templates in the st.cmd with generated names
 
@@ -65,6 +83,7 @@ def _replace_macros(device_info, device_count):
                              ("_DB_NAME_", device_info.ioc_name()),
                              ("_NAME_LOWER_", device_info.support_app_name()),
                              ("_01_APP_NAME_", device_info.ioc_app_name(1))])
+        return files_containing_macros
 
 
 def _clean_up(device_info, device_count):
@@ -97,14 +116,15 @@ def _build(ioc_path):
     run_command(["make"], ioc_path)
 
 
-def _add_to_ioc_makefile(name):
+def _add_ioc_to_makefile(device_info):
     """
     Add the IOC to the main IOC makefile repo
 
     Args:
-        name: IOC name
+        device_info: Name-based device information
     """
-    add_to_makefile_list(IOC_ROOT, "IOCDIRS", name)
+    add_to_makefile_list(IOC_ROOT, "IOCDIRS", device_info.ioc_name())
+    return path.join(IOC_ROOT, 'Makefile')
 
 
 def _add_macro_to_release_file(device_info):
@@ -115,18 +135,22 @@ def _add_macro_to_release_file(device_info):
         device_info: Name-based device information
     """
     logging.info("Adding macro to MASTER_RELEASE")
-    with open(path.join(device_info.ioc_path(), "configure", "RELEASE"), "a") as f:
+    release_file = path.join(device_info.ioc_path(), "configure", "RELEASE")
+    with open(release_file, "a") as f:
         f.write("{macro}=$(SUPPORT)/{name}/master\n".format(
             macro=device_info.ioc_name(), name=device_info.support_app_name()))
+    return release_file
 
 
 def create_ioc(device_info, device_count):
     """
-    Creates a vanilla IOC in the EPICS IOC submodule
+    Creates a device IOC in the EPICS IOC submodule
 
     Args:
-        device_info: Provides name-based information about the device
-        device_count: Number of IOCs to generate
+        device_info (DeviceInfoGenerator): Provides name-based information about the device
+        device_count (int): Number of IOCs to generate
+    Returns:
+        files_changes (list[Str]): List of unique files that have been changed/created
     """
     while not 1 <= device_count <= 9:
         try:
@@ -135,12 +159,15 @@ def create_ioc(device_info, device_count):
         except (ValueError, TypeError) as e:
             logging.warning("That was not a valid input, please try again: {}".format(e))
 
-    mkdir(device_info.ioc_path())
+    files_changed = [_add_ioc_directory(device_info),
+                     _run_ioc_template_setup(device_info, device_count),
+                     _add_macro_to_release_file(device_info),
+                     _add_ioc_to_makefile(device_info)]
 
-    _run_ioc_template_setup(device_info, device_count)
-    _add_template_config_xml(device_info, device_count)
-    _replace_macros(device_info, device_count)
+    files_changed.extend(_add_ioc_config_xml(device_info, device_count))
+    files_changed.extend(_replace_ioc_macros(device_info, device_count))
+
     _clean_up(device_info, device_count)
     _build(device_info.ioc_path())
-    _add_to_ioc_makefile(device_info.ioc_name())
-    _add_macro_to_release_file(device_info)
+
+    return list(set(files_changed))
