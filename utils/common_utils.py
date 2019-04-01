@@ -1,6 +1,4 @@
 """ Utilities common to all steps """
-from contextlib import contextmanager
-
 from git_utils import RepoWrapper
 from command_line_utils import ask_do_step
 import logging
