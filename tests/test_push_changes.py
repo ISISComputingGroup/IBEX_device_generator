@@ -24,7 +24,7 @@ class TestPushingChangesToGit(unittest.TestCase):
 
     def test_that_GIVEN_a_clean_Git_repo_with_ini_commit_WHEN_pushing_changes_with_one_file_THEN_only_that_one_file_is_pushed(self):
         # When:
-        self.repo.push_changes("a message", files_to_commit="test_file")
+        self.repo.push_changes("a message", files_to_commit=["test_file"])
 
         # Then:
         assert_that(self.repo ._repo.git.push_called, is_(equal_to(1)))
