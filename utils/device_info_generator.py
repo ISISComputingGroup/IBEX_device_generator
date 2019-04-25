@@ -161,7 +161,7 @@ class DeviceInfoGenerator(object):
         """
         Returns: The URL to the support repo
         """
-        return "git@github.com:https://github.com/ISISComputingGroup/{}.git".format(self.support_repo_name())
+        return "https://github.com/ISISComputingGroup/{}.git".format(self.support_repo_name())
 
     def ioc_test_framework_device_name(self):
         """

@@ -32,13 +32,13 @@ class TestPushingChangesToGit(unittest.TestCase):
         assert_that(self.repo ._repo.git.pushed, has_length(1))
 
     @patch("utils.git_utils.logging")
-    def test_that_GIVEN_a_clean_Git_repo_with_ini_commit_WHEN_pushing_changes_with_no_files_specified_THEN_git_adds_all_files(
+    def test_that_GIVEN_a_clean_Git_repo_with_ini_commit_WHEN_pushing_changes_with_no_files_specified_THEN_git_adds_no_files(
             self, mock_log):
         # When:
         self.repo.push_changes("a message")
 
         # Then:
-        assert_that(self.repo ._repo.git.add_all_called, is_(equal_to(1)))
+        assert_that(self.repo ._repo.git.add_all_called, is_(equal_to(0)))
 
     def test_that_GIVEN_a_clean_Git_repo_with_ini_commit_WHEN_pushing_changes_with_two_files_specified_THEN_git_adds_only_these_two_files(
             self):

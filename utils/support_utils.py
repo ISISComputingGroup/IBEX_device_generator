@@ -41,7 +41,7 @@ def _add_submodule_to_git(device_info):
 
 def _run_support_template_setup(device_info):
     logging.info("Creating files in support directory {0}".format(device_info.support_master_dir()))
-    mkdir(device_info.support_master_dir())
+    #mkdir(device_info.support_master_dir())
     cmd = [PERL, PERL_SUPPORT_GENERATOR, "-t", "streamSCPI", device_info.support_app_name()]
     run_command(cmd, device_info.support_master_dir())
     if not path.exists(device_info.support_db_path()):

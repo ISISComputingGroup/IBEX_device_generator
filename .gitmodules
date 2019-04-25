@@ -1,0 +1,4 @@
+[submodule "device"]
+	path = support/device/master
+	url = https://github.com/ISISComputingGroup/EPICS-Device.git
+	branch = master

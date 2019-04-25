@@ -26,9 +26,11 @@ def _run_ioc_template_setup(device_info, device_count):
     Returns:
         ioc_path (Str): Path to the IOC directory
     """
-    if device_count > 9:
-        raise ValueError("Cannot generate more than 9 IOCs for a single device")
+    if device_count > 99:
+        raise ValueError("Cannot generate more than 99 IOCs for a single device")
 
+    logging.info("Generating {0} IOC Apps...".format(device_count))
+    files_changed = []
     for i in range(1, device_count+1):
         app_name = device_info.ioc_app_name(i)
         ioc_path = device_info.ioc_path()
@@ -36,7 +38,10 @@ def _run_ioc_template_setup(device_info, device_count):
         run_command([PERL, PERL_IOC_GENERATOR, "-a", ARCHITECTURE, "-t", "ioc", app_name], ioc_path)
         run_command([PERL, PERL_IOC_GENERATOR, "-a", ARCHITECTURE, "-i", "-t", "ioc", "-p", app_name, app_name],
                     ioc_path)
-        return ioc_path
+        files_changed.append(ioc_path)
+    logging.info("Finished generating IOC Apps")
+
+    return list(set(files_changed))
 
 
 def _add_ioc_config_xml(device_info, device_count):
@@ -159,11 +164,11 @@ def create_ioc(device_info, device_count):
         except (ValueError, TypeError) as e:
             logging.warning("That was not a valid input, please try again: {}".format(e))
 
-    files_changed = [_add_ioc_directory(device_info),
-                     _run_ioc_template_setup(device_info, device_count),
-                     _add_macro_to_release_file(device_info),
-                     _add_ioc_to_makefile(device_info)]
-
+    files_changed = []
+    files_changed.append(_add_ioc_directory(device_info))
+    files_changed.append(_run_ioc_template_setup(device_info, device_count))
+    files_changed.append(_add_macro_to_release_file(device_info))
+    files_changed.append(_add_ioc_to_makefile(device_info))
     files_changed.extend(_add_ioc_config_xml(device_info, device_count))
     files_changed.extend(_replace_ioc_macros(device_info, device_count))
 

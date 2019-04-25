@@ -6,7 +6,7 @@ from git import Repo, GitCommandError, InvalidGitRepositoryError, NoSuchPathErro
 from command_line_utils import ask_do_step, get_input
 from templates.paths import SUPPORT_README
 from file_system_utils import copy_file, mkdir, rmtree
-from os.path import join, exists
+from os.path import join, exists, sep
 from time import sleep
 import logging
 
@@ -79,7 +79,7 @@ class RepoWrapper(object):
 
         logging.info("Branch {} ready".format(branch))
 
-    def push_changes(self, message, files_to_commit="-A", allow_master=False):
+    def push_changes(self, message, files_to_commit=(), allow_master=False):
         """
         Adds files, commits with the message provided and pushes to git.
 
@@ -100,10 +100,8 @@ class RepoWrapper(object):
             raise RuntimeError("Attempting to commit to master branch")
 
         try:
-            if files_to_commit == '-A':
-                self._repo.git.add(A=True)
-            elif files_to_commit:
-                self._repo.git.add(set(files_to_commit))
+            if files_to_commit is not None:
+                self._repo.git.add(files_to_commit)
 
             n_files = len(self._repo.index.diff("HEAD"))
             if n_files > 0:
@@ -137,9 +135,8 @@ class RepoWrapper(object):
             url: Url to the submodule repo
             path: Local system path to the submodule
         """
-
+        git_modules_path = join(self._repo.working_tree_dir, ".git", "modules", name)
         try:
-            git_modules_path = join(self._repo.working_tree_dir, ".git", "modules", name)
             if self.contains_submodule(url):
                 get_input("Submodule {} already exists. Confirm this is as expected and press return to continue"
                           .format(name))
@@ -148,13 +145,14 @@ class RepoWrapper(object):
                         "The submodule {} is not part of this repo, yet {} exists. Shall I delete it?"
                         "".format(name, git_modules_path)):
                     rmtree(git_modules_path)
-                self._repo.git.submodule("add -b {branch} --name {name} --reference {url} {path}"
-                                         .format(name=name, path=path, url=url, branch="master"))
+                self._repo.create_submodule(name=name, path=path, url=url, branch="master")
 
         except InvalidGitRepositoryError as e:
             logging.error("Cannot add {} as a submodule, it does not exist: {}".format(path, e))
+            exit()
         except GitCommandError as e:
             logging.error("Git command failed to create submodule from {}: {}".format(path, e))
+            exit()
         except Exception as e:
             raise RuntimeError("Unknown error {} of type {} whilst creating submodule in {}".format(e, type(e), path))
 
