@@ -12,12 +12,12 @@ from command_line_utils import ask_do_step
 
 def replace_in_file(target, substitutions):
     """
-    Replaces matching content in a file
+    Replace all matching expressions with substitution for a target file
 
     Args:
-        target: Path to file where we are going to make substitutions
-        substitutions: A collection of substitutions to make. Each substitution should be in the form
-        (original, final)
+        target (Str): Path to file where we are going to make substitutions
+        substitutions (list[tuple()]): A collection of substitutions to make. Each substitution should be in
+        the form (original, final)
     """
     logging.info("Making substitutions into file {}: {}".format(target, substitutions))
     with open(target) as f:
@@ -29,7 +29,7 @@ def replace_in_file(target, substitutions):
             input_str: The original string
 
         Returns:
-            The original string after substitutions have beeen made
+            The original string after substitutions have been made
         """
         output_str = input_str
         for s in substitutions:
@@ -157,6 +157,8 @@ def add_to_makefile_list(directory, list_name, entry):
         directory: Directory containing the makefile
         list_name: The name of the list in the makefile to append to
         entry: The entry to add to the list
+    Returns:
+        makefile (Str): Path to makefile
     """
     logging.info("Adding {} to list {} in Makefile for directory {}".format(entry, list_name, directory))
     makefile = join(directory, "Makefile")
@@ -165,3 +167,4 @@ def add_to_makefile_list(directory, list_name, entry):
 
     with open(makefile, "w") as f:
         f.writelines(_add_entry_to_list(old_lines, list_name, entry))
+    return makefile

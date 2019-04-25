@@ -6,7 +6,7 @@ from git import Repo, GitCommandError, InvalidGitRepositoryError, NoSuchPathErro
 from command_line_utils import ask_do_step, get_input
 from templates.paths import SUPPORT_README
 from file_system_utils import copy_file, mkdir, rmtree
-from os.path import join, exists
+from os.path import join, exists, sep
 from time import sleep
 import logging
 
@@ -79,21 +79,30 @@ class RepoWrapper(object):
 
         logging.info("Branch {} ready".format(branch))
 
-    def push_all_changes(self, message, allow_master=False):
+    def push_changes(self, message, files_to_commit=(), allow_master=False):
         """
-        Adds all modified and un-tracked files to git, commits with the message provided and pushes to git
+        Adds files, commits with the message provided and pushes to git.
 
         Args:
             message: The commit message to include with the push
             allow_master: Can commit changes to the master branch
+            files_to_commit:  Tuple of paths to files to commit. Defaults to "-A" which commits all untracked
+                and modified files.
+
+        Raises:
+            RuntimeError: Attempting to commit to master branch with allow_master=False.
+            RuntimeError: Git command error raised.
         """
+
         logging.info("Pushing all changes to current branch, {}, for repo {}".format(
             self._repo.active_branch, self._repo.working_tree_dir))
         if not allow_master and self._repo.active_branch is "master":
             raise RuntimeError("Attempting to commit to master branch")
 
         try:
-            self._repo.git.add(A=True)
+            if files_to_commit is not None:
+                self._repo.git.add(files_to_commit)
+
             n_files = len(self._repo.index.diff("HEAD"))
             if n_files > 0:
                 self._repo.git.commit(m=message)
@@ -110,9 +119,10 @@ class RepoWrapper(object):
              Adds a starting commit to a repo
         """
         try:
-            copy_file(SUPPORT_README, join(self._repo.working_dir, "README.md"))
-            self._repo.git.add(A=True)
-            self._repo.git.commit(m="Initial commit")
+            readme_path = join(self._repo.working_dir, "README.md")
+            copy_file(SUPPORT_README, readme_path)
+            self._repo.git.add(readme_path)
+            self._repo.git.commit(m="Initial commit.")
             self._repo.git.push("origin", "master", set_upstream=True)
         except (OSError, GitCommandError) as e:
             raise RuntimeError("Error whilst creating initial commit in {}: {}"
@@ -125,8 +135,8 @@ class RepoWrapper(object):
             url: Url to the submodule repo
             path: Local system path to the submodule
         """
+        git_modules_path = join(self._repo.working_tree_dir, ".git", "modules", name)
         try:
-            git_modules_path = join(self._repo.working_tree_dir, ".git", "modules", name)
             if self.contains_submodule(url):
                 get_input("Submodule {} already exists. Confirm this is as expected and press return to continue"
                           .format(name))
@@ -135,11 +145,14 @@ class RepoWrapper(object):
                         "The submodule {} is not part of this repo, yet {} exists. Shall I delete it?"
                         "".format(name, git_modules_path)):
                     rmtree(git_modules_path)
-                self._repo.create_submodule(name, path, url=url, branch="master")
+                self._repo.create_submodule(name=name, path=path, url=url, branch="master")
+
         except InvalidGitRepositoryError as e:
             logging.error("Cannot add {} as a submodule, it does not exist: {}".format(path, e))
+            exit()
         except GitCommandError as e:
             logging.error("Git command failed to create submodule from {}: {}".format(path, e))
+            exit()
         except Exception as e:
             raise RuntimeError("Unknown error {} of type {} whilst creating submodule in {}".format(e, type(e), path))
 

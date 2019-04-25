@@ -4,10 +4,6 @@ import os
 import sys
 import unittest
 from xmlrunner import XMLTestRunner
-from tests.test_device_info_generator import DeviceInfoGeneratorTests
-from tests.test_gui_utils import GuiUtilsTests
-from tests.test_file_system_utils import FileSystemUtilsTests
-from tests.test_system_path import SystemPathTests
 
 DEFAULT_TEST_LOCATION = "test-reports\\"
 
@@ -22,11 +18,8 @@ def run_tests(test_reports_path=DEFAULT_TEST_LOCATION):
     Returns:
         True if the tests passed, false otherwise
     """
-    loader = unittest.TestLoader()
-    suite = unittest.TestSuite()
-    for case in [DeviceInfoGeneratorTests, GuiUtilsTests, SystemPathTests, FileSystemUtilsTests]:
-        suite.addTests(loader.loadTestsFromTestCase(case))
 
+    suite = unittest.TestLoader().discover("tests")
     return XMLTestRunner(output=str(os.path.join(test_reports_path)), stream=sys.stdout).run(suite).wasSuccessful()
 
 

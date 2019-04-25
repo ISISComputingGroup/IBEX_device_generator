@@ -1,6 +1,4 @@
 """ Utilities common to all steps """
-from contextlib import contextmanager
-
 from git_utils import RepoWrapper
 from command_line_utils import ask_do_step
 import logging
@@ -23,23 +21,17 @@ def create_component(device, branch, path, action, commit_message, use_git, **kw
     if not ask_do_step(commit_message):
         return
 
-    @contextmanager
-    def _git_operations():
-        repo = None
+    repo = None
+    try:
         if use_git:
             repo = RepoWrapper(path)
             repo.prepare_new_branch(branch)
             logging.warning("No git so branch not created or cleaned.")
 
-        yield
+        files_to_commit = action(device, **kwargs)
 
         if repo is not None:
-            repo.push_all_changes(commit_message)
-
-    try:
-        with _git_operations():
-            action(device, **kwargs)
-
+            repo.push_changes(commit_message, files_to_commit=files_to_commit)
     except (RuntimeError, IOError) as e:
         logging.error(str(e))
     except RuntimeWarning as e:
