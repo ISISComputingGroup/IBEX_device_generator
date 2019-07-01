@@ -30,6 +30,10 @@ def create_submodule(device_info, create_submodule_in_git):
     copyfile(SUPPORT_MAKEFILE, path.join(device_info.support_dir(), "Makefile"))
     master_dir = device_info.support_master_dir()
     if create_submodule_in_git:
+        if path.isdir(path.join(master_dir, ".git")):
+            logging.error("A git repository (not submodule) already exists at {0}."
+                          "Remove this to be able to creat the submodule correctly".format(master_dir))
+            exit()
         get_input("Attempting to create repository using remote {}. Press return to confirm it exists".format(
             device_info.support_repo_url()))
         RepoWrapper(EPICS).create_submodule(device_info.support_app_name(), device_info.support_repo_url(), master_dir)
