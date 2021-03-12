@@ -2,7 +2,7 @@
 from templates.paths import TESTS_TEMPLATE
 from system_paths import IOC_TEST_FRAMEWORK_ROOT
 from os import path
-from file_system_utils import replace_in_file, copy_file
+from .file_system_utils import replace_in_file, copy_file
 import logging
 
 

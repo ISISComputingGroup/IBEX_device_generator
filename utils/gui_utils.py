@@ -1,7 +1,7 @@
 """ Utilities for modifying the gui for a new IOC """
 from templates.paths import OPI
 from system_paths import OPI_RESOURCES
-from file_system_utils import replace_in_file
+from .file_system_utils import replace_in_file
 from shutil import copyfile
 from os import path
 from lxml import etree
