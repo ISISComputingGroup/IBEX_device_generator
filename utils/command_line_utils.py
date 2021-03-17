@@ -1,6 +1,4 @@
 """ Utilities for running scripts from the command line """
-import argparse
-from sys import version_info
 
 
 def get_input(prompt):
@@ -12,7 +10,7 @@ def get_input(prompt):
 
     Returns: Input from prompt
     """
-    return input(prompt) if version_info[0] >= 3 else raw_input(prompt)
+    return input(prompt)
 
 
 def ask_do_step(name):

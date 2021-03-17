@@ -1,6 +1,6 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
 from templates.paths import EMULATOR_TEMPLATE
-from .file_system_utils import copy_tree
+from utils.file_system_utils import copy_tree
 from os import path, walk
 import logging
 

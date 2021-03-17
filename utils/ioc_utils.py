@@ -1,9 +1,9 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
 from system_paths import IOC_ROOT, PERL, PERL_IOC_GENERATOR, EPICS, ARCHITECTURE
 from templates.paths import CONFIG_XML, CONFIG_XML_NOT_0
-from .common_utils import run_command
-from .file_system_utils import replace_in_file, rmtree, mkdir, copy_file, add_to_makefile_list
-from .command_line_utils import get_input
+from utils.common_utils import run_command
+from utils.file_system_utils import replace_in_file, rmtree, mkdir, copy_file, add_to_makefile_list
+from utils.command_line_utils import get_input
 from os import path, walk, remove
 import logging
 

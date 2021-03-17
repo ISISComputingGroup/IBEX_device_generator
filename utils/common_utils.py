@@ -1,8 +1,8 @@
 """ Utilities common to all steps """
 from contextlib import contextmanager
 
-from .git_utils import RepoWrapper
-from .command_line_utils import ask_do_step
+from utils.git_utils import RepoWrapper
+from utils.command_line_utils import ask_do_step
 import logging
 import subprocess
 from os import devnull

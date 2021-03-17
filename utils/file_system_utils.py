@@ -7,7 +7,7 @@ from stat import S_IWUSR
 from shutil import rmtree as rmtree_external
 from shutil import copyfile as copyfile_external
 from shutil import copytree as copytree_external
-from .command_line_utils import ask_do_step
+from utils.command_line_utils import ask_do_step
 
 
 def replace_in_file(target, substitutions):
