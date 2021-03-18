@@ -14,7 +14,7 @@ class GuiUtilsTests(unittest.TestCase):
                    "</entry>"
 
         # Act
-        actual = etree.tostring(_generate_opi_entry("RING", "sauron.opi", "the one ring", "RING"))
+        actual = etree.tostring(_generate_opi_entry("RING", "sauron.opi", "the one ring", "RING")).decode()
 
         # Assert
         self.assertEqual(actual, expected)

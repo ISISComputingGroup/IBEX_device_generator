@@ -1,13 +1,13 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
 from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS, EPICS_MASTER_RELEASE
 from templates.paths import SUPPORT_MAKEFILE, SUPPORT_GITIGNORE, SUPPORT_LICENCE, DB
-from common_utils import run_command
-from file_system_utils import mkdir, add_to_makefile_list, replace_in_file, copy_file
-from command_line_utils import get_input
+from utils.common_utils import run_command
+from utils.file_system_utils import mkdir, add_to_makefile_list, replace_in_file, copy_file
+from utils.command_line_utils import get_input
 from os import path, remove
 from shutil import copyfile
 import logging
-from git_utils import RepoWrapper
+from utils.git_utils import RepoWrapper
 
 
 def _add_to_makefile(name):

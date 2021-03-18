@@ -1,7 +1,7 @@
 """ Utilities for modifying the gui for a new IOC """
 from templates.paths import OPI
 from system_paths import OPI_RESOURCES
-from file_system_utils import replace_in_file
+from utils.file_system_utils import replace_in_file
 from shutil import copyfile
 from os import path
 from lxml import etree
@@ -81,7 +81,8 @@ def _update_opi_info(opi_key, opi_file_name, descriptive_device_name, device_mac
     opis.append(_generate_opi_entry(opi_key, opi_file_name, descriptive_device_name, device_macro_name))
     with open(opi_info_path, "w") as f:
         f.write(
-            etree.tostring(opi_xml, pretty_print=True, encoding='UTF-8', xml_declaration=True, standalone="yes"))
+            etree.tostring(opi_xml, pretty_print=True, encoding='UTF-8', xml_declaration=True, standalone="yes")
+            .decode())
 
 
 def create_opi(device_info):

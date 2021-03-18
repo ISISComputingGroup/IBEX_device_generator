@@ -3,9 +3,9 @@ Utilities for interacting with Git. This is largely done via the command line be
 to maintain than the PythonGit API.
 """
 from git import Repo, GitCommandError, InvalidGitRepositoryError, NoSuchPathError
-from command_line_utils import ask_do_step, get_input
+from utils.command_line_utils import ask_do_step, get_input
 from templates.paths import SUPPORT_README
-from file_system_utils import copy_file, mkdir, rmtree
+from utils.file_system_utils import copy_file, mkdir, rmtree
 from os.path import join, exists
 from time import sleep
 import logging
