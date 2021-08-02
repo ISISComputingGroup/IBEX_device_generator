@@ -86,6 +86,16 @@ def mkdir(path):
         mkdir_external(path)
 
 
+def touch(path, filename):
+    """
+    Create an empty file in a given path with the given name.
+    Args:
+        path: Path to create file in.
+        filename: The filename to create.
+    """
+    open(join(path, filename), 'a').close()
+
+
 def copy_file(src, dst):
     """
     Copy a file from one place to another
