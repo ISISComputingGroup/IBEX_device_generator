@@ -180,6 +180,12 @@ class DeviceInfoGenerator(object):
         """
         return join(self.support_master_dir(), "system_tests", "tests")
 
+    def ioc_test_framework_run_script_path(self):
+        """
+        Returns: The path to the IOC system tests run script
+        """
+        return join(self.support_master_dir(), "system_tests", "run_tests.bat")
+
     def test_class_identifier(self):
         """
         Returns: The name prepended to the IOC test framework test class
