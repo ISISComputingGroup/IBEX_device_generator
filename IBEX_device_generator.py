@@ -8,7 +8,7 @@ from utils.emulator_utils import create_emulator
 from utils.ioc_utils import create_ioc
 from utils.ioc_test_framework_utils import create_test_framework
 from utils.support_utils import create_submodule, apply_support_dir_template
-from system_paths import CLIENT, EMULATORS_ROOT, IOC_ROOT, IOC_TEST_FRAMEWORK_ROOT, EPICS
+from system_paths import CLIENT, IOC_ROOT, EPICS
 import logging
 from utils.device_info_generator import DeviceInfoGenerator
 

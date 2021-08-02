@@ -1,7 +1,5 @@
 """ Utilities for integrating the device into the IOC test framework """
 from templates.paths import TESTS_TEMPLATE, TESTS_FOLDER_TEMPLATE
-from system_paths import IOC_TEST_FRAMEWORK_ROOT
-from os import path
 from utils.file_system_utils import replace_in_file, copy_file, copy_tree
 import logging
 
