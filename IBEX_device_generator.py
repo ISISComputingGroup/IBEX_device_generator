@@ -26,7 +26,7 @@ def generate_device(name, ticket, device_count, use_git):
         name: The name of the IOC
         ticket: The ticket number this relates to
         device_count: Number of IOCs to generate
-        use_git: use git, if True create branch commit and pu; if false do nothing with git
+        use_git: use git, if True then create branch, commit and push; if false do nothing with git
     """
 
     _configure_logging()

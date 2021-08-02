@@ -112,7 +112,7 @@ class DeviceInfoGenerator(object):
         """
         Returns: The directory of the Lewis emulator for the device
         """
-        return join(LEWIS_EMULATORS, self._lower_case_underscore_separated_name())
+        return join(self.support_master_dir(), "system_tests", "lewis_emulators", self._lower_case_underscore_separated_name())
 
     def emulator_name(self):
         """
@@ -173,7 +173,13 @@ class DeviceInfoGenerator(object):
         """
         Returns: The path to the IOC test framework test case file
         """
-        return join(IOC_TEST_FRAMEWORK_ROOT, "tests", "{}.py".format(self.ioc_test_framework_device_name()))
+        return join(self.support_master_dir(), "system_tests", "tests", "{}.py".format(self.ioc_test_framework_device_name()))
+
+    def ioc_test_framework_folder_path(self):
+        """
+        Returns: The path to the IOC system tests folder
+        """
+        return join(self.support_master_dir(), "system_tests", "tests")
 
     def test_class_identifier(self):
         """

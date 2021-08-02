@@ -1,8 +1,8 @@
 """ Utilities for integrating the device into the IOC test framework """
-from templates.paths import TESTS_TEMPLATE
+from templates.paths import TESTS_TEMPLATE, TESTS_FOLDER_TEMPLATE
 from system_paths import IOC_TEST_FRAMEWORK_ROOT
 from os import path
-from utils.file_system_utils import replace_in_file, copy_file
+from utils.file_system_utils import replace_in_file, copy_file, copy_tree
 import logging
 
 
@@ -13,6 +13,7 @@ def _add_template_test_file(device_info):
     """
     dst = device_info.ioc_test_framework_file_path()
     logging.info("Copying template ioc test framework tests to {}".format(dst))
+    copy_tree(TESTS_FOLDER_TEMPLATE, device_info.ioc_test_framework_folder_path())
     copy_file(TESTS_TEMPLATE, dst)
 
     replace_in_file(dst, [("_DEVICE_", device_info.ioc_name()),
