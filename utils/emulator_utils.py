@@ -27,6 +27,7 @@ def _replace_default_name(emulator_dir, emulator_name):
         for dir in dirs:
             if default_name == dir:
                 os.rename(path.join(root, dir), path.join(root, emulator_name))
+    for root, dirs, files in walk(emulator_dir):
         for filename in files:
             with open(path.join(root, filename)) as f:
                 lines = [l.replace(default_name, emulator_name) for l in f.readlines()]
