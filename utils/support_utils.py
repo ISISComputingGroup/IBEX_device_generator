@@ -2,7 +2,7 @@
 from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS, EPICS_MASTER_RELEASE
 from templates.paths import SUPPORT_MAKEFILE, SUPPORT_GITIGNORE, SUPPORT_LICENCE, DB
 from utils.common_utils import run_command
-from utils.file_system_utils import mkdir, add_to_makefile_list, replace_in_file, copy_file
+from utils.file_system_utils import append_to_file, mkdir, add_to_makefile_list, replace_in_file, copy_file
 from utils.command_line_utils import get_input
 from os import path, remove
 from shutil import copyfile
@@ -66,6 +66,10 @@ def apply_support_dir_template(device_info):
     replace_in_file(path.join(device_info.support_app_path(), "Makefile"),
                     [("DB += {}.proto".format(device_info.support_app_name()), "")])
     _add_template_db(device_info)
+    append_to_file(
+        path.join(device_info.support_master_dir(), "Makefile"),
+        ["\nioctests:", "\n\t.\\system_tests\\run_tests.bat", "\n"]
+    )
 
     run_command(["make"], device_info.support_master_dir())
 

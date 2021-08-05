@@ -39,6 +39,10 @@ def replace_in_file(target, substitutions):
     with open(target, "w") as f:
         f.writelines(substitute(line) for line in lines)
 
+def append_to_file(target, newlines):
+    with open(target, "a") as f:
+        f.writelines(newlines)
+
 
 def rmtree(delete_path):
     """
