@@ -1,4 +1,6 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
+import os
+
 from templates.paths import EMULATOR_TEMPLATE
 from utils.file_system_utils import copy_tree
 from os import path, walk
@@ -21,6 +23,10 @@ def _replace_default_name(emulator_dir, emulator_name):
         emulator_name: Name given to the emulator
     """
     default_name = "DEVICENAME"
+    for root, dirs, files in walk(emulator_dir):
+        for dir in dirs:
+            if default_name == dir:
+                os.rename(path.join(root, dir), path.join(root, emulator_name))
     for root, dirs, files in walk(emulator_dir):
         for filename in files:
             with open(path.join(root, filename)) as f:

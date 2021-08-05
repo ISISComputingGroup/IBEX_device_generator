@@ -1,8 +1,7 @@
 """ Helper to generate information about the device based on the name used in device setup """
 from os.path import join
-from system_paths import OPI_RESOURCES, EPICS, EPICS_SUPPORT, IOC_TEST_FRAMEWORK_ROOT
+from system_paths import OPI_RESOURCES, EPICS, EPICS_SUPPORT
 from utils.command_line_utils import get_input
-from system_paths import LEWIS_EMULATORS
 
 
 class DeviceInfoGenerator(object):
@@ -112,7 +111,7 @@ class DeviceInfoGenerator(object):
         """
         Returns: The directory of the Lewis emulator for the device
         """
-        return join(LEWIS_EMULATORS, self._lower_case_underscore_separated_name())
+        return join(self.support_master_dir(), "system_tests", "lewis_emulators", self._lower_case_underscore_separated_name())
 
     def emulator_name(self):
         """
@@ -169,11 +168,29 @@ class DeviceInfoGenerator(object):
         """
         return self._lower_case_underscore_separated_name()
 
+    def system_tests_folder_path(self):
+        """
+        Returns: The path to the system tests folder
+        """
+        return join(self.support_master_dir(), "system_tests")
+
     def ioc_test_framework_file_path(self):
         """
         Returns: The path to the IOC test framework test case file
         """
-        return join(IOC_TEST_FRAMEWORK_ROOT, "tests", "{}.py".format(self.ioc_test_framework_device_name()))
+        return join(self.ioc_test_framework_folder_path(), "{}.py".format(self.ioc_test_framework_device_name()))
+
+    def ioc_test_framework_folder_path(self):
+        """
+        Returns: The path to the IOC system tests folder
+        """
+        return join(self.system_tests_folder_path(), "tests")
+
+    def ioc_test_framework_run_script_path(self):
+        """
+        Returns: The path to the IOC system tests run script
+        """
+        return join(self.system_tests_folder_path(), "run_tests.bat")
 
     def test_class_identifier(self):
         """

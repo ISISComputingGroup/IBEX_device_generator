@@ -8,7 +8,7 @@ from utils.emulator_utils import create_emulator
 from utils.ioc_utils import create_ioc
 from utils.ioc_test_framework_utils import create_test_framework
 from utils.support_utils import create_submodule, apply_support_dir_template
-from system_paths import CLIENT, EMULATORS_ROOT, IOC_ROOT, IOC_TEST_FRAMEWORK_ROOT, EPICS
+from system_paths import CLIENT, IOC_ROOT, EPICS
 import logging
 from utils.device_info_generator import DeviceInfoGenerator
 
@@ -26,7 +26,7 @@ def generate_device(name, ticket, device_count, use_git):
         name: The name of the IOC
         ticket: The ticket number this relates to
         device_count: Number of IOCs to generate
-        use_git: use git, if True create branch commit and pu; if false do nothing with git
+        use_git: use git, if True then create branch, commit and push; if false do nothing with git
     """
 
     _configure_logging()
@@ -39,9 +39,9 @@ def generate_device(name, ticket, device_count, use_git):
     create_component(device_info, branch, device_info.support_master_dir(),
                      apply_support_dir_template, "Creating template file structure in support submodule", use_git)
     create_component(device_info, branch, IOC_ROOT, create_ioc, "Add template IOC", use_git, device_count=device_count)
-    create_component(device_info, branch, IOC_TEST_FRAMEWORK_ROOT, create_test_framework,
+    create_component(device_info, branch, device_info.support_master_dir(), create_test_framework,
                      "Add device to test framework", use_git)
-    create_component(device_info, branch, EMULATORS_ROOT, create_emulator, "Add template emulator", use_git)
+    create_component(device_info, branch, device_info.support_master_dir(), create_emulator, "Add template emulator", use_git)
     create_component(device_info, branch, CLIENT, create_opi, "Add template OPI file", use_git)
 
 

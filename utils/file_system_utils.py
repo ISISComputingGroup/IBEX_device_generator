@@ -39,6 +39,10 @@ def replace_in_file(target, substitutions):
     with open(target, "w") as f:
         f.writelines(substitute(line) for line in lines)
 
+def append_to_file(target, newlines):
+    with open(target, "a") as f:
+        f.writelines(newlines)
+
 
 def rmtree(delete_path):
     """
@@ -84,6 +88,16 @@ def mkdir(path):
             pass  # Do nothing if the dir exists and the user requests no deletion
     else:
         mkdir_external(path)
+
+
+def touch(path, filename):
+    """
+    Create an empty file in a given path with the given name.
+    Args:
+        path: Path to create file in.
+        filename: The filename to create.
+    """
+    open(join(path, filename), 'a').close()
 
 
 def copy_file(src, dst):
