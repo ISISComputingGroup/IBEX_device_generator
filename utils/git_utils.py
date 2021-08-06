@@ -135,7 +135,7 @@ class RepoWrapper(object):
                         "The submodule {} is not part of this repo, yet {} exists. Shall I delete it?"
                         "".format(name, git_modules_path)):
                     rmtree(git_modules_path)
-                self._repo.create_submodule(name, path, url=url, branch="master")
+                self._repo.create_submodule(name, path, url=url, branch="main")
         except InvalidGitRepositoryError as e:
             logging.error("Cannot add {} as a submodule, it does not exist: {}".format(path, e))
         except GitCommandError as e:
