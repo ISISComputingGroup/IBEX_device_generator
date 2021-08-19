@@ -57,7 +57,7 @@ def main():
     parser.add_argument("--name", type=str, help="Name of the device", required=True)
     parser.add_argument("--ticket", type=int, help="Ticket number", required=True)
     parser.add_argument("--device_count", type=int, help="Number of duplicate IOCs to generate", default=2)
-    parser.add_argument("--no_git", action='store_true', help="Use to not create a branch or push to git")
+    parser.add_argument("--no_git", action='store_false', help="Use to not create a branch or push to git")
 
     args = parser.parse_args()
     generate_device(args.name, args.ticket, args.device_count, not args.no_git)
