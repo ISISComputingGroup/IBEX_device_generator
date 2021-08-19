@@ -57,7 +57,7 @@ def main():
     parser.add_argument("--name", type=str, help="Name of the device", required=True)
     parser.add_argument("--ticket", type=int, help="Ticket number", required=True)
     parser.add_argument("--device_count", type=int, help="Number of duplicate IOCs to generate", default=2)
-    parser.add_argument("--use_git", action='store_true', help="Currently not working - Use create the relevant "
+    parser.add_argument("--use_git", action='store_true', help="Currently not working - Use to create relevant "
                                                                "branches and support repository")
 
     args = parser.parse_args()
