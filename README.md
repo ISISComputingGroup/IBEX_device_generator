@@ -1,6 +1,7 @@
 # IOC_Generator
 Generates the boilerplate structure required for developing an IBEX IOC. It will only add the items you request by prompting you before each item.
 
+Have EPICS Terminal open for this (You can obtain it for example using C:\Instrument\Apps\EPICS\config_env.bat)
 Run the script (e.g. in C:\Instrument\Dev\IBEX_device_generator) with the following command
 
 ```
