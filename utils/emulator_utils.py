@@ -42,5 +42,5 @@ def create_emulator(device_info):
     Args:
         device_info: Provides name-based information about the device
     """
-    _copy_files(device_info.emulator_dir())
-    _replace_default_name(device_info.emulator_dir(), device_info.emulator_name())
+    _copy_files(os.path.abspath(os.path.join(device_info.emulator_dir(), os.pardir)))
+    _replace_default_name(os.path.abspath(os.path.join(device_info.emulator_dir(), os.pardir)), device_info.emulator_name())
