@@ -1,14 +1,14 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
 from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS, EPICS_MASTER_RELEASE
 from templates.paths import SUPPORT_MAKEFILE, SUPPORT_GITIGNORE, SUPPORT_LICENCE, DB
-from utils.common_utils import run_command
+from utils.common_utils import run_command, get_year
 from utils.file_system_utils import append_to_file, mkdir, add_to_makefile_list, replace_in_file, copy_file
 from utils.command_line_utils import get_input
 from os import path, remove, linesep
 from shutil import copyfile
 import logging
 from utils.git_utils import RepoWrapper
-
+import datetime
 
 def _add_to_makefile(name):
     """
@@ -62,7 +62,10 @@ def apply_support_dir_template(device_info):
     # Some manual tweaks to the auto template
     remove(device_info.support_db_path())
     copyfile(SUPPORT_GITIGNORE, path.join(device_info.support_master_dir(), ".gitignore"))
-    copyfile(SUPPORT_LICENCE, path.join(device_info.support_master_dir(), "LICENCE"))
+
+    copied_license_filepath =  path.join(device_info.support_master_dir(), "LICENCE")
+    copyfile(SUPPORT_LICENCE, copied_license_filepath)
+    replace_in_file(copied_license_filepath, [("_YEAR_", get_year())])
     replace_in_file(path.join(device_info.support_app_path(), "Makefile"),
                     [("DB += {}.proto".format(device_info.support_app_name()), "")])
     _add_template_db(device_info)
