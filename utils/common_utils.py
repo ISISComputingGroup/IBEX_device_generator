@@ -6,7 +6,7 @@ from utils.command_line_utils import ask_do_step
 import logging
 import subprocess
 from os import devnull
-
+import datetime
 
 def create_component(device, branch, path, action, commit_message, use_git, **kwargs):
     """
@@ -61,3 +61,11 @@ def run_command(command, working_dir):
         cmd = subprocess.Popen(command, cwd=working_dir, stdout=null_out, stderr=subprocess.STDOUT,
                                stdin=subprocess.PIPE)
     cmd.wait()
+
+def get_year() -> str:
+    """
+    Get the current year. 
+    Returns:
+         str:  The current year formatted as a string    
+    """
+    return str(datetime.datetime.now().year)
