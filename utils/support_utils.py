@@ -8,7 +8,6 @@ from os import path, remove, linesep
 from shutil import copyfile
 import logging
 from utils.git_utils import RepoWrapper
-import datetime
 
 def _add_to_makefile(name):
     """
