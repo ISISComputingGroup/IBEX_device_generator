@@ -65,5 +65,7 @@ def run_command(command, working_dir):
 def get_year() -> str:
     """
     Get the current year. 
+    Returns:
+         str:  The current year formatted as a string    
     """
     return str(datetime.datetime.now().year)
