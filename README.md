@@ -18,6 +18,7 @@ The script runs the following steps:
 
 - Add an EPICS submodule for the device
 - Add boilerplate code to the support submodule
+  - If you get an error message stating that the directory is not found in `C:\Instrument\Apps\EPICS\support\[ioc name]`, create a folder inside support directory (use name of the ioc, in lower case) and run the script again.
 - Create `device_count` template IOCs, build them and run `make iocstartups`
 - Create a standalone Lewis emulator
 - Add a sample test suite to the IOC test framework and add it to `run_all_tests.bat`
