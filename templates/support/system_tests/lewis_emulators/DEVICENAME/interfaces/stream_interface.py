@@ -7,7 +7,7 @@ from lewis.utils.replies import conditional_reply
 @has_log
 class DEVICENAMEStreamInterface(StreamInterface):
     commands = {
-            CmdBuilder(self.catch_all).arg("^#9.*$").build()  # Catch-all command for debugging
+            CmdBuilder("catch_all").arg("^#9.*$").build()  # Catch-all command for debugging
         }
 
     def handle_error(self, request, error):
