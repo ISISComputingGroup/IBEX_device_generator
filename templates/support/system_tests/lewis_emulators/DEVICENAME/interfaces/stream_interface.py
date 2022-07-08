@@ -6,11 +6,7 @@ from lewis.utils.replies import conditional_reply
 
 @has_log
 class DEVICENAMEStreamInterface(StreamInterface):
-
-    def __init__(self):
-        super(DEVICENAMEStreamInterface, self).__init__()
-        # Commands that we expect via serial during normal operation
-        self.commands = {
+    commands = {
             CmdBuilder(self.catch_all).arg("^#9.*$").build()  # Catch-all command for debugging
         }
 
