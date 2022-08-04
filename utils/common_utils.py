@@ -29,7 +29,6 @@ def create_component(device, branch, path, action, commit_message, use_git, **kw
         if use_git:
             repo = RepoWrapper(path)
             repo.prepare_new_branch(branch)
-            logging.warning("No git so branch not created or cleaned.")
 
         yield
 
