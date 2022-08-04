@@ -96,7 +96,7 @@ class RepoWrapper(object):
             self._repo.git.add(A=True)
             n_files = len(self._repo.index.diff("HEAD"))
             if n_files > 0:
-                self._repo.git.commit(m=message)
+                self._repo.git.commit("-m", message, "--no-verify")
                 self._repo.git.push(recurse_submodule="check")
                 logging.info("{} files pushed to {}: {}".format(n_files, self._repo.active_branch, message))
             else:
