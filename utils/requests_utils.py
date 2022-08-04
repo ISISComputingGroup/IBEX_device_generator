@@ -2,12 +2,10 @@ import requests
 import logging
 
 ORGANIZATION_NAME = "ISISComputingGroup"
-ICP_WRITE_ID = 1709123
 
 def create_github_repository(use_git : bool, token : str, name : str) -> None:
     """
     Creates a public repo in the ISIS Computing Group organization.
-    Gives access to the ICP-Write team.
 
     Args:
         use_git: Use Git, if True try to create the GitHub repository, else continue.
@@ -30,7 +28,6 @@ def create_github_repository(use_git : bool, token : str, name : str) -> None:
         json={
             "name": f"{name}",
             "visibility": "public",
-            "team_id": ICP_WRITE_ID,
             "auto_init": True
         }
     )

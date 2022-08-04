@@ -62,7 +62,7 @@ def main():
     parser.add_argument("--ticket", type=int, help="Ticket number", required=True)
     parser.add_argument("--device_count", type=int, help="Number of duplicate IOCs to generate", default=2)
     parser.add_argument("--use_git", action='store_true', help="Use to create relevant branches and support repository")
-    parser.add_argument("--token", typ=str, help="GitHub token with \"repo\" scope.")
+    parser.add_argument("--token", type=str, help="GitHub token with \"repo\" scope.")
 
     args = parser.parse_args()
     generate_device(args.name, args.ticket, args.device_count, args.use_git, args.token)
