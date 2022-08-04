@@ -4,7 +4,22 @@ import logging
 ORGANIZATION_NAME = "ISISComputingGroup"
 ICP_WRITE_ID = 1709123
 
-def create_github_repository(token : str, name : str) -> None:
+def create_github_repository(use_git : bool, token : str, name : str) -> None:
+    """
+    Creates a public repo in the ISIS Computing Group organization.
+    Gives access to the ICP-Write team.
+
+    Args:
+        use_git: Use Git, if True try to create the GitHub repository, else continue.
+        token: The GitHub authentication token. If a token was not given the script exits.
+        name: The name of the GitHub repository.
+    """
+    if not use_git:
+        return
+
+    if token is None:
+        logging.critical("If you are using Git, you need to add a GitHub token.")
+        exit()
 
     response: requests.Response = requests.post(
         f"https://api.github.com/orgs/{ORGANIZATION_NAME}/repos",
