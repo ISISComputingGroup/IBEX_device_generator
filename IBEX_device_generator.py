@@ -11,6 +11,7 @@ from utils.support_utils import create_submodule, apply_support_dir_template
 from system_paths import CLIENT, IOC_ROOT, EPICS
 import logging
 from utils.device_info_generator import DeviceInfoGenerator
+from utils.requests_utils import create_github_repository
 
 
 def _configure_logging():
@@ -18,7 +19,7 @@ def _configure_logging():
     logging.getLogger().setLevel(logging.INFO)
 
 
-def generate_device(name, ticket, device_count, use_git):
+def generate_device(name, ticket, device_count, use_git, token):
     """
     Creates the boilerplate components for an IOC
 
@@ -27,12 +28,15 @@ def generate_device(name, ticket, device_count, use_git):
         ticket: The ticket number this relates to
         device_count: Number of IOCs to generate
         use_git: use git, if True then create branch, commit and push; if false do nothing with git
+        token: The GitHub token
     """
 
     _configure_logging()
 
     device_info = DeviceInfoGenerator(name)
     branch = "Ticket{}_Add_IOC_{}".format(ticket, device_info.ioc_name())
+
+    create_github_repository(use_git, token, device_info.support_repo_name())
 
     create_component(device_info, branch, EPICS, create_submodule, "Add support submodule to EPICS", use_git,
                      create_submodule_in_git=use_git)
@@ -57,11 +61,11 @@ def main():
     parser.add_argument("--name", type=str, help="Name of the device", required=True)
     parser.add_argument("--ticket", type=int, help="Ticket number", required=True)
     parser.add_argument("--device_count", type=int, help="Number of duplicate IOCs to generate", default=2)
-    parser.add_argument("--use_git", action='store_true', help="Currently not working - Use to create relevant "
-                                                               "branches and support repository")
+    parser.add_argument("--use_git", action='store_true', help="Use to create relevant branches and support repository")
+    parser.add_argument("--token", typ=str, help="GitHub token with \"repo\" scope.")
 
     args = parser.parse_args()
-    generate_device(args.name, args.ticket, args.device_count, args.use_git)
+    generate_device(args.name, args.ticket, args.device_count, args.use_git, args.token)
 
 
 if __name__ == "__main__":
