@@ -26,7 +26,7 @@ def create_github_repository(use_git : bool, token : str, name : str) -> None:
             "Authorization": f"token {token}"
         },
         json={
-            "name": f"{name}",
+            "name": name,
             "visibility": "public",
             "auto_init": True
         }
