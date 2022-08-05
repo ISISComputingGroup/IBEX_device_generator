@@ -5,7 +5,7 @@ Have EPICS Terminal open for this (You can obtain it for example using C:\Instru
 Run the script (e.g. in C:\Instrument\Dev\IBEX_device_generator) with the following command
 
 ```
-%python3% IBEX_device_generator.py --name=[NAME] --ticket=[TICKET] --device_count=2
+%python3% IBEX_device_generator.py --name=[NAME] --ticket=[TICKET] --device_count=2 --use_git --token[TOKEN]
 ```
 
 where:
@@ -13,9 +13,13 @@ where:
 - **name**: the name of the device. It is used of generating the name of the IOC, the branches it creates, the device emulator etc.
 - **ticket**: is the ticket number. It is used for naming the branches created during the script
 - **device_count**: the number of IOCs to generate. This argument is optional and defaults to 2
+- **use_git**: whether to create the support repository and the relevant branches. This argument is optional and defaults to false.
+- **token**: if you are using **use_git** this argument is mandatory. Your GitHub authentication token with `repo` scope.
 
 The script runs the following steps:
 
+- Create the support GitHub repository.
+  - After the script is finished give access to the ICP-Write team.
 - Add an EPICS submodule for the device
 - Add boilerplate code to the support submodule
   - If you get an error message stating that the directory is not found in `C:\Instrument\Apps\EPICS\support\[ioc name]`, create a folder inside support directory (use name of the ioc, in lower case) and run the script again.
