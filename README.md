@@ -5,7 +5,7 @@ Have EPICS Terminal open for this (You can obtain it for example using C:\Instru
 Run the script (e.g. in C:\Instrument\Dev\IBEX_device_generator) with the following command
 
 ```
-%python3% IBEX_device_generator.py --name=[NAME] --ticket=[TICKET] --device_count=2 --use_git --token[TOKEN]
+%python3% IBEX_device_generator.py --name=[NAME] --ticket=[TICKET] --device_count=2 --github_token[TOKEN]
 ```
 
 where:
@@ -13,8 +13,7 @@ where:
 - **name**: the name of the device. It is used of generating the name of the IOC, the branches it creates, the device emulator etc.
 - **ticket**: is the ticket number. It is used for naming the branches created during the script
 - **device_count**: the number of IOCs to generate. This argument is optional and defaults to 2
-- **use_git**: whether to create the support repository and the relevant branches. This argument is optional and defaults to false.
-- **token**: if you are using **use_git** this argument is mandatory. Your GitHub authentication token with `repo` scope.
+- **github_token**: Your GitHub authentication token with `repo` scope. If set the support repository and the relevant branches will be created.
 
 The script runs the following steps:
 
