@@ -33,6 +33,6 @@ def create_github_repository(use_git : bool, token : str, name : str) -> None:
     )
 
     if response.status_code == requests.codes["created"]:
-        logging.info("Successfully created GitHub repository.")
+        logging.info(f"Repository {response.json().get('html_url')} created successfully.")
     else:
         raise Exception(f"Failed to create repository: {response.status_code}: {response.reason}")
