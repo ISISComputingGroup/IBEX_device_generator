@@ -22,6 +22,7 @@ def create_submodule(device_info, create_submodule_in_git, github_token):
     Creates a submodule and links it into the main EPICS repo
 
     Args:
+        github_token: Github API Personal Access Token
         device_info: Provides name-based information about the device
         create_submodule_in_git: True then create submodule in git; False do not do this operation
     """
@@ -31,12 +32,14 @@ def create_submodule(device_info, create_submodule_in_git, github_token):
     if create_submodule_in_git:
         if path.isdir(path.join(master_dir, ".git")):
             logging.error("A git repository (not submodule) already exists at {0}."
-                          "Remove this to be able to creat the submodule correctly".format(master_dir))
+                          "Remove this to be able to create the submodule correctly".format(master_dir))
             exit()
         if github_token is not None:
-            get_input(f"Attempting to create repository using remote {device_info.support_repo_url()}. Press return to confirm it exists")
+            message = "Attempting to add submodule using remote {}. Press return to confirm it exists"
         else:
-            get_input(f"Please manually create a repository using remote {device_info.support_repo_url()}. Press return when it exists")
+            message = "No token provided - please manually create a repository that matches remote {}. Press return " \
+                      "when it exists"
+        get_input(message.format(device_info.support_repo_url()))
         RepoWrapper(EPICS).create_submodule(device_info.support_app_name(), device_info.support_repo_url(), master_dir)
     else:
         logging.warning("Because you have chosen no-git the submodule has not been added for your ioc support module. "
