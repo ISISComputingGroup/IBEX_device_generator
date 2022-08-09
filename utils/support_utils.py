@@ -17,7 +17,7 @@ def _add_to_makefile(name):
     add_to_makefile_list(EPICS_SUPPORT, "SUPPDIRS", name)
 
 
-def create_submodule(device_info, create_submodule_in_git):
+def create_submodule(device_info, create_submodule_in_git, github_token):
     """
     Creates a submodule and links it into the main EPICS repo
 
@@ -33,8 +33,10 @@ def create_submodule(device_info, create_submodule_in_git):
             logging.error("A git repository (not submodule) already exists at {0}."
                           "Remove this to be able to creat the submodule correctly".format(master_dir))
             exit()
-        get_input("Attempting to create repository using remote {}. Press return to confirm it exists".format(
-            device_info.support_repo_url()))
+        if github_token is not None:
+            get_input(f"Attempting to create repository using remote {device_info.support_repo_url()}. Press return to confirm it exists")
+        else:
+            get_input(f"Please manually create a repository using remote {device_info.support_repo_url()}. Press return when it exists")
         RepoWrapper(EPICS).create_submodule(device_info.support_app_name(), device_info.support_repo_url(), master_dir)
     else:
         logging.warning("Because you have chosen no-git the submodule has not been added for your ioc support module. "
