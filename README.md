@@ -11,9 +11,10 @@ Run the script (e.g. in C:\Instrument\Dev\IBEX_device_generator) with the follow
 where:
 
 - **name**: the name of the device. It is used of generating the name of the IOC, the branches it creates, the device emulator etc.
-- **ticket**: is the ticket number. It is used for naming the branches created during the script
-- **device_count**: the number of IOCs to generate. This argument is optional and defaults to 2
-- **github_token**: Your GitHub authentication token with `repo` scope. If set the support repository and the relevant branches will be created.
+- **ticket**: is the ticket number. It is used for naming the branches created during the script.
+- **device_count**: the number of IOCs to generate. This argument is optional and defaults to 2.
+- **use_git**: use to create relevant branches.
+- **github_token**: your GitHub authentication token with `repo` scope. Use to create support repository.
 
 The script runs the following steps:
 

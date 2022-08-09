@@ -19,7 +19,7 @@ def _configure_logging():
     logging.getLogger().setLevel(logging.INFO)
 
 
-def generate_device(name, ticket, device_count, github_token):
+def generate_device(name, ticket, device_count, use_git, github_token):
     """
     Creates the boilerplate components for an IOC
 
@@ -27,7 +27,8 @@ def generate_device(name, ticket, device_count, github_token):
         name: The name of the IOC
         ticket: The ticket number this relates to
         device_count: Number of IOCs to generate
-        github_token: If set then create branch, commit and push; if false do nothing with git
+        use_git: use git, if True then create branch, commit and push; if false do nothing with git
+        github_token: If set creates GitHub repository
     """
 
     _configure_logging()
@@ -37,7 +38,6 @@ def generate_device(name, ticket, device_count, github_token):
 
     create_github_repository(github_token, device_info.support_repo_name())
 
-    use_git = github_token is not None
     create_component(device_info, branch, EPICS, create_submodule, "Add support submodule to EPICS", use_git,
                      create_submodule_in_git=use_git)
     create_component(device_info, branch, device_info.support_master_dir(),
@@ -61,10 +61,11 @@ def main():
     parser.add_argument("--name", type=str, help="Name of the device", required=True)
     parser.add_argument("--ticket", type=int, help="Ticket number", required=True)
     parser.add_argument("--device_count", type=int, help="Number of duplicate IOCs to generate", default=2)
-    parser.add_argument("--github_token", type=str, help="GitHub token with \"repo\" scope. Use to create relevant branches and support repository")
+    parser.add_argument("--use_git", action='store_false', help="Use to create relevant branches")
+    parser.add_argument("--github_token", type=str, help="GitHub token with \"repo\" scope. Use to create support repository")
 
     args = parser.parse_args()
-    generate_device(args.name, args.ticket, args.device_count, args.github_token)
+    generate_device(args.name, args.ticket, args.device_count, args.use_git, args.github_token)
 
 
 if __name__ == "__main__":
