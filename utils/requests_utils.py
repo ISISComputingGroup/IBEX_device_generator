@@ -1,18 +1,20 @@
 import requests
 import logging
+from utils.device_info_generator import DeviceInfoGenerator
 
 ORGANIZATION_NAME = "ISISComputingGroup"
 
-def create_github_repository(github_token : str, name : str) -> None:
+
+def create_github_repository(device_info: DeviceInfoGenerator, github_token: str) -> None:
     """
     Creates a public repo in the ISIS Computing Group organization.
 
     Args:
+        device_info: Provides name-based information about the device
         github_token: The GitHub authentication token.
-        name: The name of the GitHub repository.
     """
     if github_token is None:
-        return
+        raise Exception("Token not specified, unable to create support repository")
 
     response: requests.Response = requests.post(
         f"https://api.github.com/orgs/{ORGANIZATION_NAME}/repos",
@@ -21,7 +23,7 @@ def create_github_repository(github_token : str, name : str) -> None:
             "Authorization": f"token {github_token}"
         },
         json={
-            "name": name,
+            "name": device_info.support_repo_name(),
             "visibility": "public",
             "auto_init": True
         }
