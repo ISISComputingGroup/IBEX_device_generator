@@ -106,9 +106,9 @@ class RepoWrapper(object):
         """
         logging.info("Pushing all changes to current branch, {}, for repo {}".format(
             self._repo.active_branch, self._repo.working_tree_dir))
-        if not allow_master and self._repo.active_branch is "master":
+        if not allow_master and self._repo.active_branch == "master":
             raise RuntimeError("Attempting to commit to master branch")
-        if not allow_main and self._repo.active_branch is "main":
+        if not allow_main and self._repo.active_branch == "main":
             raise RuntimeError("Attempting to commit to main branch")
 
         try:
