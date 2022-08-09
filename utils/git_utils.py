@@ -24,7 +24,7 @@ class RepoWrapper(object):
             self._repo = Repo(path)
         except (InvalidGitRepositoryError, NoSuchPathError):
             mkdir(path)
-            self._repo = Repo.init(path, kwargs="--initial-branch=main")
+            self._repo = Repo.init(path, initial_branch='main')
             self.add_initial_commit()
         except Exception as e:
             raise RuntimeError("Unable to attach to git repository at path {}: {}".format(path, e))
