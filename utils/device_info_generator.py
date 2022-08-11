@@ -1,7 +1,6 @@
 """ Helper to generate information about the device based on the name used in device setup """
 from os.path import join
 from system_paths import OPI_RESOURCES, EPICS, EPICS_SUPPORT
-from utils.command_line_utils import get_input
 
 
 class DeviceInfoGenerator(object):
@@ -21,7 +20,7 @@ class DeviceInfoGenerator(object):
             proposed_name = self.ioc_name()
             if self._is_valid_ioc_name(proposed_name):
                 break
-            self._name = get_input(
+            self._name = input(
                 "Device name, {}, is invalid and produces an invalid IOC name {}. Please enter a valid device name: ".
                 format(self._name, proposed_name))
 

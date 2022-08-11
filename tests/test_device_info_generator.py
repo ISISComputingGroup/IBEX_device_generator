@@ -54,7 +54,7 @@ class DeviceInfoGeneratorTests(unittest.TestCase):
     def test_GIVEN_an_ioc_shorter_than_8_characters_with_spaces_THEN_info_names_match_values_as_defined_in_test_case(self):
         self._test_case(self.test_cases["short_spaces"])
 
-    @patch("utils.device_info_generator.get_input")
-    def test_GIVEN_an_ioc_longer_than_8_characters_with_spaces_THEN_info_names_match_values_as_defined_in_test_case(self, get_input):
-        get_input.return_value = "short"
+    @patch("utils.device_info_generator.input")
+    def test_GIVEN_an_ioc_longer_than_8_characters_with_spaces_THEN_info_names_match_values_as_defined_in_test_case(self, input):
+        input.return_value = "short"
         self._test_case(self.test_cases["long_spaces"])

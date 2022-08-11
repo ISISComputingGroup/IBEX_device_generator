@@ -3,7 +3,7 @@ Utilities for interacting with Git. This is largely done via the command line be
 to maintain than the PythonGit API.
 """
 from git import Repo, GitCommandError, InvalidGitRepositoryError, NoSuchPathError
-from utils.command_line_utils import ask_do_step, get_input
+from utils.command_line_utils import ask_do_step
 from templates.paths import SUPPORT_README
 from utils.file_system_utils import copy_file, mkdir, rmtree
 from os.path import join, exists
@@ -37,7 +37,7 @@ class RepoWrapper(object):
         logging.info("Preparing new branch, {}, for repo {}".format(branch, self._repo.working_tree_dir))
         if self._repo.is_dirty():
             try:
-                option = int(get_input(
+                option = int(input(
                     "Repository {} is dirty, clean it? \n"
                     "    0: No clean\n"
                     "    1: Stash uncommited changes\n"
@@ -147,7 +147,7 @@ class RepoWrapper(object):
         try:
             git_modules_path = join(self._repo.working_tree_dir, ".git", "modules", name)
             if self.contains_submodule(url):
-                get_input("Submodule {} already exists. Confirm this is as expected and press return to continue"
+                input("Submodule {} already exists. Confirm this is as expected and press return to continue"
                           .format(name))
             else:
                 if exists(git_modules_path) and ask_do_step(
