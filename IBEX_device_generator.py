@@ -61,12 +61,11 @@ def main():
     parser.add_argument("--name", type=str, help="Name of the device", required=True)
     parser.add_argument("--ticket", type=int, help="Ticket number", required=True)
     parser.add_argument("--device_count", type=int, help="Number of duplicate IOCs to generate", default=2)
-    parser.add_argument("--github_token", type=str, help="GitHub token with \"repo\" scope. Use to create support "
-                                                         "repository. If not specified no git operations will occur")
+    parser.add_argument("--use_git", action='store_true', help="Use to create relevant branches. Remote repository must exist")
+    parser.add_argument("--github_token", type=str, help="GitHub token with \"repo\" scope. Use to create support repository")
 
     args = parser.parse_args()
-    use_git = args.github_token is not None
-    generate_device(args.name, args.ticket, args.device_count, use_git, args.github_token)
+    generate_device(args.name, args.ticket, args.device_count, args.use_git, args.github_token)
 
 
 if __name__ == "__main__":

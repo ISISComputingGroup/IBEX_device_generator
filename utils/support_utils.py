@@ -3,7 +3,6 @@ from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS, EPI
 from templates.paths import SUPPORT_MAKEFILE, SUPPORT_GITIGNORE, SUPPORT_LICENCE, DB
 from utils.common_utils import run_command, get_year
 from utils.file_system_utils import append_to_file, mkdir, add_to_makefile_list, replace_in_file, copy_file
-from utils.command_line_utils import get_input
 from os import path, remove, linesep
 from shutil import copyfile
 import logging
@@ -34,7 +33,7 @@ def create_submodule(device_info, create_submodule_in_git):
             logging.error("A git repository (not submodule) already exists at {0}."
                           "Remove this to be able to create the submodule correctly".format(master_dir))
             exit()
-        get_input(f"Attempting to add submodule using remote {device_info.support_repo_url()}. Press return to confirm it exists")
+        input(f"Attempting to add submodule using remote {device_info.support_repo_url()}. Press return to confirm it exists")
         RepoWrapper(EPICS).create_submodule(device_info.support_app_name(), device_info.support_repo_url(), master_dir)
     else:
         logging.warning("Because you have chosen no-git the submodule has not been added for your ioc support module. "
@@ -56,7 +55,7 @@ def apply_support_dir_template(device_info):
         logging.warning("The makeSupport.pl didn't run correctly. It's very temperamental. "
                         "Please run the following command manually from an EPICS terminal")
         logging.warning("cd {} && {}".format(device_info.support_master_dir(), " ".join(cmd)))
-        get_input("Press return to continue...")
+        input("Press return to continue...")
 
     # Some manual tweaks to the auto template
     remove(device_info.support_db_path())

@@ -3,7 +3,6 @@ from system_paths import IOC_ROOT, PERL, PERL_IOC_GENERATOR, EPICS, ARCHITECTURE
 from templates.paths import CONFIG_XML, CONFIG_XML_NOT_0
 from utils.common_utils import run_command
 from utils.file_system_utils import replace_in_file, rmtree, mkdir, copy_file, add_to_makefile_list
-from utils.command_line_utils import get_input
 from os import path, walk, remove
 import logging
 
@@ -130,7 +129,7 @@ def create_ioc(device_info, device_count):
     """
     while not 1 <= device_count <= 9:
         try:
-            device_count = int(get_input("{} IOCs currently requested. The current script requires a number"
+            device_count = int(input("{} IOCs currently requested. The current script requires a number"
                                          " between 1 and 9. Please enter a new value: ".format(device_count)))
         except (ValueError, TypeError) as e:
             logging.warning("That was not a valid input, please try again: {}".format(e))
