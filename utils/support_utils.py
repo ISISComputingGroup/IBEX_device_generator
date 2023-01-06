@@ -3,7 +3,7 @@ from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS, EPI
 from templates.paths import SUPPORT_MAKEFILE, SUPPORT_GITIGNORE, SUPPORT_LICENCE, DB
 from utils.common_utils import run_command, get_year
 from utils.file_system_utils import append_to_file, mkdir, add_to_makefile_list, replace_in_file, copy_file
-from os import path, remove, linesep
+from os import path, remove
 from shutil import copyfile
 import logging
 from utils.git_utils import RepoWrapper
@@ -69,7 +69,7 @@ def apply_support_dir_template(device_info):
     _add_template_db(device_info)
     append_to_file(
         path.join(device_info.support_master_dir(), "Makefile"),
-        [linesep + "ioctests:", linesep + "\t.\\system_tests\\run_tests.bat", linesep]
+        ["\nioctests:\n", "\t.\\system_tests\\run_tests.bat\n"]
     )
 
     run_command(["make"], device_info.support_master_dir())
