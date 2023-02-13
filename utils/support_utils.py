@@ -1,5 +1,5 @@
 """ Utilities for adding a template emulator for a new IBEX device"""
-from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS, EPICS_MASTER_RELEASE
+from system_paths import EPICS_SUPPORT, PERL, PERL_SUPPORT_GENERATOR, EPICS
 from templates.paths import SUPPORT_MAKEFILE, SUPPORT_GITIGNORE, SUPPORT_GITATTRIBUTES, SUPPORT_LICENCE, DB
 from utils.common_utils import run_command, get_year
 from utils.file_system_utils import append_to_file, mkdir, add_to_makefile_list, replace_in_file, copy_file

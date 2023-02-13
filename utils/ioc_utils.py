@@ -113,7 +113,7 @@ def _add_macro_to_release_file(device_info):
     Args:
         device_info: Name-based device information
     """
-    logging.info("Adding macro to MASTER_RELEASE")
+    logging.info("Adding macro to RELEASE")
     with open(path.join(device_info.ioc_path(), "configure", "RELEASE"), "a") as f:
         f.write("{macro}=$(SUPPORT)/{name}/master\n".format(
             macro=device_info.ioc_name(), name=device_info.support_app_name()))
