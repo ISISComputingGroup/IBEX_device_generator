@@ -19,7 +19,9 @@ where:
 The script runs the following steps:
 
 - Create the support GitHub repository.
-  - After the script is finished give access to the ICP-Write team.
+  - After the script is finished give team access as per https://github.com/ISISComputingGroup/ibex_developers_manual/wiki/Adding-new-modules-via-Git#1-create-submodule-in-github in particular:
+    - `Write` access to the `ICP-Write` team.
+    - `Maintain` access to the `ICP-WriteAndMerge` team.
 - Add an EPICS submodule for the device
 - Add boilerplate code to the support submodule
   - If you get an error message stating that the directory is not found in `C:\Instrument\Apps\EPICS\support\[ioc name]`, create a folder inside support directory (use name of the ioc, in lower case) and run the script again.
