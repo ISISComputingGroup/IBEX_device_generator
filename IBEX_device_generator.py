@@ -11,7 +11,7 @@ from utils.support_utils import create_submodule, apply_support_dir_template
 from system_paths import CLIENT, IOC_ROOT, EPICS
 import logging
 from utils.device_info_generator import DeviceInfoGenerator
-from utils.requests_utils import create_github_repository
+from utils.requests_utils import create_github_repository, grant_permissions_for_github_repository
 
 
 def _configure_logging():
@@ -36,7 +36,9 @@ def generate_device(name, ticket, device_count, use_git, github_token):
     device_info = DeviceInfoGenerator(name)
     branch = "Ticket{}_Add_IOC_{}".format(ticket, device_info.ioc_name())
     create_component(device_info, branch, device_info.support_master_dir(), create_github_repository,
-                     "Create github repository", False, github_token=github_token)
+                     "Create GitHub repository", False, github_token=github_token)
+    create_component(device_info, branch, device_info.support_master_dir(), grant_permissions_for_github_repository,
+                     "Grant permissions for GitHub repository", False, github_token=github_token)
     create_component(device_info, branch, EPICS, create_submodule, "Add support submodule to EPICS", use_git,
                      create_submodule_in_git=use_git)
     create_component(device_info, branch, device_info.support_master_dir(),
