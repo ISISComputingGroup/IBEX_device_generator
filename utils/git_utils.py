@@ -137,13 +137,12 @@ class RepoWrapper(object):
             raise RuntimeError("Error whilst creating initial commit in {}: {}"
                                .format(self._repo.working_dir, e))
 
-    def create_submodule(self, name, url, path, branch):
+    def create_submodule(self, name, url, path):
         """
         Args:
             name: Name of the submodule
             url: Url to the submodule repo
             path: Local system path to the submodule
-            branch: the branch to be written to .gitmodules
         """
         try:
             git_modules_path = join(self._repo.working_tree_dir, ".git", "modules", name)
