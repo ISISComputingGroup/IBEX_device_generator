@@ -18,7 +18,6 @@ def _configure_logging():
     logging.basicConfig(format="%(asctime)-15s, %(levelname)s: %(message)s")
     logging.getLogger().setLevel(logging.INFO)
 
-
 def generate_device(name, ticket, device_count, use_git, github_token):
     """
     Creates the boilerplate components for an IOC
