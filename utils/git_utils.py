@@ -9,7 +9,7 @@ from utils.file_system_utils import copy_file, mkdir, rmtree
 from os.path import join, exists
 from time import sleep
 import logging
-
+import subprocess
 
 class RepoWrapper(object):
     """
@@ -154,11 +154,13 @@ class RepoWrapper(object):
                         "The submodule {} is not part of this repo, yet {} exists. Shall I delete it?"
                         "".format(name, git_modules_path)):
                     rmtree(git_modules_path)
-                self._repo.create_submodule(name, path, url=url, branch="main")
-        except InvalidGitRepositoryError as e:
-            logging.error("Cannot add {} as a submodule, it does not exist: {}".format(path, e))
-        except GitCommandError as e:
-            logging.error("Git command failed to create submodule from {}: {}".format(path, e))
+                branch = "main"
+                # We use subprocess here because gitpython seems to add a /refs/heads/ prefix to any branch you give it,
+                # and this breaks the repo checks. 
+                subprocess.run(f"git submodule add -b {branch} --name {name} {url} {path}", cwd = self._repo.working_tree_dir, check=True)
+                
+        except subprocess.CalledProcessError as e:
+            logging.error("Cannot add {} as a submodule, error: {}".format(path, e))
         except Exception as e:
             raise RuntimeError("Unknown error {} of type {} whilst creating submodule in {}".format(e, type(e), path))
 
