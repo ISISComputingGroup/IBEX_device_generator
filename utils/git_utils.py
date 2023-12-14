@@ -10,6 +10,7 @@ from os.path import join, exists
 from time import sleep
 import logging
 import subprocess
+import posixpath
 
 class RepoWrapper(object):
     """
@@ -155,9 +156,11 @@ class RepoWrapper(object):
                         "".format(name, git_modules_path)):
                     rmtree(git_modules_path)
                 branch = "main"
+                # create path relative to current root in case path is absolute
+                sub_path = posixpath.relpath(path, start=self._repo.working_tree_dir)
                 # We use subprocess here because gitpython seems to add a /refs/heads/ prefix to any branch you give it,
                 # and this breaks the repo checks. 
-                subprocess.run(f"git submodule add -b {branch} --name {name} {url} {path}", cwd = self._repo.working_tree_dir, check=True)
+                subprocess.run(f"git submodule add -b {branch} --name {name} {url} {sub_path}", cwd = self._repo.working_tree_dir, check=True)
                 
         except subprocess.CalledProcessError as e:
             logging.error("Cannot add {} as a submodule, error: {}".format(path, e))
