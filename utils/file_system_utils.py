@@ -81,7 +81,7 @@ def mkdir(path):
         path: The path to the dir to create
     """
     if exists(path):
-        if ask_do_step("{} already exists. Delete it?".format(path)):
+        if ask_do_step("{} already exists. Delete its contents and make it an empty directory?".format(path)):
             rmtree(path)
             mkdir_external(path)
         else:
@@ -155,7 +155,7 @@ def _add_entry_to_list(text, list_name, entry):
     last_line = ""
     marker = "{} += ".format(list_name)
     for line in text:
-        if marker in last_line and marker not in line  or text:
+        if marker in last_line and marker not in line and marker not in text:
             new_text.append(marker + entry + "\n")
         new_text.append(line)
         last_line = line

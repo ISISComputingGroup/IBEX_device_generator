@@ -133,13 +133,17 @@ def create_ioc(device_info, device_count):
                                          " between 1 and 9. Please enter a new value: ".format(device_count)))
         except (ValueError, TypeError) as e:
             logging.warning("That was not a valid input, please try again: {}".format(e))
+    
+    try:
 
-    mkdir(device_info.ioc_path())
+        mkdir(device_info.ioc_path())
 
-    _run_ioc_template_setup(device_info, device_count)
-    _add_template_config_xml(device_info, device_count)
-    _replace_macros(device_info, device_count)
-    _clean_up(device_info, device_count)
-    _build(device_info.ioc_path())
-    _add_to_ioc_makefile(device_info.ioc_name())
-    _add_macro_to_release_file(device_info)
+        _run_ioc_template_setup(device_info, device_count)
+        _add_template_config_xml(device_info, device_count)
+        _replace_macros(device_info, device_count)
+        _clean_up(device_info, device_count)
+        _build(device_info.ioc_path())
+        _add_to_ioc_makefile(device_info.ioc_name())
+        _add_macro_to_release_file(device_info)
+    except Exception as e:
+        logging.error(str(e))
