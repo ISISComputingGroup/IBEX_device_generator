@@ -8,6 +8,7 @@ from shutil import rmtree as rmtree_external
 from shutil import copyfile as copyfile_external
 from shutil import copytree as copytree_external
 from utils.command_line_utils import ask_do_step
+import re
 
 
 def replace_in_file(target, substitutions):
@@ -143,6 +144,9 @@ def _copy(src, dst, remove_func, copy_func):
 
 def _add_entry_to_list(text, list_name, entry):
     """
+    Check if IOC name has already been added to support/Makefile or ioc/master/Makefile, 
+    and add it at the end of IOC | SUPP DIRS list if it isn't there already.
+
     Args:
         text: The original text
         list_name: The name of the list to add to
@@ -151,15 +155,35 @@ def _add_entry_to_list(text, list_name, entry):
     Returns: The original text with the requested entry added to the named list
 
     """
+    do_not_write = False
+    dirs_list = []
     new_text = []
     last_line = ""
     marker = "{} += ".format(list_name)
+
+    #Add each line that begins with IOCSDIRS or SUPPDIRS, i.e. line, to dirs_list
     for line in text:
-        if marker in last_line and marker not in line and entry not in text:
-            new_text.append(marker + entry + "\n")
-        new_text.append(line)
-        last_line = line
-    return new_text
+        if re.match("^{}".format(list_name), line):
+            dirs_list.append(line)
+
+    #Check if any line added to dirs_list has a match with "IOCDIRS/SUPPDIRS += entry",
+    #and if so, set do_not_write to True, to prevent multiple lines of the same IOC
+    for item in dirs_list:
+        if re.search("{}".format(entry), item):
+            print("IOC name already added to {}".format(list_name))
+            do_not_write = True
+            break
+    
+    #Go to the end of the list of IOCDIRS/SUPPDIRS += iocname, and add our new IOC
+    if do_not_write == False:
+        for line in text:
+            if marker in last_line and marker not in line:
+                new_text.append(marker + entry + "\n")
+            new_text.append(line)
+            last_line = line
+        return new_text #return Makefile with new entry
+    else:
+        return text #return unedited Makefile
 
 
 def add_to_makefile_list(directory, list_name, entry):
