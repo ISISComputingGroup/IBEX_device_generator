@@ -8,21 +8,23 @@ class DeviceInfoGenerator(object):
     Generates info used in setting up a device under IBEX based on the name
     """
 
-    def __init__(self, raw_name):
+    def __init__(self, raw_name, unique_name_exists):
         """
         Args:
             raw_name: The raw input name of the device
         """
         self._name = raw_name
         self._ioc_name = None
+        self._unique_name_exists = unique_name_exists
 
-        while True:
-            proposed_name = self.ioc_name()
-            if self._is_valid_ioc_name(proposed_name):
-                break
-            self._name = input(
-                "Device name, {}, is invalid and produces an invalid IOC name {}. Please enter a valid device name: ".
-                format(self._name, proposed_name))
+        if unique_name_exists == False:
+            while True:
+                proposed_name = self.ioc_name()
+                if self._is_valid_ioc_name(proposed_name):
+                    break
+                self._name = input(
+                    "Device name, {}, is invalid and produces an invalid IOC name {}. Please enter a valid device name: ".
+                    format(self._name, proposed_name))
 
     def _lower_case_underscore_separated_name(self):
         """

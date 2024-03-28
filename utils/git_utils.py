@@ -28,39 +28,120 @@ class RepoWrapper(object):
             self.add_initial_commit()
         except Exception as e:
             raise RuntimeError("Unable to attach to git repository at path {}: {}".format(path, e))
+        
+    def git_command(self, command, path):
+        try:
+            subprocess.run(command, cwd=path,  shell=True)  
+        except subprocess.CalledProcessError as e:
+            print("Error:", e)
+
+
+    def repo_status(self):
+        """
+        Returns True if repo status is clean, False if otherwise
+        """
+        command = []
+        repo = Repo(self._repo.working_tree_dir)
+        wrapper = RepoWrapper(self._repo.working_tree_dir)
+        logging.info("Checking git status of repo {}".format(repo.working_tree_dir))
+        path = "C:\Instrument\Apps\EPICS"
+
+        if repo.is_dirty():
+            try:
+                command = ['git', 'status']
+                wrapper.git_command(command, path)
+                option = int(input(
+                    "Repository {} is dirty, clean it? \n"
+                    "    0: No clean\n"
+                    "    1: Stash uncommited changes\n"
+                    "    2: Git submodule update --recursive. This will return all submodules to the tips "
+                    "of the branches they are pinned to. In most cases this will return EPICS top to a clean state.\n"
+                    "    3: Reset hard to HEAD. All unpushed changes will be lost\n"
+                    "    [Default: 0] ".format(repo.working_tree_dir)))
+                
+            except (ValueError, TypeError):
+                option = 0
+            logging.info("Option {} selected".format(option))
+
+            try:
+                if option == 1:
+                    logging.info("Local changes will be stashed")
+                    
+                    command = ['git', 'stash']
+                    wrapper.git_command(command, path)
+
+                elif option == 2 and ask_do_step(
+                        "Git submodule update --recursive requested. All uncommited changes will be lost. Are you sure?"): 
+                    command = ['git', 'submodule', 'update', '--recursive', '--init']
+                    wrapper.git_command(command, path)
+                    
+                elif option == 3 and ask_do_step(
+                        "Git reset HEAD --hard requested. All unpushed changes will be lost. Are you sure?"):
+                    command = ['git', 'reset', '--hard', 'HEAD']
+                    wrapper.git_command(command, path)
+
+                else:
+                    logging.info("No clean requested")
+
+            except GitCommandError as e:
+                logging.warning("Error whilst scrubbing repository. I'll try to continue anyway: {}".format(e))
+            return False
+        else:
+            logging.info("Repo {} is clean.".format(self._repo.working_tree_dir))
+            return True
 
     def prepare_new_branch(self, branch):
         """
         Args:
             branch: Name of the new branch
         """
-        logging.info("Preparing new branch, {}, for repo {}".format(branch, self._repo.working_tree_dir))
-        if self._repo.is_dirty():
+        command = []
+        repo = Repo(self._repo.working_tree_dir)
+        wrapper = RepoWrapper(self._repo.working_tree_dir)
+        logging.info("Checking git status of repo {}".format(repo.working_tree_dir))
+        path = "C:\Instrument\Apps\EPICS"
+
+        if repo.is_dirty():
             try:
+                command = ['git', 'status']
+                wrapper.git_command(command, path)
                 option = int(input(
                     "Repository {} is dirty, clean it? \n"
                     "    0: No clean\n"
                     "    1: Stash uncommited changes\n"
-                    "    2: Clean (-fd). All uncommited changes will be lost\n"
+                    "    2: Git submodule update --recursive. This will return all submodules to the tips "
+                    "of the branches they are pinned to. In most cases this will return EPICS top to a clean state.\n"
                     "    3: Reset hard to HEAD. All unpushed changes will be lost\n"
-                    "    [Default: 0] ".format(self._repo.working_tree_dir)))
+                    "    [Default: 0] ".format(repo.working_tree_dir)))
+                
             except (ValueError, TypeError):
                 option = 0
             logging.info("Option {} selected".format(option))
+
             try:
                 if option == 1:
                     logging.info("Local changes will be stashed")
-                    self._repo.git.stash(include_untracked=True)
+                    
+                    command = ['git', 'stash']
+                    wrapper.git_command(command, path)
+
                 elif option == 2 and ask_do_step(
-                        "Git clean -fd requested. All uncommited changes will be lost. Are you sure?"):
-                    self._repo.git.clean(f=True, d=True)
+                        "Git submodule update --recursive requested. All uncommited changes will be lost. Are you sure?"): 
+                    command = ['git', 'submodule', 'update', '--recursive', '--init']
+                    wrapper.git_command(command, path)
+                    
                 elif option == 3 and ask_do_step(
                         "Git reset HEAD --hard requested. All unpushed changes will be lost. Are you sure?"):
-                    self._repo.git.reset("HEAD", hard=True)
+                    command = ['git', 'reset', '--hard', 'HEAD']
+                    wrapper.git_command(command, path)
+
                 else:
                     logging.info("No clean requested")
+
             except GitCommandError as e:
-                logging.warning("Error whilst scrubbing repository. I'll try to continue anyway: {}").format(e)
+                logging.warning("Error whilst scrubbing repository. I'll try to continue anyway: {}".format(e))
+        else:
+            logging.info("Repo {} is clean.".format(self._repo.working_tree_dir))
 
         try:
             logging.info("Switching repo {} to master/main and fetching latest changes".format(self._repo.working_tree_dir))
@@ -119,7 +200,7 @@ class RepoWrapper(object):
                 self._repo.git.push(recurse_submodule="check")
                 logging.info("{} files pushed to {}: {}".format(n_files, self._repo.active_branch, message))
             else:
-                logging.warn("Commit aborted. No files changed")
+                return logging.warn("Commit aborted. No files changed")
         except GitCommandError as e:
             raise RuntimeError("Error whilst pushing changes to git, {}".format(e))
 

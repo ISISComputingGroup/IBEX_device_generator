@@ -37,7 +37,7 @@ class DeviceInfoGeneratorTests(unittest.TestCase):
              SUPPORT: "short", REPO: "EPICS-Short", TESTS: "short"}
 
     def _test_case(self, case):
-        info = DeviceInfoGenerator(case[RAW])
+        info = DeviceInfoGenerator(case[RAW], False)
         self.assertEqual(case[OPI_FILE], info.opi_file_name())
         self.assertEqual(case[OPI_KEY], info.opi_key())
         self.assertEqual(case[LOG], info.log_name())
