@@ -18,7 +18,8 @@ def _run_ioc_template_setup(device_info, device_sup_info, device_count):
         device_count: How many IOC apps to generate
     """
     if device_sup_info.ioc_name() == "NONE":
-        device_sup_info = device_info
+        for i in device_sup_info:
+            device_sup_info[i] = device_info[i]
 
     if device_count > 99:
         raise ValueError("Cannot generate more than 99 IOCs for a single device")
@@ -123,7 +124,7 @@ def _add_macro_to_release_file(device_info, device_sup_info):
             macro=device_info.ioc_name(), name=device_sup_info.support_app_name()))
 
 
-def create_ioc(device_info, device_sup_info, device_count):
+def create_ioc(ioc_info, sup_info, device_count):
     """
     Creates a vanilla IOC in the EPICS IOC submodule
 
@@ -139,16 +140,16 @@ def create_ioc(device_info, device_sup_info, device_count):
             logging.warning("That was not a valid input, please try again: {}".format(e))
     
     try:
-        _add_to_ioc_makefile(device_info.ioc_name())
+        _add_to_ioc_makefile(ioc_info.ioc_name())
         
-        mkdir(device_info.ioc_path())
+        mkdir(ioc_info.ioc_path())
 
-        _run_ioc_template_setup(device_info, device_sup_info, device_count)
-        _add_template_config_xml(device_info, device_count)
-        _replace_macros(device_info, device_sup_info, device_count)
-        _clean_up(device_info, device_count)
-        _build(device_info.ioc_path())
-        _add_macro_to_release_file(device_info, device_sup_info)
+        _run_ioc_template_setup(ioc_info, sup_info, device_count)
+        _add_template_config_xml(ioc_info, device_count)
+        _replace_macros(ioc_info, sup_info, device_count)
+        _clean_up(ioc_info, device_count)
+        _build(ioc_info.ioc_path())
+        _add_macro_to_release_file(ioc_info, sup_info)
         
         
     except Exception as e:

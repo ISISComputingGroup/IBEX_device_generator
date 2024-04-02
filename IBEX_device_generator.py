@@ -54,10 +54,10 @@ def generate_device(name, support_module_name, ticket, device_count, use_git, gi
         create_component(device_info, branch, device_info.support_master_dir(),
                         apply_support_dir_template, "Creating template file structure in support submodule", use_git)
 
-        create_component(device_info, branch, IOC_ROOT, create_ioc, "Add template IOC", use_git, device_count=device_count)
+        create_component(device_info, branch, IOC_ROOT, create_ioc, "Add template IOC", use_git, sup_info=device_info, device_count=device_count)
 
         create_component(device_info, branch, device_info.support_master_dir(), create_test_framework,
-                        "Add device to test framework", use_git)
+                        "Add device to test framework", use_git, unique_name=device_info)
 
         create_component(device_info, branch, device_info.support_master_dir(), create_emulator, "Add template emulator",
                         use_git)
@@ -81,7 +81,7 @@ def generate_device(name, support_module_name, ticket, device_count, use_git, gi
         create_component(device_sup_info, branch, device_sup_info.support_master_dir(),
                         apply_support_dir_template, "Creating template file structure in support submodule", use_git)
 
-        create_component(device_info, branch, IOC_ROOT, create_ioc, "Add template IOC", use_git, device_sup_info=device_sup_info, device_count=device_count)
+        create_component(device_info, branch, IOC_ROOT, create_ioc, "Add template IOC", use_git, sup_info=device_sup_info, device_count=device_count)
 
         create_component(device_info, branch, device_sup_info.support_master_dir(), create_test_framework,
                         "Add device to test framework", use_git, unique_name=device_sup_info)
