@@ -5,6 +5,11 @@
 <ioc_details>These are template details</ioc_details>
 <macros>
 <macro name="PORT" pattern="^COM[0-9]+$" description="Serial COM port" hasDefault="NO" />
+<macro name="STOP" pattern="^[0-2]$" description="Serial communication stop bit, defaults to 1." defaultValue="1" hasDefault="YES" />
+<macro name="PARITY" pattern="^(even)|(odd)|(none)$" description="Serial communication parity (Default: none)." defaultValue="none" hasDefault="YES" />
+<macro name="BITS" pattern="^[5-8]$" description="Serial communication number of bits, defaults to 8." defaultValue="8" hasDefault="YES" />
+<macro name="BAUD" pattern="300|600|1200|2400|4800|9600|19200|38400|57600|115200" description="Serial communication baud rate, defaults to 9600." defaultValue="9600" hasDefault="YES"/>
+
 </macros>
 <pvsets>
 </pvsets>
