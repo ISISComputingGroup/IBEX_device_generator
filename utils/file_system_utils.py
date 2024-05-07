@@ -155,35 +155,24 @@ def _add_entry_to_list(text, list_name, entry):
     Returns: The original text with the requested entry added to the named list
 
     """
-    do_not_write = False
-    dirs_list = []
     new_text = []
     last_line = ""
     marker = "{} += ".format(list_name)
-
-    #Add each line that begins with IOCSDIRS or SUPPDIRS, i.e. line, to dirs_list
-    for line in text:
-        if re.match("^{}".format(list_name), line):
-            dirs_list.append(line)
-
-    #Check if any line added to dirs_list has a match with "IOCDIRS/SUPPDIRS += entry",
-    #and if so, set do_not_write to True, to prevent multiple lines of the same IOC
-    for item in dirs_list:
-        if re.search("{}".format(entry), item):
-            print("IOC name already added to {}".format(list_name))
-            do_not_write = True
-            break
     
-    #Go to the end of the list of IOCDIRS/SUPPDIRS += iocname, and add our new IOC
-    if do_not_write == False:
-        for line in text:
-            if marker in last_line and marker not in line:
-                new_text.append(marker + entry + "\n")
-            new_text.append(line)
-            last_line = line
-        return new_text #return Makefile with new entry
-    else:
-        return text #return unedited Makefile
+    new_line = marker + entry + "\n"
+    # Go to the end of the list of IOCDIRS/SUPPDIRS += iocname, and add our new IOC
+    for line in text:
+        if entry in line:
+            # Entry already in the list
+            logging.warn("IOC name already added to {}".format(list_name))
+            return text
+        elif marker in last_line and marker not in line:
+            # We found the end of the list
+            new_text.append(new_line)
+        # Copy rest of the lines into new text as usual
+        new_text.append(line)
+        last_line = line
+    return new_text # return Makefile with new entry
 
 
 def add_to_makefile_list(directory, list_name, entry):
