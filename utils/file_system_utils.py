@@ -2,13 +2,12 @@
 import logging
 from os import access, chmod, W_OK, remove
 from os.path import exists, join
-from os import mkdir as mkdir_external
+from os import makedirs
 from stat import S_IWUSR
 from shutil import rmtree as rmtree_external
 from shutil import copyfile as copyfile_external
 from shutil import copytree as copytree_external
 from utils.command_line_utils import ask_do_step
-import re
 
 
 def replace_in_file(target, substitutions):
@@ -81,15 +80,14 @@ def mkdir(path):
     Args:
         path: The path to the dir to create
     """
-    if exists(path):
+    try:
+        makedirs(path)
+
+    except OSError:
         if ask_do_step("{} already exists. Delete its contents and make it an empty directory?".format(path)):
             rmtree(path)
-            mkdir_external(path)
-        else:
-            pass  # Do nothing if the dir exists and the user requests no deletion
-    else:
-        mkdir_external(path)
-
+            mkdir(path)
+        # Else do nothing if the dir exists and the user requests no deletion
 
 def touch(path, filename):
     """
