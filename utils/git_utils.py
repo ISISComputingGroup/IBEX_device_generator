@@ -95,16 +95,10 @@ class RepoWrapper(object):
         Args:
             branch: Name of the new branch
         """
-        command = []
-        repo = Repo(self._repo.working_tree_dir)
-        wrapper = RepoWrapper(self._repo.working_tree_dir)
-        logging.info("Checking git status of repo {}".format(repo.working_tree_dir))
-        path = "C:\Instrument\Apps\EPICS"
 
-        if repo.is_dirty():
+        logging.info("Checking git status of repo {}".format(self._repo.working_tree_dir))
+        if self._repo.is_dirty():
             try:
-                command = ['git', 'status']
-                wrapper.git_command(command, path)
                 option = int(input(
                     "Repository {} is dirty, clean it? \n"
                     "    0: No clean\n"
@@ -112,7 +106,7 @@ class RepoWrapper(object):
                     "    2: Git submodule update --recursive. This will return all submodules to the tips "
                     "of the branches they are pinned to. In most cases this will return EPICS top to a clean state.\n"
                     "    3: Reset hard to HEAD. All unpushed changes will be lost\n"
-                    "    [Default: 0] ".format(repo.working_tree_dir)))
+                    "    [Default: 0] ".format(self._repo.working_tree_dir)))
                 
             except (ValueError, TypeError):
                 option = 0
@@ -121,19 +115,16 @@ class RepoWrapper(object):
             try:
                 if option == 1:
                     logging.info("Local changes will be stashed")
-                    
-                    command = ['git', 'stash']
-                    wrapper.git_command(command, path)
+                    self._repo.git.stash(include_untracked=True)
 
                 elif option == 2 and ask_do_step(
-                        "Git submodule update --recursive requested. All uncommited changes will be lost. Are you sure?"): 
+                        "Git submodule update --recursive requested. All uncommited changes will be lost. Are you sure?"):
                     command = ['git', 'submodule', 'update', '--recursive', '--init']
-                    wrapper.git_command(command, path)
+                    self.git_command(command, self._repo.working_tree_dir)
                     
                 elif option == 3 and ask_do_step(
                         "Git reset HEAD --hard requested. All unpushed changes will be lost. Are you sure?"):
-                    command = ['git', 'reset', '--hard', 'HEAD']
-                    wrapper.git_command(command, path)
+                    self._repo.git.reset("HEAD", hard=True)
 
                 else:
                     logging.info("No clean requested")
