@@ -7,20 +7,15 @@ from os import path, walk, remove
 import logging
 
 
-def _run_ioc_template_setup(device_info, device_sup_info, device_count):
+def _run_ioc_template_setup(device_info, device_count):
     """
     Runs the EPICS perl scripts associated with IOC creation. Passes in the IBEX type flag to use our own templates
     found in C:\\Instrument\\Apps\\EPICS\\base\\master\\templates
 
     Args:
         device_info: Name-based information about the device
-        device_sup_info: A unique optional name given to the support module
         device_count: How many IOC apps to generate
     """
-    if device_sup_info.ioc_name() == "NONE":
-        for i in device_sup_info:
-            device_sup_info[i] = device_info[i]
-
     if device_count > 99:
         raise ValueError("Cannot generate more than 99 IOCs for a single device")
 
@@ -46,7 +41,7 @@ def _add_template_config_xml(device_info, device_count):
     run_command(["make", "iocstartups"], EPICS)
 
 
-def _replace_macros(device_info, device_sup_info, device_count):
+def _replace_macros(device_info, device_count):
     """
     Replace a couple of templates in the st.cmd with generated names
 
@@ -65,9 +60,9 @@ def _replace_macros(device_info, device_sup_info, device_count):
             if not path.exists(file_containing_macros):
                 AssertionError("Attempting to replace macros before command file has been created")
             replace_in_file(file_containing_macros,
-                            [("_SUPPORT_MACRO_", device_info.ioc_name()),
-                             ("_DB_NAME_", device_sup_info.ioc_name()),
-                             ("_NAME_LOWER_", device_sup_info.support_app_name()),
+                            [("_SUPPORT_MACRO_", device_info.ioc_name),
+                             ("_DB_NAME_", device_info.ioc_name),
+                             ("_NAME_LOWER_", device_info.support_app_name()),
                              ("_01_APP_NAME_", device_info.ioc_app_name(1))])
 
 
@@ -111,7 +106,7 @@ def _add_to_ioc_makefile(name):
     add_to_makefile_list(IOC_ROOT, "IOCDIRS", name)
 
 
-def _add_macro_to_release_file(device_info, device_sup_info):
+def _add_macro_to_release_file(device_info):
     """
     Adds a macro for the support directory to IOC release file
 
@@ -121,10 +116,10 @@ def _add_macro_to_release_file(device_info, device_sup_info):
     logging.info("Adding macro to RELEASE")
     with open(path.join(device_info.ioc_path(), "configure", "RELEASE"), "a") as f:
         f.write("{macro}=$(SUPPORT)/{name}/master\n".format(
-            macro=device_info.ioc_name(), name=device_sup_info.support_app_name()))
+            macro=device_info.ioc_name, name=device_info.support_app_name()))
 
 
-def create_ioc(ioc_info, sup_info, device_count):
+def create_ioc(ioc_info, device_count):
     """
     Creates a vanilla IOC in the EPICS IOC submodule
 
@@ -140,16 +135,16 @@ def create_ioc(ioc_info, sup_info, device_count):
             logging.warning("That was not a valid input, please try again: {}".format(e))
     
     try:
-        _add_to_ioc_makefile(ioc_info.ioc_name())
+        _add_to_ioc_makefile(ioc_info.ioc_name)
         
         mkdir(ioc_info.ioc_path())
 
-        _run_ioc_template_setup(ioc_info, sup_info, device_count)
+        _run_ioc_template_setup(ioc_info, device_count)
         _add_template_config_xml(ioc_info, device_count)
-        _replace_macros(ioc_info, sup_info, device_count)
+        _replace_macros(ioc_info, device_count)
         _clean_up(ioc_info, device_count)
         _build(ioc_info.ioc_path())
-        _add_macro_to_release_file(ioc_info, sup_info)
+        _add_macro_to_release_file(ioc_info)
         
         
     except Exception as e:

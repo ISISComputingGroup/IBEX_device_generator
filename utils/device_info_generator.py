@@ -2,65 +2,69 @@
 from os.path import join
 from system_paths import OPI_RESOURCES, EPICS, EPICS_SUPPORT
 
+class InvalidIOCNameError(Exception):
+    "Raised when IOC name is invalid."
+    pass
 
 class DeviceInfoGenerator(object):
     """
     Generates info used in setting up a device under IBEX based on the name
     """
 
-    def __init__(self, raw_name, unique_name_exists):
+    def __init__(self, ioc_name, device_name):
         """
         Args:
-            raw_name: The raw input name of the device
+            ioc_name: The name of the IOC (Must be between 1 and 8 alphanumeric characters)
+            device_name: The longer, more descriptive name of the device.
+
+        Raises:
+            InvalidIOCNameError: if IOC name is invalid.
         """
-        self._name = raw_name
-        self._ioc_name = None
-        self._unique_name_exists = unique_name_exists
+        if self._is_valid_ioc_name(ioc_name):
+            # Make sure only valid ioc names are allowed
+            self._ioc_name = ioc_name
+        else:
+            raise InvalidIOCNameError
+        
+        self._device_name = device_name # Accept any device name for now
 
-        if unique_name_exists == False:
-            while True:
-                proposed_name = self.ioc_name()
-                if self._is_valid_ioc_name(proposed_name):
-                    break
-                self._name = input(
-                    "Device name, {}, is invalid and produces an invalid IOC name {}. Please enter a valid device name: ".
-                    format(self._name, proposed_name))
+    @property
+    def ioc_name(self):
+        """
+        Returns: The name of the IOC based on the input name. Must be between 1 and 8 characters
+        """
+        return self._ioc_name
 
-    def _lower_case_underscore_separated_name(self):
+    @property
+    def device_name(self):
+        """
+        Returns: The name of the device that can be different to the IOC name.
+        """
+        return self._device_name
+
+    def _lower_case_underscore_separated_ioc_name(self):
         """
         Returns: The name in lower case with spaces replaced by underscores
         """
-        return self._name.lower().replace(" ", "_")
-
-    def _title_case_with_spaces(self):
+        return self._ioc_name.lower().replace(" ", "_")
+    
+    def _lower_case_underscore_separated_device_name(self):
         """
-        Returns: The name of the device in title case with spaces left in
+        Returns: The name in lower case with spaces replaced by underscores
         """
-        return self._name.title()
+        return self._device_name.lower().replace(" ", "_")
 
     def _title_case_no_spaces(self):
         """
         Returns: The name of the device in title case with spaces removed
         """
-        return self._name.title().replace(" ", "")
-
-    def _upper_case_spaces_removed_no_truncation(self):
-        """
-        Returns: The name of the device in upper case but not shortened in any other way
-        """
-        return self._name.upper().replace(" ", "")
-
-    def _original_case_no_spaces(self):
-        """
-        Returns: The name of the device in its original case with spaces removed
-        """
-        return self._name.replace(" ", "")
+        return self._device_name.title().replace(" ", "")
 
     def opi_file_name(self):
         """
         Returns: The name of the OPI file for this device
         """
-        return "{}.opi".format(self._lower_case_underscore_separated_name())
+        return "{}.opi".format(self._lower_case_underscore_separated_ioc_name())
 
     def opi_file_path(self):
         """
@@ -72,13 +76,7 @@ class DeviceInfoGenerator(object):
         """
         Returns: The key used for identifying the OPI in the GUI
         """
-        return self._upper_case_spaces_removed_no_truncation()
-
-    def log_name(self):
-        """
-        Returns: The name of the device used to identify it in the logs
-        """
-        return self._name
+        return self._ioc_name
 
     @staticmethod
     def _is_valid_ioc_name(name):
@@ -95,30 +93,24 @@ class DeviceInfoGenerator(object):
         Returns: An auto-generated valid IOC name
         """
         import re
-        name = re.sub(r'\W+', '', self._name)  # Make alphanumeric
+        name = re.sub(r'\W+', '', self._ioc_name)  # Make alphanumeric
         name = name.upper()
         name = name.replace(' ', '')
         name = name[:8]
         assert self._is_valid_ioc_name(name)
         return name
 
-    def ioc_name(self):
-        """
-        Returns: The name of the IOC based on the input name. Must be between 1 and 8 characters
-        """
-        return self._upper_case_spaces_removed_no_truncation()
-
     def emulator_dir(self):
         """
         Returns: The directory of the Lewis emulator for the device
         """
-        return join(self.support_master_dir(), "system_tests", "lewis_emulators", self._lower_case_underscore_separated_name())
+        return join(self.support_master_dir(), "system_tests", "lewis_emulators", self._lower_case_underscore_separated_ioc_name())
 
     def emulator_name(self):
         """
         Returns: The device name used for the lewis emulator
         """
-        return self._title_case_no_spaces()
+        return self._ioc_name.title().replace(" ", "")
 
     def ioc_path(self):
         """
@@ -127,9 +119,9 @@ class DeviceInfoGenerator(object):
 
         Returns: The path to the IOC
         """
-        return join(EPICS, "ioc", "master", self.ioc_name())
+        return join(EPICS, "ioc", "master", self._ioc_name)
 
-    def ioc_app_name(self, index, auto=False):
+    def ioc_app_name(self, index):
         """
         Args:
             auto: Accept the auto-generated IOC name by default
@@ -137,7 +129,26 @@ class DeviceInfoGenerator(object):
 
         Returns: The name of the application
         """
-        return "{}-IOC-{:02d}".format(self.ioc_name(), index)
+        return "{}-IOC-{:02d}".format(self._ioc_name, index)
+
+    def support_app_name(self):
+        """
+        Returns: The name used to identify the device within the support submodule
+        """
+        return self._lower_case_underscore_separated_device_name()
+
+    def support_app_path(self):
+        """
+        Returns: Path to the support application in device submodule
+        e.g. C:\Instrument\Apps\EPICS\support\gemorc\master\gemorcSup
+        """
+        return join(self.support_master_dir(), "{}Sup".format(self.support_app_name()))
+
+    def support_db_path(self):
+        """
+        Returns: Path to the support DB generated by the makeSupport.pl script
+        """
+        return join(self.support_app_path(), "{}.db".format(self.support_app_name()))
 
     def support_dir(self):
         """
@@ -155,7 +166,7 @@ class DeviceInfoGenerator(object):
         """
         Returns: The name of the support repo for the device
         """
-        return "EPICS-{}".format(self._title_case_no_spaces())
+        return "EPICS-{}".format(self._device_name.replace(" ", "_"))
 
     def support_repo_url(self):
         """
@@ -167,7 +178,7 @@ class DeviceInfoGenerator(object):
         """
         Returns: The name used to identify the device in the IOC test framework
         """
-        return self._lower_case_underscore_separated_name()
+        return self._lower_case_underscore_separated_device_name()
 
     def system_tests_folder_path(self):
         """
@@ -199,25 +210,6 @@ class DeviceInfoGenerator(object):
         """
         return self._title_case_no_spaces()
 
-    def support_app_name(self):
-        """
-        Returns: The name used to identify the device within the support submodule
-        """
-        return self._lower_case_underscore_separated_name()
-
-    def support_app_path(self):
-        """
-        Returns: Path to the support application in device submodule
-        e.g. C:\Instrument\Apps\EPICS\support\gemorc\master\gemorcSup
-        """
-        return join(self.support_master_dir(), "{}Sup".format(self.support_app_name()))
-
-    def support_db_path(self):
-        """
-        Returns: Path to the support DB generated by the makeSupport.pl script
-        """
-        return join(self.support_app_path(), "{}.db".format(self.support_app_name()))
-
     def ioc_boot_path(self, index):
         """
         Args:
@@ -235,3 +227,9 @@ class DeviceInfoGenerator(object):
         Returns: Path to the ioc source directory
         """
         return join(self.ioc_path(), "{}App".format(self.ioc_app_name(index)), "src")
+    
+    def log_name(self):
+        """
+        Returns: The name of the device used to identify it in the logs
+        """
+        return self._ioc_name
