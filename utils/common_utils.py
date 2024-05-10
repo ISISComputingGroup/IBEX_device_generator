@@ -33,10 +33,7 @@ def create_component(device, branch, path, action, commit_message, use_git, **kw
         yield
 
         if repo is not None:
-            try:
-                repo.push_all_changes(commit_message)
-            except Exception as e:
-                logging.warning(e)
+            repo.push_all_changes(commit_message)
 
     try:
         with _git_operations():
