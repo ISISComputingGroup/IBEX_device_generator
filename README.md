@@ -5,12 +5,13 @@ Have EPICS Terminal open for this (You can obtain it for example using C:\Instru
 Run the script (e.g. in C:\Instrument\Dev\IBEX_device_generator) with the following command
 
 ```
-%python3% IBEX_device_generator.py --name=[NAME] --ticket=[TICKET] --device_count=2 --use_git --github_token[TOKEN]
+%python3% IBEX_device_generator.py --ioc_name=[NAME] --device_name=[DEVICE] --ticket=[TICKET] --device_count=2 --use_git --github_token[TOKEN]
 ```
 
 where:
 
-- **name**: the name of the device. It is used of generating the name of the IOC, the branches it creates, the device emulator etc.
+- **ioc_name**: the name of the IOC. It is used of generating the PV structure etc.
+- **device_name**: the name of the device. It is used of generating the support module directory, the repository, the device emulator etc. (This is optional and if omitted will just mirror **ioc_name**)
 - **ticket**: is the ticket number. It is used for naming the branches created during the script.
 - **device_count**: the number of IOCs to generate. This argument is optional and defaults to 2.
 - **use_git**: use to create relevant branches. Remote repository must exist.
