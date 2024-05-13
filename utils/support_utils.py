@@ -25,9 +25,13 @@ def create_submodule(device_info, create_submodule_in_git):
         device_info: Provides name-based information about the device
         create_submodule_in_git: True then create submodule in git; False do not do this operation
     """
-    mkdir(device_info.support_dir())
-    copyfile(SUPPORT_MAKEFILE, path.join(device_info.support_dir(), "Makefile"))
-    master_dir = device_info.support_master_dir()
+    try:
+        mkdir(device_info.support_dir())
+        copyfile(SUPPORT_MAKEFILE, path.join(device_info.support_dir(), "Makefile"))
+        master_dir = device_info.support_master_dir()
+    except Exception as e:
+        logging.error(str(e))
+
     if create_submodule_in_git:
         if path.isdir(path.join(master_dir, ".git")):
             logging.error("A git repository (not submodule) already exists at {0}."
@@ -48,13 +52,17 @@ def apply_support_dir_template(device_info):
     Args:
         device_info: Provides name-based information about the device
     """
-    mkdir(device_info.support_master_dir())
-    cmd = [PERL, PERL_SUPPORT_GENERATOR, "-t", "streamSCPI", device_info.support_app_name()]
-    run_command(cmd, device_info.support_master_dir())
+    try:
+        mkdir(device_info.support_master_dir())
+        cmd = [PERL, PERL_SUPPORT_GENERATOR, "-t", "streamSCPI", device_info.support_app_name()]
+        run_command(cmd, device_info.support_master_dir())
+    except Exception as e:
+        logging.error(str(e))
+
     if not path.exists(device_info.support_db_path()):
         logging.warning("The makeSupport.pl didn't run correctly. It's very temperamental. "
-                        "Please run the following command manually from an EPICS terminal")
-        logging.warning("cd {} && {}".format(device_info.support_master_dir(), " ".join(cmd)))
+                        "Please run the following command manually from an EPICS terminal: "
+                        "cd {} && {}".format(device_info.support_master_dir(), " ".join(cmd)))
         input("Press return to continue...")
 
     # Some manual tweaks to the auto template

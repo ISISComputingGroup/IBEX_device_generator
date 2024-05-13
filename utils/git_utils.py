@@ -28,39 +28,65 @@ class RepoWrapper(object):
             self.add_initial_commit()
         except Exception as e:
             raise RuntimeError("Unable to attach to git repository at path {}: {}".format(path, e))
+        
+    def git_command(self, command, path):
+        try:
+            subprocess.run(command, cwd=path,  shell=True)  
+        except subprocess.CalledProcessError as e:
+            print("Error:", e)
 
-    def prepare_new_branch(self, branch):
+
+    def clean_repo(self):
         """
-        Args:
-            branch: Name of the new branch
+        Returns True if repo status is clean, False if otherwise
         """
-        logging.info("Preparing new branch, {}, for repo {}".format(branch, self._repo.working_tree_dir))
+        logging.info("Checking git status of repo {}".format(self._repo.working_tree_dir))
+
         if self._repo.is_dirty():
             try:
                 option = int(input(
                     "Repository {} is dirty, clean it? \n"
                     "    0: No clean\n"
                     "    1: Stash uncommited changes\n"
-                    "    2: Clean (-fd). All uncommited changes will be lost\n"
+                    "    2: Git submodule update --recursive. This will return all submodules to the tips "
+                    "of the branches they are pinned to. In most cases this will return EPICS top to a clean state.\n"
                     "    3: Reset hard to HEAD. All unpushed changes will be lost\n"
                     "    [Default: 0] ".format(self._repo.working_tree_dir)))
+                
             except (ValueError, TypeError):
                 option = 0
+
             logging.info("Option {} selected".format(option))
+
             try:
                 if option == 1:
                     logging.info("Local changes will be stashed")
                     self._repo.git.stash(include_untracked=True)
+
                 elif option == 2 and ask_do_step(
-                        "Git clean -fd requested. All uncommited changes will be lost. Are you sure?"):
-                    self._repo.git.clean(f=True, d=True)
+                        "Git submodule update --recursive requested. All uncommited changes will be lost. Are you sure?"):
+                    command = ['git', 'submodule', 'update', '--recursive', '--init']
+                    self.git_command(command, self._repo.working_tree_dir)
+                    
                 elif option == 3 and ask_do_step(
                         "Git reset HEAD --hard requested. All unpushed changes will be lost. Are you sure?"):
                     self._repo.git.reset("HEAD", hard=True)
+
                 else:
                     logging.info("No clean requested")
+
             except GitCommandError as e:
-                logging.warning("Error whilst scrubbing repository. I'll try to continue anyway: {}").format(e)
+                logging.warning("Error whilst scrubbing repository. I'll try to continue anyway: {}".format(e))
+        else:
+            logging.info("Repo {} is clean.".format(self._repo.working_tree_dir))
+
+    def prepare_new_branch(self, branch):
+        """
+        Args:
+            branch: Name of the new branch
+        """
+
+        self.clean_repo()
 
         try:
             logging.info("Switching repo {} to master/main and fetching latest changes".format(self._repo.working_tree_dir))
@@ -119,7 +145,7 @@ class RepoWrapper(object):
                 self._repo.git.push(recurse_submodule="check")
                 logging.info("{} files pushed to {}: {}".format(n_files, self._repo.active_branch, message))
             else:
-                logging.warn("Commit aborted. No files changed")
+                return logging.warn("Commit aborted. No files changed")
         except GitCommandError as e:
             raise RuntimeError("Error whilst pushing changes to git, {}".format(e))
 

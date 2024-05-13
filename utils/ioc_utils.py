@@ -60,8 +60,8 @@ def _replace_macros(device_info, device_count):
             if not path.exists(file_containing_macros):
                 AssertionError("Attempting to replace macros before command file has been created")
             replace_in_file(file_containing_macros,
-                            [("_SUPPORT_MACRO_", device_info.ioc_name()),
-                             ("_DB_NAME_", device_info.ioc_name()),
+                            [("_SUPPORT_MACRO_", device_info.ioc_name),
+                             ("_DB_NAME_", device_info.ioc_name),
                              ("_NAME_LOWER_", device_info.support_app_name()),
                              ("_01_APP_NAME_", device_info.ioc_app_name(1))])
 
@@ -116,10 +116,10 @@ def _add_macro_to_release_file(device_info):
     logging.info("Adding macro to RELEASE")
     with open(path.join(device_info.ioc_path(), "configure", "RELEASE"), "a") as f:
         f.write("{macro}=$(SUPPORT)/{name}/master\n".format(
-            macro=device_info.ioc_name(), name=device_info.support_app_name()))
+            macro=device_info.ioc_name, name=device_info.support_app_name()))
 
 
-def create_ioc(device_info, device_count):
+def create_ioc(ioc_info, device_count):
     """
     Creates a vanilla IOC in the EPICS IOC submodule
 
@@ -133,13 +133,19 @@ def create_ioc(device_info, device_count):
                                          " between 1 and 9. Please enter a new value: ".format(device_count)))
         except (ValueError, TypeError) as e:
             logging.warning("That was not a valid input, please try again: {}".format(e))
+    
+    try:
+        _add_to_ioc_makefile(ioc_info.ioc_name)
+        
+        mkdir(ioc_info.ioc_path())
 
-    mkdir(device_info.ioc_path())
-
-    _run_ioc_template_setup(device_info, device_count)
-    _add_template_config_xml(device_info, device_count)
-    _replace_macros(device_info, device_count)
-    _clean_up(device_info, device_count)
-    _build(device_info.ioc_path())
-    _add_to_ioc_makefile(device_info.ioc_name())
-    _add_macro_to_release_file(device_info)
+        _run_ioc_template_setup(ioc_info, device_count)
+        _add_template_config_xml(ioc_info, device_count)
+        _replace_macros(ioc_info, device_count)
+        _clean_up(ioc_info, device_count)
+        _build(ioc_info.ioc_path())
+        _add_macro_to_release_file(ioc_info)
+        
+        
+    except Exception as e:
+        logging.error(str(e))

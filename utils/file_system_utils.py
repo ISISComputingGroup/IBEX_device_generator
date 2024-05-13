@@ -2,7 +2,7 @@
 import logging
 from os import access, chmod, W_OK, remove
 from os.path import exists, join
-from os import mkdir as mkdir_external
+from os import makedirs
 from stat import S_IWUSR
 from shutil import rmtree as rmtree_external
 from shutil import copyfile as copyfile_external
@@ -80,15 +80,14 @@ def mkdir(path):
     Args:
         path: The path to the dir to create
     """
-    if exists(path):
-        if ask_do_step("{} already exists. Delete it?".format(path)):
-            rmtree(path)
-            mkdir_external(path)
-        else:
-            pass  # Do nothing if the dir exists and the user requests no deletion
-    else:
-        mkdir_external(path)
+    try:
+        makedirs(path)
 
+    except OSError:
+        if ask_do_step("{} already exists. Delete its contents and make it an empty directory?".format(path)):
+            rmtree(path)
+            mkdir(path)
+        # Else do nothing if the dir exists and the user requests no deletion
 
 def touch(path, filename):
     """
@@ -143,6 +142,9 @@ def _copy(src, dst, remove_func, copy_func):
 
 def _add_entry_to_list(text, list_name, entry):
     """
+    Check if IOC name has already been added to support/Makefile or ioc/master/Makefile, 
+    and add it at the end of IOC | SUPP DIRS list if it isn't there already.
+
     Args:
         text: The original text
         list_name: The name of the list to add to
@@ -154,12 +156,21 @@ def _add_entry_to_list(text, list_name, entry):
     new_text = []
     last_line = ""
     marker = "{} += ".format(list_name)
+    
+    new_line = marker + entry + "\n"
+    # Go to the end of the list of IOCDIRS/SUPPDIRS += iocname, and add our new IOC
     for line in text:
-        if marker in last_line and marker not in line:
-            new_text.append(marker + entry + "\n")
+        if entry in line:
+            # Entry already in the list
+            logging.warn("IOC name already added to {}".format(list_name))
+            return text
+        elif marker in last_line and marker not in line:
+            # We found the end of the list
+            new_text.append(new_line)
+        # Copy rest of the lines into new text as usual
         new_text.append(line)
         last_line = line
-    return new_text
+    return new_text # return Makefile with new entry
 
 
 def add_to_makefile_list(directory, list_name, entry):
