@@ -63,7 +63,6 @@ def apply_support_dir_template(device_info):
         logging.warning("The makeSupport.pl didn't run correctly. It's very temperamental. "
                         "Please run the following command manually from an EPICS terminal: "
                         "cd {} && {}".format(device_info.support_master_dir(), " ".join(cmd)))
-        #logging("cd {} && {}".format(device_info.support_master_dir(), " ".join(cmd)))
         input("Press return to continue...")
 
     # Some manual tweaks to the auto template
