@@ -5,7 +5,7 @@ Have EPICS Terminal open for this (You can obtain it for example using C:\Instru
 Run the script (e.g. in C:\Instrument\Dev\IBEX_device_generator) with the following command
 
 ```
-%python3% IBEX_device_generator.py --ioc_name=[NAME] --device_name=[DEVICE] --ticket=[TICKET] --device_count=2 --use_git --github_token[TOKEN]
+%python3% IBEX_device_generator.py --ioc_name=[NAME] --device_name=[DEVICE] --ticket=[TICKET] --device_count=2 --use_git --github_token [TOKEN]
 ```
 
 where:
